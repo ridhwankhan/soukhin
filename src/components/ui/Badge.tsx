@@ -5,20 +5,24 @@ interface BadgeProps {
   size?: 'sm' | 'md';
 }
 
-const badgeStyles: Record<ProductBadge, { bg: string; text: string; label: string; labelBn: string }> = {
-  'new': { bg: 'bg-[#1B4332]', text: 'text-white', label: 'New', labelBn: 'নতুন' },
-  'eid-collection': { bg: 'bg-[#B8860B]', text: 'text-white', label: 'Eid Collection', labelBn: 'ঈদ সংগ্রহ' },
-  'best-seller': { bg: 'bg-[#C2704A]', text: 'text-white', label: 'Best Seller', labelBn: 'সেরা বিক্রিত' },
-  'pre-order': { bg: 'bg-[#666666]', text: 'text-white', label: 'Pre-order', labelBn: 'প্রি-অর্ডার' },
+const badgeConfig: Record<ProductBadge, { bg: string; text: string; label: string }> = {
+  'new':           { bg: 'bg-[#1B4332]',  text: 'text-white',        label: 'New' },
+  'eid-collection':{ bg: 'bg-[#9A7535]',  text: 'text-white',        label: 'Eid' },
+  'best-seller':   { bg: 'bg-[#B5603E]',  text: 'text-white',        label: 'Best Seller' },
+  'pre-order':     { bg: 'bg-[#4A4A4A]',  text: 'text-white',        label: 'Pre-order' },
 };
 
 export default function Badge({ badge, size = 'md' }: BadgeProps) {
-  const style = badgeStyles[badge];
-  const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-3 py-1 text-sm';
+  const config = badgeConfig[badge];
+  if (!config) return null;
 
   return (
-    <span className={`${style.bg} ${style.text} ${sizeClasses} rounded-sm font-medium`}>
-      {style.label}
+    <span
+      className={`${config.bg} ${config.text} font-semibold tracking-wide inline-block leading-none ${
+        size === 'sm' ? 'text-[9px] px-1.5 py-0.5' : 'text-[10px] px-2 py-1'
+      }`}
+    >
+      {config.label}
     </span>
   );
 }

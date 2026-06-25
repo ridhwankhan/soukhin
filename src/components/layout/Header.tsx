@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ShoppingBag, Heart, Search, User, ChevronDown } from 'lucide-react';
-import { NAV_LINKS, NAV_DROPDOWNS, BRAND_CONFIG } from '../../config';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Menu, X, ShoppingBag, Heart, Search, ChevronDown } from 'lucide-react';
+import { NAV_LINKS, NAV_DROPDOWNS, BRAND_CONFIG, SITE_SETTINGS } from '../../config';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 
@@ -16,18 +16,16 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [expandedMobileMenus, setExpandedMobileMenus] = useState<string[]>([]);
+  const [expandedMobile, setExpandedMobile] = useState<string[]>([]);
   const location = useLocation();
   const { getItemCount } = useCart();
   const { items: wishlistItems } = useWishlist();
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   useEffect(() => {
@@ -36,56 +34,55 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
   }, [location]);
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+    const handler = (e: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
         setActiveDropdown(null);
       }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const toggleMobileSubmenu = (label: string) => {
-    setExpandedMobileMenus(prev =>
-      prev.includes(label) ? prev.filter(m => m !== label) : [...prev, label]
-    );
-  };
-
-  const getDropdownContent = (slug: string) => {
+  const getDropdown = (slug: string) => {
     const key = slug.replace('/category/', '');
     return NAV_DROPDOWNS[key as keyof typeof NAV_DROPDOWNS];
   };
 
+  const toggleMobile = (label: string) => {
+    setExpandedMobile(prev =>
+      prev.includes(label) ? prev.filter(m => m !== label) : [...prev, label]
+    );
+  };
+
+  const cartCount = getItemCount();
+  const wishCount = wishlistItems.length;
+
   return (
-    <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-      scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'
-    }`}>
-      {/* Announcement bar */}
-      <div className="bg-[#1B4332] text-white text-center py-2 text-sm">
-        <span>Free delivery on orders over ৳2000 | Use code: SOUKHIN10</span>
+    <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? 'bg-white shadow-[0_1px_0_0_#E2D9CF]' : 'bg-white'}`}>
+      {/* Announcement */}
+      <div className="bg-[#1B4332] text-white/90 text-center py-2 text-xs tracking-wide">
+        {SITE_SETTINGS.announcementBar}
       </div>
 
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 md:h-20">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" ref={navRef}>
+        <div className="flex items-center justify-between h-[60px] md:h-[68px]">
+
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-[#1B4332] rounded-sm flex items-center justify-center">
-              <span className="text-white font-serif text-xl font-bold">শ</span>
+          <Link to="/" className="flex items-center gap-2.5 flex-shrink-0" aria-label="Soukhin home">
+            <div className="w-9 h-9 bg-[#1B4332] flex items-center justify-center">
+              <span className="text-white font-serif text-lg font-bold leading-none">শ</span>
             </div>
-            <div className="hidden sm:block">
-              <span className={`font-serif text-xl font-semibold transition-colors ${
-                scrolled ? 'text-[#1B4332]' : 'text-[#1B4332]'
-              }`}>{BRAND_CONFIG.name}</span>
-              <p className={`text-xs transition-colors ${
-                scrolled ? 'text-[#666666]' : 'text-[#666666]'
-              }`}>{BRAND_CONFIG.nameBn}</p>
+            <div className="leading-none">
+              <span className="font-serif text-[1.15rem] font-semibold text-[#1A1A1A] tracking-tight">{BRAND_CONFIG.name}</span>
+              <p className="text-[10px] text-[#7A7A7A] font-bengali mt-0.5">{BRAND_CONFIG.taglineBn}</p>
             </div>
           </Link>
 
-          {/* Desktop Nav with Dropdowns */}
-          <div className="hidden lg:flex items-center gap-6" ref={dropdownRef}>
+          {/* Desktop Nav */}
+          <div className="hidden lg:flex items-center gap-0.5">
             {NAV_LINKS.map(link => {
-              const dropdownContent = link.hasDropdown ? getDropdownContent(link.href) : null;
+              const dropdown = link.hasDropdown ? getDropdown(link.href) : null;
+              const isActive = location.pathname === link.href || (link.href !== '/' && location.pathname.startsWith(link.href));
 
               return (
                 <div
@@ -96,48 +93,44 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
                 >
                   <Link
                     to={link.href}
-                    className={`flex items-center gap-1 text-sm font-medium transition-colors hover:text-[#1B4332] ${
-                      location.pathname === link.href || (link.href !== '/' && location.pathname.startsWith(link.href))
-                        ? 'text-[#1B4332]'
-                        : scrolled ? 'text-[#2D2D2D]' : 'text-[#2D2D2D]'
+                    className={`flex items-center gap-0.5 px-3.5 py-2 text-sm font-medium transition-colors duration-150 rounded-sm ${
+                      isActive ? 'text-[#1B4332]' : 'text-[#4A4A4A] hover:text-[#1B4332]'
                     }`}
                   >
                     {link.label}
                     {link.hasDropdown && (
-                      <ChevronDown className={`w-4 h-4 transition-transform ${
-                        activeDropdown === link.href ? 'rotate-180' : ''
-                      }`} />
+                      <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-150 ${activeDropdown === link.href ? 'rotate-180' : ''}`} />
                     )}
                   </Link>
 
-                  {/* Mega Menu Dropdown */}
                   <AnimatePresence>
-                    {link.hasDropdown && activeDropdown === link.href && dropdownContent && (
+                    {link.hasDropdown && activeDropdown === link.href && dropdown && (
                       <motion.div
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-max"
+                        exit={{ opacity: 0, y: 6 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50"
                       >
-                        <div className="bg-white rounded-lg shadow-xl border border-gray-100 p-6 flex gap-8">
-                          {Object.entries(dropdownContent).map(([section, items]) => (
+                        <div className="bg-white border border-[#E2D9CF] shadow-lg p-5 flex gap-8 min-w-max">
+                          {Object.entries(dropdown).map(([section, items]) => (
                             <div key={section}>
-                              <h3 className="text-xs font-semibold text-[#1B4332] uppercase tracking-wider mb-3 border-b border-[#1B4332]/20 pb-2">
+                              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#9A7535] mb-3 pb-2 border-b border-[#E2D9CF]">
                                 {section}
-                              </h3>
-                              <div className="space-y-2">
-                                {items.map((item) => (
-                                  <Link
-                                    key={item.href}
-                                    to={item.href}
-                                    className="block text-sm text-[#2D2D2D] hover:text-[#1B4332] py-1 transition-colors"
-                                  >
-                                    <span>{item.label}</span>
-                                    <span className="text-xs text-[#999999] ml-1">{item.labelBn}</span>
-                                  </Link>
+                              </p>
+                              <ul className="space-y-1.5">
+                                {items.map(item => (
+                                  <li key={item.href}>
+                                    <Link
+                                      to={item.href}
+                                      className="flex items-baseline gap-1.5 text-sm text-[#4A4A4A] hover:text-[#1B4332] transition-colors duration-100 py-0.5"
+                                    >
+                                      <span>{item.label}</span>
+                                      <span className="text-[11px] text-[#9A9A9A] font-bengali">{item.labelBn}</span>
+                                    </Link>
+                                  </li>
                                 ))}
-                              </div>
+                              </ul>
                             </div>
                           ))}
                         </div>
@@ -150,49 +143,45 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-center gap-1">
             <button
               onClick={onSearchToggle}
-              className="p-2 hover:bg-[#F5F0E8] rounded-full transition-colors"
+              aria-label="Search"
+              className={`p-2 rounded-sm transition-colors ${searchOpen ? 'bg-[#F5F0E8] text-[#1B4332]' : 'text-[#4A4A4A] hover:bg-[#F5F0E8] hover:text-[#1B4332]'}`}
             >
-              <Search className="w-5 h-5 text-[#2D2D2D]" />
+              <Search className="w-[18px] h-[18px]" />
             </button>
 
             <Link
               to="/wishlist"
-              className="p-2 hover:bg-[#F5F0E8] rounded-full transition-colors relative"
+              aria-label={`Wishlist${wishCount ? `, ${wishCount} items` : ''}`}
+              className="relative p-2 rounded-sm text-[#4A4A4A] hover:bg-[#F5F0E8] hover:text-[#1B4332] transition-colors"
             >
-              <Heart className="w-5 h-5 text-[#2D2D2D]" />
-              {wishlistItems.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#C2704A] text-white text-xs rounded-full flex items-center justify-center">
-                  {wishlistItems.length}
+              <Heart className="w-[18px] h-[18px]" />
+              {wishCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#B5603E] text-white text-[9px] font-semibold rounded-full flex items-center justify-center">
+                  {wishCount > 9 ? '9+' : wishCount}
                 </span>
               )}
             </Link>
 
             <button
               onClick={onCartClick}
-              className="p-2 hover:bg-[#F5F0E8] rounded-full transition-colors relative"
+              aria-label={`Cart${cartCount ? `, ${cartCount} items` : ''}`}
+              className="relative p-2 rounded-sm text-[#4A4A4A] hover:bg-[#F5F0E8] hover:text-[#1B4332] transition-colors"
             >
-              <ShoppingBag className="w-5 h-5 text-[#2D2D2D]" />
-              {getItemCount() > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#1B4332] text-white text-xs rounded-full flex items-center justify-center">
-                  {getItemCount()}
+              <ShoppingBag className="w-[18px] h-[18px]" />
+              {cartCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#1B4332] text-white text-[9px] font-semibold rounded-full flex items-center justify-center">
+                  {cartCount > 9 ? '9+' : cartCount}
                 </span>
               )}
             </button>
 
-            <Link
-              to="/admin"
-              className="hidden md:block p-2 hover:bg-[#F5F0E8] rounded-full transition-colors"
-            >
-              <User className="w-5 h-5 text-[#2D2D2D]" />
-            </Link>
-
-            {/* Mobile menu button */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 hover:bg-[#F5F0E8] rounded-full transition-colors"
+              onClick={() => setMobileMenuOpen(v => !v)}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              className="lg:hidden p-2 rounded-sm text-[#4A4A4A] hover:bg-[#F5F0E8] transition-colors ml-1"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -207,30 +196,25 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-white border-t border-[#F5F0E8] max-h-[80vh] overflow-y-auto"
+            transition={{ duration: 0.2 }}
+            className="lg:hidden bg-white border-t border-[#E2D9CF] overflow-hidden"
           >
-            <div className="px-4 py-4">
+            <nav className="px-4 py-3 max-h-[75vh] overflow-y-auto">
               {NAV_LINKS.map(link => {
-                const dropdownContent = link.hasDropdown ? getDropdownContent(link.href) : null;
-                const isExpanded = expandedMobileMenus.includes(link.label);
+                const dropdown = link.hasDropdown ? getDropdown(link.href) : null;
+                const isExpanded = expandedMobile.includes(link.label);
+                const isActive = location.pathname === link.href || (link.href !== '/' && location.pathname.startsWith(link.href));
 
                 return (
-                  <div key={link.href}>
-                    {link.hasDropdown && dropdownContent ? (
+                  <div key={link.href} className="border-b border-[#F5F0E8] last:border-0">
+                    {dropdown ? (
                       <>
                         <button
-                          onClick={() => toggleMobileSubmenu(link.label)}
-                          className={`w-full flex items-center justify-between px-4 py-3 rounded-sm text-sm font-medium transition-colors ${
-                            location.pathname.startsWith(link.href)
-                              ? 'bg-[#1B4332] text-white'
-                              : 'hover:bg-[#F5F0E8]'
-                          }`}
+                          onClick={() => toggleMobile(link.label)}
+                          className={`w-full flex items-center justify-between px-2 py-3.5 text-sm font-medium transition-colors ${isActive ? 'text-[#1B4332]' : 'text-[#4A4A4A]'}`}
                         >
-                          <span>
-                            <span>{link.label}</span>
-                            <span className="ml-2 text-xs opacity-70">{link.labelBn}</span>
-                          </span>
-                          <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                          <span>{link.label}</span>
+                          <ChevronDown className={`w-4 h-4 transition-transform duration-150 ${isExpanded ? 'rotate-180' : ''}`} />
                         </button>
                         <AnimatePresence>
                           {isExpanded && (
@@ -238,25 +222,24 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: 'auto', opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
-                              className="overflow-hidden bg-[#F8F6F3] ml-4 rounded-md my-1"
+                              className="overflow-hidden"
                             >
-                              {Object.entries(dropdownContent).map(([section, items]) => (
-                                <div key={section} className="py-2">
-                                  <p className="px-4 text-xs font-semibold text-[#1B4332] uppercase tracking-wider mb-1">
-                                    {section}
-                                  </p>
-                                  {items.map((item) => (
-                                    <Link
-                                      key={item.href}
-                                      to={item.href}
-                                      className="block px-4 py-2 text-sm text-[#2D2D2D] hover:text-[#1B4332] hover:bg-white transition-colors"
-                                    >
-                                      {item.label}
-                                      <span className="text-xs text-[#999999] ml-1">{item.labelBn}</span>
-                                    </Link>
-                                  ))}
-                                </div>
-                              ))}
+                              <div className="pb-3 pl-4">
+                                {Object.entries(dropdown).map(([section, items]) => (
+                                  <div key={section} className="mb-3">
+                                    <p className="text-[10px] font-semibold uppercase tracking-widest text-[#9A7535] mb-1.5">{section}</p>
+                                    {items.map(item => (
+                                      <Link
+                                        key={item.href}
+                                        to={item.href}
+                                        className="block py-1.5 text-sm text-[#4A4A4A] hover:text-[#1B4332]"
+                                      >
+                                        {item.label}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                ))}
+                              </div>
                             </motion.div>
                           )}
                         </AnimatePresence>
@@ -264,26 +247,21 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
                     ) : (
                       <Link
                         to={link.href}
-                        className={`block px-4 py-3 rounded-sm text-sm font-medium transition-colors ${
-                          location.pathname === link.href
-                            ? 'bg-[#1B4332] text-white'
-                            : 'hover:bg-[#F5F0E8]'
-                        }`}
+                        className={`flex items-center justify-between px-2 py-3.5 text-sm font-medium transition-colors ${isActive ? 'text-[#1B4332]' : 'text-[#4A4A4A]'}`}
                       >
-                        <span>{link.label}</span>
-                        <span className="ml-2 text-xs opacity-70">{link.labelBn}</span>
+                        {link.label}
                       </Link>
                     )}
                   </div>
                 );
               })}
-              <Link
-                to="/admin"
-                className="block px-4 py-3 rounded-sm text-sm font-medium hover:bg-[#F5F0E8] mt-2 border-t border-[#F5F0E8] pt-4"
-              >
-                Admin Dashboard
-              </Link>
-            </div>
+
+              <div className="pt-3 pb-1 border-t border-[#E2D9CF] mt-1">
+                <Link to="/admin" className="block px-2 py-3 text-sm text-[#7A7A7A] hover:text-[#1B4332] transition-colors">
+                  Admin
+                </Link>
+              </div>
+            </nav>
           </motion.div>
         )}
       </AnimatePresence>

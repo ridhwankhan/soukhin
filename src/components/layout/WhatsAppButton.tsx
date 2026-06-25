@@ -1,31 +1,18 @@
-import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 import { WHATSAPP_NUMBER } from '../../config';
 
 export default function WhatsAppButton() {
-  const phoneNumber = WHATSAPP_NUMBER || '880XXXXXXXXXX';
-
-  const handleClick = () => {
-    if (!WHATSAPP_NUMBER) {
-      alert('WhatsApp number not configured. Please add your number in src/config/site.ts');
-      return;
-    }
-    window.open(`https://wa.me/${phoneNumber}`, '_blank');
-  };
+  if (!WHATSAPP_NUMBER) return null;
 
   return (
-    <motion.button
-      onClick={handleClick}
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      className="fixed bottom-6 right-6 z-40 p-4 bg-[#25D366] text-white rounded-full shadow-lg hover:shadow-xl transition-shadow"
-      aria-label="Contact on WhatsApp"
+    <a
+      href={`https://wa.me/${WHATSAPP_NUMBER}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Chat on WhatsApp"
+      className="fixed bottom-6 right-6 z-40 flex items-center justify-center w-12 h-12 bg-[#25D366] text-white shadow-lg hover:shadow-xl hover:scale-[1.04] transition-all duration-200"
     >
-      <MessageCircle className="w-7 h-7" fill="white" />
-      <span className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full animate-ping" />
-      <span className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full" />
-    </motion.button>
+      <MessageCircle className="w-5 h-5 fill-white" />
+    </a>
   );
 }

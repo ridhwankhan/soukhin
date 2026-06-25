@@ -52,7 +52,8 @@ function CustomerLayout({ children }: { children: React.ReactNode }) {
         searchOpen={searchOpen}
         onSearchToggle={() => setSearchOpen(!searchOpen)}
       />
-      <main className="flex-1 pt-[88px] md:pt-[108px]">
+      {/* 32px announcement + 60px/68px nav */}
+      <main className="flex-1 pt-[92px] md:pt-[100px]">
         {children}
       </main>
       <Footer />
@@ -70,56 +71,16 @@ function App() {
         <Router>
           <Routes>
             {/* Customer Routes */}
-            <Route path="/" element={
-              <CustomerLayout>
-                <HomePage />
-              </CustomerLayout>
-            } />
-            <Route path="/category/:slug" element={
-              <CustomerLayout>
-                <CategoryPage />
-              </CustomerLayout>
-            } />
-            <Route path="/wishlist" element={
-              <CustomerLayout>
-                <WishlistPage />
-              </CustomerLayout>
-            } />
-            <Route path="/checkout" element={
-              <CustomerLayout>
-                <CheckoutPage />
-              </CustomerLayout>
-            } />
-            <Route path="/about" element={
-              <CustomerLayout>
-                <AboutPage />
-              </CustomerLayout>
-            } />
-            <Route path="/contact" element={
-              <CustomerLayout>
-                <ContactPage />
-              </CustomerLayout>
-            } />
-            <Route path="/faq" element={
-              <CustomerLayout>
-                <FAQPage />
-              </CustomerLayout>
-            } />
-            <Route path="/return-exchange" element={
-              <CustomerLayout>
-                <ReturnExchangePage />
-              </CustomerLayout>
-            } />
-            <Route path="/privacy" element={
-              <CustomerLayout>
-                <PrivacyPage />
-              </CustomerLayout>
-            } />
-            <Route path="/terms" element={
-              <CustomerLayout>
-                <TermsPage />
-              </CustomerLayout>
-            } />
+            <Route path="/" element={<CustomerLayout><HomePage /></CustomerLayout>} />
+            <Route path="/category/:slug" element={<CustomerLayout><CategoryPage /></CustomerLayout>} />
+            <Route path="/wishlist" element={<CustomerLayout><WishlistPage /></CustomerLayout>} />
+            <Route path="/checkout" element={<CustomerLayout><CheckoutPage /></CustomerLayout>} />
+            <Route path="/about" element={<CustomerLayout><AboutPage /></CustomerLayout>} />
+            <Route path="/contact" element={<CustomerLayout><ContactPage /></CustomerLayout>} />
+            <Route path="/faq" element={<CustomerLayout><FAQPage /></CustomerLayout>} />
+            <Route path="/return-exchange" element={<CustomerLayout><ReturnExchangePage /></CustomerLayout>} />
+            <Route path="/privacy" element={<CustomerLayout><PrivacyPage /></CustomerLayout>} />
+            <Route path="/terms" element={<CustomerLayout><TermsPage /></CustomerLayout>} />
 
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>
@@ -131,9 +92,9 @@ function App() {
               <Route path="customers" element={<CustomersPage />} />
               <Route path="reviews" element={<ReviewsPage />} />
               <Route path="coupons" element={<CouponsPage />} />
-              <Route path="banners" element={<div className="p-8 text-center">Banners Management - Coming Soon</div>} />
-              <Route path="hero" element={<div className="p-8 text-center">Hero Section Editor - Coming Soon</div>} />
-              <Route path="announcements" element={<div className="p-8 text-center">Announcements Editor - Coming Soon</div>} />
+              <Route path="banners" element={<div className="p-8 text-center text-[#7A7A7A]">Banners — Coming Soon</div>} />
+              <Route path="hero" element={<div className="p-8 text-center text-[#7A7A7A]">Hero Editor — Coming Soon</div>} />
+              <Route path="announcements" element={<div className="p-8 text-center text-[#7A7A7A]">Announcements — Coming Soon</div>} />
               <Route path="messages" element={<MessagesPage />} />
               <Route path="settings/payment" element={<PaymentSettingsPage />} />
               <Route path="settings/delivery" element={<DeliverySettingsPage />} />
