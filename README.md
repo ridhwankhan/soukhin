@@ -2,7 +2,7 @@
 
 [![Repository](https://img.shields.io/badge/GitHub-ridhwankhan%2Fsoukhin-1B4332?style=flat-square&logo=github)](https://github.com/ridhwankhan/soukhin)
 
-> **Status: Initial draft outline complete** — storefront, admin dashboard, and Supabase schema are scaffolded with mock data. Payment gateways, WhatsApp, and production backend wiring are next.
+> **Status: v1.2** — Auth flows, profile page, announcements, product labels, and redesigned storefront/admin UI. Payment gateways, WhatsApp, and production backend wiring are next.
 
 A premium Bangladeshi lifestyle ecommerce website and admin system built with React, TypeScript, Tailwind CSS, and Three.js.
 
