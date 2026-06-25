@@ -7,6 +7,7 @@ import Modal from '../../components/ui/Modal';
 import ProductDetail from '../../components/product/ProductDetail';
 import { categories, subcategories, getProductsByCategory } from '../../data';
 import { CategorySlug, Product, SortOption } from '../../types';
+import { useProducts } from '../../context/ProductContext';
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'newest', label: 'Newest First' },
@@ -19,7 +20,15 @@ export default function CategoryPage() {
   const { slug } = useParams<{ slug: string }>();
   const category = categories.find(c => c.slug === slug);
   const subcats = subcategories[slug as string] || [];
-  const rawProducts = getProductsByCategory(slug as CategorySlug);
+  const { products: allProducts } = useProducts();
+  const categoryProductIds = useMemo(
+    () => new Set(getProductsByCategory(slug as CategorySlug).map(p => p.id)),
+    [slug]
+  );
+  const rawProducts = useMemo(
+    () => allProducts.filter(p => categoryProductIds.has(p.id)),
+    [allProducts, categoryProductIds]
+  );
 
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [priceMin, setPriceMin] = useState<number | null>(null);

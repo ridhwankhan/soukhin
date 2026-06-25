@@ -44,5 +44,14 @@ export const adminUsers: AdminUser[] = [
   },
 ];
 
-// Mock current admin for demo purposes
+// Demo passwords — used by AuthContext for role-based admin login
+export const ADMIN_PASSWORDS: Record<string, string> = {
+  'owner@soukhin.com': 'owner123',
+  'admin@soukhin.com': 'admin123',
+  'mod@soukhin.com': 'mod123',
+  'orders@soukhin.com': 'orders123',
+  'inventory@soukhin.com': 'inv123',
+};
+
+// Legacy export — retained for compatibility; auth state now comes from AuthContext
 export const currentAdmin: AdminUser = adminUsers[0];

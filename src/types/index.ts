@@ -23,43 +23,53 @@ export interface Product {
   updatedAt: string;
 }
 
-export type ProductBadge = 'new' | 'eid-collection' | 'best-seller' | 'pre-order';
+export type ProductBadge =
+  | 'new'
+  | 'eid-collection'
+  | 'best-seller'
+  | 'pre-order'
+  | 'featured'
+  | 'sale'
+  | 'limited-edition';
+
+export const PRODUCT_BADGE_LABELS: Record<ProductBadge, string> = {
+  'new': 'New',
+  'eid-collection': 'Eid',
+  'best-seller': 'Best Seller',
+  'pre-order': 'Pre-order',
+  'featured': 'Featured',
+  'sale': 'Sale',
+  'limited-edition': 'Limited',
+};
 
 export type CategorySlug =
-  // Main categories
   | 'wearables'
   | 'home-living'
   | 'food-pitha'
   | 'jewelry'
   | 'gifts'
   | 'new-arrivals'
-  // Wearables subcategories - Women
   | 'women-three-piece'
   | 'women-dresses'
   | 'women-sarees'
   | 'women-kurtis'
   | 'women-shawls'
-  // Wearables subcategories - Men
   | 'men-panjabi'
   | 'men-shirts'
   | 'men-tshirts'
   | 'men-waistcoats'
-  // Wearables subcategories - Kids
   | 'kids-girls'
   | 'kids-boys'
   | 'kids-baby'
-  // Wearables subcategories - Accessories
   | 'accessories-bags'
   | 'accessories-scarves'
   | 'accessories-watches'
-  // Home & Living subcategories
   | 'home-sheets'
   | 'home-cushions'
   | 'home-curtains'
   | 'home-runners'
   | 'home-towels'
   | 'home-decor'
-  // Jewelry subcategories
   | 'jewelry-earrings'
   | 'jewelry-necklaces'
   | 'jewelry-bangles'
@@ -152,6 +162,17 @@ export interface Order {
   updatedAt: string;
 }
 
+// Customer Auth Types
+export interface CustomerUser {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  avatar?: string;
+  createdAt: string;
+}
+
 // Admin Types
 export type AdminRole =
   | 'owner'
@@ -197,6 +218,18 @@ export type Permission =
   | 'manage-users'
   | 'view-audit-log';
 
+// Announcement Type
+export interface Announcement {
+  id: string;
+  text: string;
+  textBn?: string;
+  link?: string;
+  isActive: boolean;
+  bgColor: 'green' | 'gold' | 'terracotta' | 'dark';
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Content Types
 export interface Banner {
   id: string;
@@ -228,48 +261,19 @@ export interface SiteSettings {
 
 // Payment Config Types
 export interface PaymentConfig {
-  bkash: {
-    merchantId: string;
-    apiKey: string;
-    enabled: boolean;
-  };
-  nagad: {
-    merchantId: string;
-    apiKey: string;
-    enabled: boolean;
-  };
-  rocket: {
-    merchantId: string;
-    apiKey: string;
-    enabled: boolean;
-  };
-  card: {
-    gatewayPublicKey: string;
-    enabled: boolean;
-  };
-  cod: {
-    enabled: boolean;
-  };
-  bankTransfer: {
-    enabled: boolean;
-    accountDetails: string;
-  };
+  bkash: { merchantId: string; apiKey: string; enabled: boolean };
+  nagad: { merchantId: string; apiKey: string; enabled: boolean };
+  rocket: { merchantId: string; apiKey: string; enabled: boolean };
+  card: { gatewayPublicKey: string; enabled: boolean };
+  cod: { enabled: boolean };
+  bankTransfer: { enabled: boolean; accountDetails: string };
 }
 
 // Delivery Config Types
 export interface DeliveryConfig {
-  insideDhaka: {
-    fee: number;
-    estimatedDays: string;
-  };
-  outsideDhaka: {
-    fee: number;
-    estimatedDays: string;
-  };
-  pickup: {
-    enabled: boolean;
-    address: string;
-  };
+  insideDhaka: { fee: number; estimatedDays: string };
+  outsideDhaka: { fee: number; estimatedDays: string };
+  pickup: { enabled: boolean; address: string };
 }
 
 // Coupon Types
@@ -354,11 +358,7 @@ export interface DashboardStats {
 }
 
 // Filter/Sort Types
-export type SortOption =
-  | 'newest'
-  | 'popular'
-  | 'price-low-high'
-  | 'price-high-low';
+export type SortOption = 'newest' | 'popular' | 'price-low-high' | 'price-high-low';
 
 export interface ProductFilters {
   category?: CategorySlug;

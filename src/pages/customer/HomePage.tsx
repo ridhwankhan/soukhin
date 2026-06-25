@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Truck, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react';
 import HeroSection from '../../components/hero/HeroSection';
 import ProductCard from '../../components/product/ProductCard';
 import { getFeaturedProducts, getNewArrivals } from '../../data';
+import { useProducts } from '../../context/ProductContext';
 
 const categories = [
   {
@@ -73,8 +74,11 @@ const inViewVariants = {
 };
 
 export default function HomePage() {
-  const featuredProducts = getFeaturedProducts();
-  const newArrivals = getNewArrivals();
+  const { products: allProducts } = useProducts();
+  const featuredProductIds = useMemo(() => new Set(getFeaturedProducts().map(p => p.id)), []);
+  const newArrivalIds = useMemo(() => new Set(getNewArrivals().map(p => p.id)), []);
+  const featuredProducts = useMemo(() => allProducts.filter(p => featuredProductIds.has(p.id)), [allProducts, featuredProductIds]);
+  const newArrivals = useMemo(() => allProducts.filter(p => newArrivalIds.has(p.id)), [allProducts, newArrivalIds]);
 
   return (
     <div className="min-h-screen bg-white">
