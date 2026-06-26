@@ -3,6 +3,10 @@ import { SiteSettings } from '../types';
 // Store contact email
 export const CONTACT_EMAIL = 'shoukhin.lifestyle.bd@gmail.com';
 
+// Site developer credit (footer)
+export const DEVELOPER_NAME = 'Ridhwan';
+export const DEVELOPER_EMAIL = 'ridhwankhan03@gmail.com';
+
 // WhatsApp number - Add your number here (format: country code + number, no spaces or symbols)
 // Example: "8801712345678" for Bangladesh
 export const WHATSAPP_NUMBER = '';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Phone, Mail, MapPin, MessageCircle, Clock } from 'lucide-react';
+import { Mail, MapPin, MessageCircle, Clock } from 'lucide-react';
 import { CONTACT_EMAIL } from '../../config';
 import { submitContactMessage } from '../../lib/contactService';
 import { isValidEmail } from '../../lib/validators';
@@ -139,21 +139,14 @@ export default function ContactPage() {
                 <div className="space-y-4">
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 bg-[#1B4332]/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Phone className="w-5 h-5 text-[#1B4332]" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-[#2D2D2D]">Phone</h3>
-                      <p className="text-sm text-[#666666]">+880 XXX XXX XXXX</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-[#1B4332]/10 rounded-full flex items-center justify-center flex-shrink-0">
                       <Mail className="w-5 h-5 text-[#1B4332]" />
                     </div>
                     <div>
                       <h3 className="font-medium text-[#2D2D2D]">Email</h3>
-                      <a href={`mailto:${CONTACT_EMAIL}`} className="text-sm text-[#666666] hover:text-[#1B4332]">
+                      <a
+                        href={`mailto:${CONTACT_EMAIL}`}
+                        className="text-sm text-[#1B4332] hover:underline break-all"
+                      >
                         {CONTACT_EMAIL}
                       </a>
                     </div>

@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Mail, MapPin, Phone } from 'lucide-react';
-import { BRAND_CONFIG, FOOTER_LINKS, SITE_SETTINGS } from '../../config';
+import { Facebook, Instagram, Heart, Mail, MapPin } from 'lucide-react';
+import { BRAND_CONFIG, CONTACT_EMAIL, DEVELOPER_EMAIL, DEVELOPER_NAME, FOOTER_LINKS, SITE_SETTINGS } from '../../config';
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const developerMailto = `mailto:${DEVELOPER_EMAIL}?subject=Soukhin%20website`;
 
   return (
     <footer className="bg-[#111A14] text-white">
@@ -96,15 +97,12 @@ export default function Footer() {
             <h3 className="text-xs font-semibold uppercase tracking-[0.1em] text-white/40 mb-4">Contact</h3>
             <ul className="space-y-3">
               <li>
-                <a href="tel:+8801700000000" className="flex items-center gap-2.5 text-sm text-white/60 hover:text-white transition-colors">
-                  <Phone className="w-3.5 h-3.5 flex-shrink-0 text-white/30" />
-                  +880 17 0000 0000
-                </a>
-              </li>
-              <li>
-                <a href="mailto:hello@soukhin.com" className="flex items-center gap-2.5 text-sm text-white/60 hover:text-white transition-colors">
-                  <Mail className="w-3.5 h-3.5 flex-shrink-0 text-white/30" />
-                  hello@soukhin.com
+                <a
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  className="flex items-center gap-2.5 text-sm text-white/60 hover:text-white transition-colors group"
+                >
+                  <Mail className="w-3.5 h-3.5 flex-shrink-0 text-white/30 group-hover:text-white/70" />
+                  <span className="underline-offset-2 group-hover:underline break-all">{CONTACT_EMAIL}</span>
                 </a>
               </li>
               <li className="flex items-start gap-2.5 text-sm text-white/60">
@@ -122,13 +120,28 @@ export default function Footer() {
           <p className="text-xs text-white/35 order-2 sm:order-1">
             © {year} {BRAND_CONFIG.name}. All rights reserved.
           </p>
-          <div className="flex items-center gap-3 order-1 sm:order-2">
+          <div className="flex items-center gap-3 order-1 sm:order-2 flex-wrap justify-center">
             <span className="text-xs text-white/30">Accepts:</span>
             {['bKash', 'Nagad', 'Rocket', 'Cash on Delivery'].map(method => (
               <span key={method} className="text-[11px] px-2 py-0.5 border border-white/10 text-white/40 rounded-[2px]">
                 {method}
               </span>
             ))}
+          </div>
+        </div>
+
+        <div className="border-t border-white/5">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-center gap-1.5 text-xs text-white/40">
+            <span>Made with</span>
+            <Heart className="w-3.5 h-3.5 text-[#C2704A] fill-[#C2704A]/30" aria-hidden />
+            <span>by</span>
+            <a
+              href={developerMailto}
+              className="inline-flex items-center gap-1.5 text-white/55 hover:text-white transition-colors font-medium"
+            >
+              {DEVELOPER_NAME}
+              <Mail className="w-3.5 h-3.5" aria-hidden />
+            </a>
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { CONTACT_EMAIL } from '../../config';
 
 export function ReturnExchangePage() {
   return (
@@ -48,7 +49,7 @@ export function ReturnExchangePage() {
             </ul>
 
             <h2 className="text-xl font-semibold text-[#2D2D2D] mb-4 mt-8">How to Request a Return</h2>
-            <p className="mb-4">Contact us via WhatsApp or phone within 7 days of delivery:</p>
+            <p className="mb-4">Contact us via email or WhatsApp within 7 days of delivery:</p>
             <ol className="list-decimal pl-6 mb-6 space-y-2">
               <li>Provide your order number</li>
               <li>Explain the reason for return/exchange</li>
@@ -57,7 +58,10 @@ export function ReturnExchangePage() {
             </ol>
 
             <p className="mt-8">
-              For any questions about returns, please contact us at <strong>hello@soukhin.com</strong>
+              For any questions about returns, please contact us at{' '}
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-[#1B4332] font-medium hover:underline">
+                {CONTACT_EMAIL}
+              </a>
             </p>
           </div>
         </div>
@@ -119,7 +123,10 @@ export function PrivacyPage() {
 
             <h2 className="text-xl font-semibold text-[#2D2D2D] mb-4 mt-8">Contact Us</h2>
             <p>
-              For privacy-related inquiries, contact us at <strong>hello@soukhin.com</strong>
+              For privacy-related inquiries, contact us at{' '}
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-[#1B4332] font-medium hover:underline">
+                {CONTACT_EMAIL}
+              </a>
             </p>
           </div>
         </div>
