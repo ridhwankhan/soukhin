@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { fetchDashboardSummary, DashboardSummary } from '../../lib/dashboardService';
 import { fetchAdminOrders } from '../../lib/orderService';
-import { getLowStockProducts } from '../../data';
+import { fetchLowStockProducts } from '../../lib/productService';
 import CategoryRevenueChart from '../components/CategoryRevenueChart';
 import { Order } from '../../types';
 
@@ -21,21 +21,24 @@ export default function AdminDashboard() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const lowStockProducts = getLowStockProducts();
+  const [lowStockProducts, setLowStockProducts] = useState<Awaited<ReturnType<typeof fetchLowStockProducts>>>([]);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
-        const [stats, orders] = await Promise.all([
+        const [stats, orders, lowStock] = await Promise.all([
           fetchDashboardSummary(),
           fetchAdminOrders(undefined, undefined, undefined),
+          fetchLowStockProducts(),
         ]);
         setSummary(stats);
         setRecentOrders(orders.slice(0, 5));
+        setLowStockProducts(lowStock);
       } catch {
         setSummary(null);
         setRecentOrders([]);
+        setLowStockProducts([]);
       } finally {
         setLoading(false);
       }

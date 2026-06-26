@@ -245,10 +245,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (isStaff) {
-      const admin = await fetchMyAdminProfileWithRetry(3);
+      const { admin, error: profileError } = await fetchMyAdminProfileWithRetry(3);
       if (!admin) {
         await supabase.auth.signOut();
-        return { error: 'Your staff account is not active. Contact the store owner.' };
+        return {
+          error:
+            profileError ?? 'Your staff account is not active. Contact the store owner.',
+        };
       }
       return { isStaff: true, staffRole: admin.role, adminProfile: admin };
     }

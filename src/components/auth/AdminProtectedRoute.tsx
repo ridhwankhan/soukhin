@@ -15,9 +15,11 @@ interface AdminProtectedRouteProps {
 }
 
 function StaffAccessPending() {
-  const { refreshAdmin } = useAdminAuth();
+  const { user } = useAuth();
+  const { refreshAdmin, adminError } = useAdminAuth();
   const { needsStaffSetup } = useStaffAccess();
   const [retrying, setRetrying] = useState(false);
+  const signedInEmail = user?.email ?? CONTACT_EMAIL;
 
   const handleRetry = async () => {
     setRetrying(true);
@@ -33,14 +35,20 @@ function StaffAccessPending() {
         </div>
         <h2 className="text-xl font-semibold text-ink mb-2">Staff profile not linked yet</h2>
         <p className="text-sm text-ink-secondary mb-4">
-          You are signed in as <strong className="text-ink">{CONTACT_EMAIL}</strong>, but the dashboard
+          You are signed in as <strong className="text-ink">{signedInEmail}</strong>, but the dashboard
           could not load your staff profile from the database.
         </p>
+        {adminError && (
+          <p className="text-xs text-red-600 mb-4 text-left bg-red-50 p-3 rounded-sm border border-red-200">
+            {adminError}
+          </p>
+        )}
         {needsStaffSetup && (
           <p className="text-xs text-ink-muted mb-4 text-left bg-canvas p-3 rounded-sm border border-line">
-            Run this once in Supabase → SQL Editor, then click Retry:
+            Run this once in Supabase → SQL Editor (project{' '}
+            <strong>yxctdtihkmslpidscfph</strong>), then click Retry:
             <code className="block mt-2 text-[11px] whitespace-pre-wrap break-all">
-              {`INSERT INTO admin_users (email, name, role, is_active)\nVALUES ('${CONTACT_EMAIL}', 'Soukhin Owner', 'owner', true)\nON CONFLICT (email) DO UPDATE SET role = 'owner', is_active = true;`}
+              {`-- Paste full file: supabase/migrations/20260626233000_011_fix_staff_profile_link.sql`}
             </code>
           </p>
         )}

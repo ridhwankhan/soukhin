@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { normalizePhone } from './validators';
+import { Customer } from '../types';
 
 export interface CustomerProfile {
   id: string;
@@ -99,4 +100,14 @@ export async function ensureCustomerProfile(
   const existing = await fetchCustomerProfile(userId);
   if (existing) return existing;
   return createCustomerProfile({ userId, ...fallback });
+}
+
+export async function fetchAdminCustomers(): Promise<Customer[]> {
+  const { data, error } = await supabase.rpc('list_customers_admin');
+  if (error) throw error;
+  return ((data as Customer[]) ?? []).map((c) => ({
+    ...c,
+    orders: c.orders ?? 0,
+    totalSpent: c.totalSpent ?? 0,
+  }));
 }

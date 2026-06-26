@@ -1,5 +1,5 @@
 export const BRAND_CONFIG = {
-  name: 'Soukhin',
+  name: 'Shoukhin',
   nameBn: 'শৌখিন',
   tagline: 'Tasteful Living',
   taglineBn: 'স্বাদের ঠিকানা',
@@ -49,7 +49,7 @@ export const BRAND_CONFIG = {
   },
 
   defaultMeta: {
-    title: 'Soukhin | শৌখিন - Premium Bangladeshi Lifestyle Brand',
+    title: 'Shoukhin | শৌখিন - Premium Bangladeshi Lifestyle Brand',
     description: 'Shop premium ladies wear, three-piece outfits, homemade food, pitha, snacks, and gift items. Elegant Bangladeshi craftsmanship delivered to your door.',
   },
 };

@@ -10,7 +10,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { fetchMyAdminProfile, fetchMyAdminProfileWithRetry, signInAdmin, signOutAdmin } from '../lib/adminService';
+import { fetchMyAdminProfileWithRetry, signInAdmin, signOutAdmin } from '../lib/adminService';
 import { hasPermission } from '../config/roles';
 import { AdminUser, Permission } from '../types';
 import { clearSessionMarkers, touchSession } from '../lib/sessionManager';
@@ -22,6 +22,7 @@ interface AdminAuthContextType {
   user: User | null;
   session: Session | null;
   admin: AdminUser | null;
+  adminError: string | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
@@ -39,12 +40,17 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [admin, setAdmin] = useState<AdminUser | null>(null);
+  const [adminError, setAdminError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadAdmin = useCallback(async () => {
-    const profile = await withTimeout(fetchMyAdminProfileWithRetry(3), 15_000, null);
-    setAdmin(profile);
-    return profile;
+    const result = await withTimeout(fetchMyAdminProfileWithRetry(3), 15_000, {
+      admin: null,
+      error: 'Profile load timed out',
+    });
+    setAdmin(result.admin);
+    setAdminError(result.admin ? null : result.error ?? null);
+    return result.admin;
   }, []);
 
   const setAdminProfile = useCallback((profile: AdminUser | null) => {
@@ -172,6 +178,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       user,
       session,
       admin,
+      adminError,
       loading,
       signIn,
       signOut,
@@ -179,7 +186,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       refreshAdmin: loadAdmin,
       setAdminProfile,
     }),
-    [user, session, admin, loading, signIn, signOut, can, loadAdmin, setAdminProfile]
+    [user, session, admin, adminError, loading, signIn, signOut, can, loadAdmin, setAdminProfile]
   );
 
   return (

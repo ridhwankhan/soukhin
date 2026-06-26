@@ -200,6 +200,21 @@ export async function deleteProduct(productId: string): Promise<void> {
   if (error) throw error;
 }
 
+export async function fetchLowStockProducts(threshold = 10): Promise<Product[]> {
+  const all = await fetchAllProducts(false);
+  return all
+    .filter((p) => p.stock <= threshold)
+    .sort((a, b) => a.stock - b.stock);
+}
+
+export async function updateProductStock(productId: string, stock: number): Promise<void> {
+  const { error } = await supabase.rpc('update_product_stock_admin', {
+    p_product_id: productId,
+    p_stock: stock,
+  });
+  if (error) throw error;
+}
+
 export function createEmptyProduct(categorySlug?: string): Product {
   return {
     id: '',

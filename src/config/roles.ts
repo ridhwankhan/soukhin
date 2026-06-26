@@ -27,6 +27,7 @@ export const ROLE_PERMISSIONS: RolePermission[] = [
     permissions: [
       'view-dashboard', 'view-orders', 'view-products',
       'view-inventory', 'view-reviews', 'manage-reviews',
+      'view-coupons', 'manage-coupons',
       'view-content', 'manage-content',
     ],
   },
@@ -34,12 +35,14 @@ export const ROLE_PERMISSIONS: RolePermission[] = [
     role: 'order-manager',
     permissions: [
       'view-dashboard', 'view-orders', 'update-orders',
+      'view-coupons', 'manage-coupons',
     ],
   },
   {
     role: 'inventory-manager',
     permissions: [
       'view-dashboard', 'view-products', 'manage-products', 'view-inventory', 'manage-inventory',
+      'view-coupons', 'manage-coupons',
     ],
   },
 ];

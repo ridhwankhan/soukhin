@@ -25,26 +25,44 @@ function mapAdminProfile(row: AdminProfileRow): AdminUser {
   };
 }
 
-export async function fetchMyAdminProfile(): Promise<AdminUser | null> {
+export type AdminProfileResult = {
+  admin: AdminUser | null;
+  error?: string;
+};
+
+export async function fetchMyAdminProfile(): Promise<AdminProfileResult> {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) return null;
+  if (userError || !user) {
+    return { admin: null, error: userError?.message ?? 'Not signed in' };
+  }
 
   const { data, error } = await supabase.rpc('get_my_admin_profile');
-  if (error || !data) return null;
+  if (!error && data) {
+    return { admin: mapAdminProfile(data as AdminProfileRow) };
+  }
 
-  return mapAdminProfile(data as AdminProfileRow);
+  const fallback = await supabase.rpc('ensure_my_staff_profile');
+  if (!fallback.error && fallback.data) {
+    return { admin: mapAdminProfile(fallback.data as AdminProfileRow) };
+  }
+
+  return {
+    admin: null,
+    error: error?.message ?? fallback.error?.message ?? 'Staff profile not found',
+  };
 }
 
 /** Retry profile fetch — helps right after sign-in before JWT is fully ready. */
-export async function fetchMyAdminProfileWithRetry(attempts = 3): Promise<AdminUser | null> {
+export async function fetchMyAdminProfileWithRetry(attempts = 3): Promise<AdminProfileResult> {
+  let last: AdminProfileResult = { admin: null };
   for (let i = 0; i < attempts; i++) {
-    const profile = await fetchMyAdminProfile();
-    if (profile) return profile;
+    last = await fetchMyAdminProfile();
+    if (last.admin) return last;
     if (i < attempts - 1) {
       await new Promise((r) => window.setTimeout(r, 400));
     }
   }
-  return null;
+  return last;
 }
 
 export async function signInAdmin(email: string, password: string): Promise<{ admin?: AdminUser; error?: string }> {
@@ -80,10 +98,14 @@ export async function signInAdmin(email: string, password: string): Promise<{ ad
     return { error: 'Please verify your email before signing in to the admin panel.' };
   }
 
-  const admin = await fetchMyAdminProfile();
+  const { admin, error: profileError } = await fetchMyAdminProfile();
   if (!admin) {
     await supabase.auth.signOut();
-    return { error: 'Your account is not linked to an active admin profile. Contact the store owner.' };
+    return {
+      error:
+        profileError ??
+        'Your account is not linked to an active admin profile. Contact the store owner.',
+    };
   }
 
   return { admin };

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MessageCircle, X, Mail } from 'lucide-react';
-import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_PHONE_URL, WHATSAPP_URL } from '../../config';
+import { CONTACT_EMAIL, CONTACT_MAILTO, CONTACT_PHONE, CONTACT_PHONE_URL, WHATSAPP_URL } from '../../config';
 
 export default function SupportFab() {
   const [open, setOpen] = useState(false);
@@ -36,13 +36,13 @@ export default function SupportFab() {
               Call {CONTACT_PHONE}
             </a>
             <a
-              href={`mailto:${CONTACT_EMAIL}`}
+              href={CONTACT_MAILTO}
               className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-ink hover:bg-surface transition-colors"
             >
               <span className="w-8 h-8 rounded-full bg-accent text-accent-fg flex items-center justify-center flex-shrink-0">
                 <Mail className="w-4 h-4" />
               </span>
-              Email us
+              Email {CONTACT_EMAIL}
             </a>
             <Link
               to="/contact"

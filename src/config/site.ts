@@ -2,6 +2,7 @@ import { SiteSettings } from '../types';
 
 // Store contact
 export const CONTACT_EMAIL = 'shoukhin.lifestyle.bd@gmail.com';
+export const CONTACT_MAILTO = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Shoukhin — Customer enquiry')}`;
 export const CONTACT_PHONE = '01577577168';
 /** International format for tel: / wa.me (no + or spaces) */
 export const CONTACT_PHONE_DIAL = '8801577577168';
@@ -30,7 +31,7 @@ export const SITE_SETTINGS: SiteSettings = {
   facebookLink: 'https://facebook.com/soukhin',
   instagramLink: 'https://instagram.com/soukhin.bd',
   logo: '/images/logo.png',
-  footerText: 'Soukhin - Premium Bangladeshi Lifestyle Brand',
+  footerText: 'Shoukhin - Premium Bangladeshi Lifestyle Brand',
 };
 
 export const NAV_LINKS = [
@@ -100,7 +101,7 @@ export const FOOTER_LINKS = {
     { href: '/category/new-arrivals', label: 'New Arrivals' },
   ],
   info: [
-    { href: '/about', label: 'About Soukhin' },
+    { href: '/about', label: 'About Shoukhin' },
     { href: '/contact', label: 'Contact Us' },
     { href: '/track-order', label: 'Track Order' },
     { href: '/faq', label: 'FAQ' },

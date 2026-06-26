@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import NotificationPanel from './components/NotificationPanel';
-import { ROLE_LABELS } from '../config';
+import { BRAND_CONFIG, ROLE_LABELS } from '../config';
 import { Permission } from '../types';
 
 const navItems = [
@@ -159,7 +159,7 @@ export default function AdminLayout() {
               <div className="w-8 h-8 bg-accent rounded-sm flex items-center justify-center">
                 <span className="text-white font-serif font-bold">শ</span>
               </div>
-              <span className="font-semibold">Soukhin Admin</span>
+              <span className="font-semibold">{BRAND_CONFIG.name} Admin</span>
             </Link>
           )}
           <button

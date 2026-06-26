@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, MessageCircle, Clock, Phone } from 'lucide-react';
-import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_PHONE_URL, WHATSAPP_URL } from '../../config';
+import { CONTACT_EMAIL, CONTACT_MAILTO, CONTACT_PHONE, CONTACT_PHONE_URL, WHATSAPP_URL } from '../../config';
 import { submitContactMessage } from '../../lib/contactService';
 import { isValidEmail } from '../../lib/validators';
 import Button from '../../components/ui/Button';
@@ -144,7 +144,7 @@ export default function ContactPage() {
                     <div>
                       <h3 className="font-medium text-ink">Email</h3>
                       <a
-                        href={`mailto:${CONTACT_EMAIL}`}
+                        href={CONTACT_MAILTO}
                         className="text-sm text-accent hover:underline break-all"
                       >
                         {CONTACT_EMAIL}
