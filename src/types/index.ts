@@ -158,6 +158,7 @@ export interface Order {
   deliveryFee: number;
   total: number;
   adminNotes?: string;
+  paymentTransactionId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -216,6 +217,7 @@ export type Permission =
   | 'manage-settings'
   | 'view-users'
   | 'manage-users'
+  | 'manage-staff'
   | 'view-audit-log';
 
 // Announcement Type

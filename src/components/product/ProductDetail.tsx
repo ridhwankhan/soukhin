@@ -4,7 +4,7 @@ import { Heart, ShoppingCart, Minus, Plus, ChevronLeft, ChevronRight, Package, T
 import { Product } from '../../types';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
-import { useCart } from '../../context/CartContext';
+import { useProtectedCart } from '../../hooks/useProtectedCart';
 import { useWishlist } from '../../context/WishlistContext';
 import { BRAND_CONFIG } from '../../config';
 
@@ -18,7 +18,7 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
   const [selectedSize, setSelectedSize] = useState<string | undefined>(product.sizeOptions?.[0]);
   const [selectedColor, setSelectedColor] = useState<string | undefined>(product.colorOptions?.[0]);
   const [quantity, setQuantity] = useState(1);
-  const { addItem, isInCart } = useCart();
+  const { addItem, isInCart } = useProtectedCart();
   const { isInWishlist, toggleItem } = useWishlist();
 
   const displayPrice = product.salePrice ?? product.price;

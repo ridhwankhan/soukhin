@@ -2,286 +2,267 @@
 
 [![Repository](https://img.shields.io/badge/GitHub-ridhwankhan%2Fsoukhin-1B4332?style=flat-square&logo=github)](https://github.com/ridhwankhan/soukhin)
 
-> **Status: v1.2** — Auth flows, profile page, announcements, product labels, and redesigned storefront/admin UI. Payment gateways, WhatsApp, and production backend wiring are next.
+Production-ready storefront and admin dashboard for a Bangladeshi lifestyle brand. Built with **React**, **TypeScript**, **Tailwind CSS**, **Supabase**, and **Three.js**.
 
-A premium Bangladeshi lifestyle ecommerce website and admin system built with React, TypeScript, Tailwind CSS, and Three.js.
-
-## Features
-
-### Customer Website
-- Premium 3D hero section with Three.js
-- Product browsing by categories
-- Advanced filtering (price, size, color, badges)
-- Sorting (newest, popular, price)
-- Product badges (New, Eid Collection, Best Seller, Pre-order)
-- Shopping cart with quantity controls
-- Wishlist functionality
-- Checkout with multiple payment options
-- WhatsApp order generation for COD
-- Responsive mobile-first design
-- Floating WhatsApp button
-
-### Admin Dashboard
-- Role-based access control (Owner, Admin, Moderator, Order Manager, Inventory Manager)
-- Dashboard overview with stats
-- Order management with status updates
-- Product management
-- Inventory tracking
-- Customer management
-- Review moderation
-- Coupon/discount management
-- Content management (banners, hero, announcements)
-- Message/inquiry management
-- Payment settings
-- Delivery settings
-- User management
-- Audit log
-
-## Getting Started
-
-### Prerequisites
-- Node.js 18+
-- npm or yarn
-
-### Installation
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-The app will be available at `http://localhost:5173`
-
-### Building for Production
-
-```bash
-npm run build
-```
-
-## Configuration
-
-### WhatsApp Number
-
-Edit `src/config/site.ts`:
-
-```typescript
-export const WHATSAPP_NUMBER = '8801712345678'; // Your number here
-```
-
-Format: Country code + number without spaces or symbols.
-Example: For Bangladesh number 0171-2345678, use `8801712345678`
-
-### Payment Gateways
-
-Edit `src/config/payment.ts`:
-
-```typescript
-export const PAYMENT_CONFIG: PaymentConfig = {
-  bkash: {
-    merchantId: 'YOUR_BKASH_MERCHANT_ID',
-    apiKey: 'YOUR_BKASH_API_KEY',
-    enabled: true,
-  },
-  nagad: {
-    merchantId: 'YOUR_NAGAD_MERCHANT_ID',
-    apiKey: 'YOUR_NAGAD_API_KEY',
-    enabled: true,
-  },
-  rocket: {
-    merchantId: 'YOUR_ROCKET_MERCHANT_ID',
-    apiKey: 'YOUR_ROCKET_API_KEY',
-    enabled: true,
-  },
-  card: {
-    gatewayPublicKey: 'YOUR_CARD_GATEWAY_KEY',
-    enabled: true, // Enable when ready
-  },
-  // ... cod and bankTransfer
-};
-```
-
-### Delivery Settings
-
-Edit `src/config/delivery.ts`:
-
-```typescript
-export const DELIVERY_CONFIG: DeliveryConfig = {
-  insideDhaka: {
-    fee: 60,
-    estimatedDays: '1-2',
-  },
-  outsideDhaka: {
-    fee: 120,
-    estimatedDays: '3-5',
-  },
-  pickup: {
-    enabled: true,
-    address: 'Your store address',
-  },
-};
-```
-
-### Brand Settings
-
-Edit `src/config/brand.ts` to customize:
-- Brand name and tagline
-- Colors (primary, secondary, accent, etc.)
-- Typography
-- Social media links
-- Currency settings
-
-## Admin Roles & Permissions
-
-| Role | Permissions |
-|------|-------------|
-| Owner | Full access to everything |
-| Admin | Products, orders, customers, coupons, content, settings |
-| Moderator | Reviews, messages, content management |
-| Order Manager | View and update orders only |
-| Inventory Manager | Stock and product availability |
-
-### Adding Admin Users
-
-Currently uses mock data in `src/data/admin.ts`. For production:
-1. Connect to Supabase or your backend
-2. Create admin_users table
-3. Update `src/admin/AdminLayout.tsx` to fetch current user from auth
-
-## Project Structure
-
-```
-src/
-├── admin/                    # Admin dashboard
-│   ├── AdminLayout.tsx      # Admin layout with sidebar
-│   └── pages/               # Admin pages
-├── components/
-│   ├── cart/                # Cart drawer component
-│   ├── hero/                # 3D hero scene (Three.js)
-│   ├── layout/              # Header, Footer, WhatsApp button
-│   ├── product/             # Product card, detail
-│   └── ui/                  # Reusable UI components
-├── config/                   # Configuration files
-│   ├── brand.ts            # Brand colors, fonts
-│   ├── delivery.ts         # Delivery settings
-│   ├── payment.ts          # Payment gateway config
-│   ├── roles.ts            # Admin role permissions
-│   └── site.ts             # Site settings, WhatsApp, social
-├── context/                  # React contexts
-│   ├── CartContext.tsx     # Shopping cart state
-│   └── WishlistContext.tsx # Wishlist state
-├── data/                     # Mock data
-│   ├── admin.ts            # Admin users
-│   ├── categories.ts       # Product categories
-│   ├── content.ts          # Banners, coupons, messages
-│   ├── customers.ts        # Customer data, reviews
-│   ├── orders.ts           # Order data
-│   └── products.ts         # Product catalog
-├── pages/
-│   ├── customer/           # Customer-facing pages
-│   └── info/               # About, Contact, Policies
-├── types/                   # TypeScript interfaces
-│   └── index.ts
-├── App.tsx                  # Main router
-├── main.tsx                # Entry point
-└── index.css               # Global styles
-```
-
-## Customizing Products
-
-Edit `src/data/products.ts` to add your products:
-
-```typescript
-{
-  id: 'unique-id',
-  name: 'Product Name',
-  nameBn: 'পণ্যের নাম', // Bengali name
-  category: 'ladies-wear', // Category slug
-  price: 1500,
-  salePrice: 1200, // Optional, for discounts
-  images: ['url1', 'url2'],
-  stock: 25,
-  sku: 'LW-001',
-  description: 'Product description',
-  sizeOptions: ['S', 'M', 'L', 'XL'], // Optional
-  colorOptions: ['Red', 'Blue'], // Optional
-  foodNote: 'Pre-order recommended', // For food items
-  deliveryNote: 'Same-day delivery', // Optional
-  tags: ['tag1', 'tag2'],
-  isActive: true,
-  isFeatured: true,
-  badges: ['new', 'best-seller'], // new, eid-collection, best-seller, pre-order
-  createdAt: '2024-01-01',
-  updatedAt: '2024-06-01',
-}
-```
-
-## Replacing Images
-
-All product images use Pexels URLs as placeholders. Replace with your own:
-
-1. Upload images to your CDN or hosting
-2. Update URLs in `src/data/products.ts`
-3. Update category images in `src/data/categories.ts`
-4. Update banner images in `src/data/content.ts`
-
-## Connecting to a Backend
-
-The app is structured for easy backend integration:
-
-1. **Supabase**: Replace mock data imports with Supabase queries
-2. **Firebase**: Use Firebase SDK for real-time data
-3. **Custom API**: Create API service layer in `src/lib/api.ts`
-
-### Example: Supabase Integration
-
-```typescript
-// src/lib/supabase.ts
-import { createClient } from '@supabase/supabase-js';
-
-export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
-
-// Then in components:
-const { data: products } = await supabase
-  .from('products')
-  .select('*')
-  .eq('isActive', true);
-```
-
-## Tech Stack
-
-- **Framework**: React 18 + TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **3D Graphics**: Three.js + @react-three/fiber + @react-three/drei
-- **Animations**: Framer Motion
-- **Routing**: React Router v6
-- **Icons**: Lucide React
-- **State**: React Context + localStorage
-
-## Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-
-## Performance Notes
-
-- 3D hero uses reduced motion fallback for accessibility
-- Mobile devices get optimized 3D rendering
-- Images use lazy loading
-- Cart/wishlist persist in localStorage
-
-## License
-
-MIT
+**Live stack (100% free tier to start):** Vercel (hosting) + Supabase (database, auth, storage, edge functions)
 
 ---
 
-Built with care for the Bangladeshi ecommerce community.
+## What works today
+
+### Customer website
+- Product catalog from Supabase (categories, search, filters)
+- Sign up / sign in with email verification (required before checkout)
+- Shopping cart, wishlist, checkout with server-validated prices
+- Cash on delivery + manual bKash transaction ID
+- bKash tokenized checkout (edge function — configure credentials to enable)
+- Order tracking by order number + phone
+- Contact form with spam protection
+- Order history on account page
+
+### Admin dashboard (`/admin/login`)
+- Role-based access: **Owner**, **Admin**, **Moderator**, **Order Manager**, **Inventory Manager**
+- **Staff & role management** (Owner + Admin): add emails, assign roles, send invite, deactivate
+- Products CRUD with compressed image upload to Supabase Storage
+- Orders, messages, dashboard analytics
+- Session idle timeout + permission checks on every API call
+
+---
+
+## Roles & who can do what
+
+| Role | Access |
+|------|--------|
+| **Owner** | Everything + assign any role (including Admin/Owner) |
+| **Admin** | Store operations + add **Inventory Manager**, **Order Manager**, **Moderator** |
+| **Inventory Manager** | Add/edit/remove products and stock |
+| **Order Manager** | View and update orders |
+| **Moderator** | Reviews and customer messages |
+
+### Adding team members (Owner / Admin)
+
+1. Go to **Admin → Users** (`/admin/users`)
+2. Click **Add Staff Member** — enter name, email, role
+3. Click **Send invite** — they get an email to set a password
+4. They sign in at **`/admin/login`** with that email
+
+> **Owner only** can promote someone to Admin or Owner. Admins can add multiple Inventory Managers, Order Managers, etc.
+
+---
+
+## Free deployment guide (step by step)
+
+Everything below stays on **free tiers** for a small launch. No credit card required for Vercel + Supabase free plans.
+
+### Cost summary
+
+| Service | Free tier | Paid when |
+|---------|-----------|-----------|
+| [Supabase](https://supabase.com) | 500 MB DB, 1 GB storage, 50k MAU auth | High traffic / storage |
+| [Vercel](https://vercel.com) | Hobby hosting, 100 GB bandwidth/mo | Commercial use at scale |
+| [Cloudflare](https://cloudflare.com) | DNS + CDN + basic DDoS (optional) | Advanced WAF |
+| Domain `.com` | — | ~$10–15/year (optional; use `*.vercel.app` free subdomain first) |
+
+---
+
+### Step 1 — Supabase project (backend)
+
+1. Go to [supabase.com](https://supabase.com) → **Start your project** → New organization → **New project**
+2. Choose region **Singapore** (closest to Bangladesh)
+3. Save your **database password**
+4. Wait for the project to finish provisioning
+
+**Run database migrations** (required, in order):
+
+1. Open **SQL Editor** in Supabase dashboard
+2. Run each file from `supabase/migrations/` in order:
+   - `20260625181910_001_initial_schema.sql`
+   - `20260625183059_003_restructure_categories.sql`
+   - `20260625182007_002_seed_data.sql`
+   - `20260626120000_004_customer_auth.sql`
+   - `20260626140000_005_orders_analytics_notifications.sql`
+   - `20260626160000_006_products_storage.sql`
+   - `20260626180000_007_admin_security.sql`
+   - `20260626200000_008_production_hardening.sql`
+   - `20260626220000_009_staff_management.sql`
+
+**Get API keys:** Settings → API → copy **Project URL** and **anon public** key.
+
+**Auth URLs:** Authentication → URL Configuration (set after Vercel deploy in Step 4):
+- Site URL: `https://your-app.vercel.app`
+- Redirect URLs: `https://your-app.vercel.app/auth?verified=1`
+
+---
+
+### Step 2 — Create the Owner account
+
+In **SQL Editor**, run (use your real email):
+
+```sql
+INSERT INTO admin_users (email, name, role, is_active)
+VALUES ('shoukhin.lifestyle.bd@gmail.com', 'Soukhin Owner', 'owner', true)
+ON CONFLICT (email) DO UPDATE SET role = 'owner', is_active = true;
+```
+
+In **Authentication → Users → Add user**:
+- Email: same as above
+- Password: strong password
+- ✅ Auto Confirm User (so you can log in immediately)
+
+Sign in at `https://your-app.vercel.app/admin/login` after deploy.
+
+---
+
+### Step 3 — Deploy edge functions (invites + bKash)
+
+Install [Supabase CLI](https://supabase.com/docs/guides/cli):
+
+```bash
+npm install -g supabase
+supabase login
+supabase link --project-ref YOUR_PROJECT_REF
+```
+
+Deploy functions:
+
+```bash
+supabase functions deploy invite-staff
+supabase functions deploy bkash-payment
+```
+
+Set secrets (Dashboard → Edge Functions → Secrets, or CLI):
+
+```
+SUPABASE_URL=https://xxx.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+SUPABASE_ANON_KEY=your_anon_key
+SITE_URL=https://your-app.vercel.app
+ALLOWED_SITE_ORIGINS=https://your-app.vercel.app
+
+# bKash (sandbox first — optional until you have merchant account)
+BKASH_APP_KEY=
+BKASH_APP_SECRET=
+BKASH_USERNAME=
+BKASH_PASSWORD=
+BKASH_BASE_URL=https://tokenized.sandbox.bka.sh/v1.2.0-beta
+```
+
+---
+
+### Step 4 — Deploy frontend on Vercel (free)
+
+1. Push this repo to GitHub (already at `github.com/ridhwankhan/soukhin`)
+2. Go to [vercel.com](https://vercel.com) → **Add New → Project** → Import `ridhwankhan/soukhin`
+3. Framework: **Vite**
+4. Build command: `npm run build`
+5. Output directory: `dist`
+6. Environment variables:
+
+```
+VITE_SUPABASE_URL=https://xxx.supabase.co
+VITE_SUPABASE_ANON_KEY=your_anon_key
+VITE_SITE_URL=https://your-app.vercel.app
+VITE_BKASH_ENABLED=false
+```
+
+7. Click **Deploy**
+
+8. Copy your Vercel URL → go back to Supabase **Auth → URL Configuration** and set Site URL + Redirect URLs to match.
+
+9. Redeploy on Vercel if you changed env vars.
+
+**Custom domain (optional, paid yearly):** Vercel → Project → Settings → Domains → add `soukhin.com` → point DNS as instructed.
+
+---
+
+### Step 5 — Make it fully functional (checklist)
+
+- [ ] All 9 migrations applied in Supabase
+- [ ] Owner row in `admin_users` + Auth user with same email
+- [ ] Vercel env vars set, site loads
+- [ ] Supabase Auth redirect URLs match Vercel URL
+- [ ] `invite-staff` function deployed (for team invites)
+- [ ] Sign in at `/admin/login` as owner
+- [ ] Add products under **Admin → Products** (upload images)
+- [ ] Create customer account on storefront, verify email, place test order
+- [ ] Test order tracking at `/track-order`
+- [ ] Add inventory managers under **Admin → Users** → Send invite
+- [ ] Set `WHATSAPP_NUMBER` in `src/config/site.ts` and redeploy for COD WhatsApp messages
+- [ ] When bKash merchant ready: set secrets, `VITE_BKASH_ENABLED=true`, redeploy
+
+---
+
+### Step 6 — Local development
+
+```bash
+git clone https://github.com/ridhwankhan/soukhin.git
+cd soukhin
+npm install
+cp .env.example .env   # fill in Supabase URL + anon key
+npm run dev            # http://localhost:5173
+```
+
+```bash
+npm run build          # production build
+npm run load-test      # stress-test public endpoints (optional)
+```
+
+---
+
+## Environment variables
+
+| Variable | Where | Purpose |
+|----------|-------|---------|
+| `VITE_SUPABASE_URL` | Vercel + `.env` | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Vercel + `.env` | Public API key |
+| `VITE_SITE_URL` | Vercel + `.env` | Your live URL (bKash origin check) |
+| `VITE_BKASH_ENABLED` | Vercel | `true` when bKash is configured |
+| Edge function secrets | Supabase only | bKash keys, service role, `SITE_URL` |
+
+Never commit `.env` or the **service role** key to GitHub.
+
+---
+
+## Project structure
+
+```
+src/
+├── admin/              # Dashboard (login, products, orders, users, …)
+├── components/         # UI, auth guards, cart, layout
+├── config/             # Brand, delivery, payment, roles
+├── context/            # Auth, AdminAuth, Cart, Wishlist
+├── hooks/              # Session manager, debounce
+├── lib/                # Supabase services (orders, products, staff, …)
+├── pages/customer/     # Storefront pages
+└── pages/info/         # About, contact, policies
+
+supabase/
+├── migrations/         # Run in order on Supabase
+└── functions/          # invite-staff, bkash-payment
+```
+
+---
+
+## Security
+
+- Admin routes require staff login + server-side permission checks
+- Checkout prices validated on server (`create_order_secure`)
+- Rate limits on contact, search, track order, auth
+- Product image uploads restricted to staff with `manage-products`
+- bKash payments verify order ownership + amount
+
+---
+
+## Tech stack
+
+React 18 · TypeScript · Vite · Tailwind CSS · Supabase · Three.js · Framer Motion · Recharts
+
+---
+
+## Support contact
+
+Store email: **shoukhin.lifestyle.bd@gmail.com**
+
+---
+
+MIT License · Built for the Bangladeshi ecommerce community.

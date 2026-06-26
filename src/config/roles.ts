@@ -8,7 +8,7 @@ export const ROLE_PERMISSIONS: RolePermission[] = [
       'view-products', 'manage-products', 'view-inventory', 'manage-inventory',
       'view-customers', 'manage-customers', 'view-reviews', 'manage-reviews',
       'view-coupons', 'manage-coupons', 'view-content', 'manage-content',
-      'view-settings', 'manage-settings', 'view-users', 'manage-users',
+      'view-settings', 'manage-settings', 'view-users', 'manage-users', 'manage-staff',
       'view-audit-log',
     ],
   },
@@ -19,7 +19,7 @@ export const ROLE_PERMISSIONS: RolePermission[] = [
       'view-products', 'manage-products', 'view-inventory', 'manage-inventory',
       'view-customers', 'manage-customers', 'view-reviews', 'manage-reviews',
       'view-coupons', 'manage-coupons', 'view-content', 'manage-content',
-      'view-settings',
+      'view-settings', 'view-users', 'manage-staff',
     ],
   },
   {
@@ -39,7 +39,7 @@ export const ROLE_PERMISSIONS: RolePermission[] = [
   {
     role: 'inventory-manager',
     permissions: [
-      'view-dashboard', 'view-products', 'view-inventory', 'manage-inventory',
+      'view-dashboard', 'view-products', 'manage-products', 'view-inventory', 'manage-inventory',
     ],
   },
 ];

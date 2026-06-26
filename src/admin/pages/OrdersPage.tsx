@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, ChevronDown, Eye, Edit2, Phone, MapPin, Package } from 'lucide-react';
-import { orders } from '../../data';
+import { fetchAdminOrders, updateOrderStatus } from '../../lib/orderService';
 import { OrderStatus, Order, PaymentStatus } from '../../types';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
@@ -25,24 +25,47 @@ const PAYMENT_STATUS_CONFIG: Record<PaymentStatus, { label: string; color: strin
 };
 
 export default function OrdersPage() {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
   const [paymentFilter, setPaymentFilter] = useState<PaymentStatus | 'all'>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [editStatus, setEditStatus] = useState<OrderStatus | null>(null);
 
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch =
-      order.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
-      order.shipping.name.toLowerCase().includes(search.toLowerCase()) ||
-      order.shipping.phone.includes(search);
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    const matchesPayment = paymentFilter === 'all' || order.paymentStatus === paymentFilter;
-    return matchesSearch && matchesStatus && matchesPayment;
-  });
+  const loadOrders = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchAdminOrders(
+        search || undefined,
+        statusFilter === 'all' ? undefined : statusFilter,
+        paymentFilter === 'all' ? undefined : paymentFilter
+      );
+      setOrders(data);
+    } catch {
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [search, statusFilter, paymentFilter]);
 
-  const handleUpdateStatus = (orderId: string, newStatus: OrderStatus) => {
-    console.log('Update order', orderId, 'to', newStatus);
+  useEffect(() => {
+    const timer = setTimeout(loadOrders, 300);
+    return () => clearTimeout(timer);
+  }, [loadOrders]);
+
+  const filteredOrders = orders;
+
+  const handleUpdateStatus = async (orderId: string, newStatus: OrderStatus) => {
+    try {
+      await updateOrderStatus(orderId, newStatus);
+      await loadOrders();
+      if (selectedOrder?.id === orderId) {
+        setSelectedOrder((prev) => prev ? { ...prev, status: newStatus } : null);
+      }
+    } catch {
+      // ignore
+    }
     setEditStatus(null);
   };
 
@@ -51,7 +74,7 @@ export default function OrdersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-[#2D2D2D]">Orders</h1>
-          <p className="text-sm text-[#666666]">{filteredOrders.length} orders found</p>
+          <p className="text-sm text-[#666666]">{loading ? 'Loading...' : `${filteredOrders.length} orders found`}</p>
         </div>
       </div>
 
@@ -187,6 +210,13 @@ export default function OrdersPage() {
                 </span>
               </div>
             </div>
+
+            {selectedOrder.paymentTransactionId && (
+              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-sm text-sm">
+                <span className="text-[#666666]">Transaction ID: </span>
+                <span className="font-mono font-medium text-[#1B4332]">{selectedOrder.paymentTransactionId}</span>
+              </div>
+            )}
 
             {/* Customer Info */}
             <div className="grid md:grid-cols-2 gap-6 mb-6">

@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { searchProducts } from '../../data';
+import { Search, X } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { searchProducts } from '../../lib/productService';
+import { useDebounce } from '../../hooks/useDebounce';
 import { Product } from '../../types';
 
 interface SearchBarProps {
@@ -12,31 +13,35 @@ interface SearchBarProps {
 
 export default function SearchBar({ isOpen, onClose }: SearchBarProps) {
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 400);
   const [results, setResults] = useState<Product[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 80);
-    } else {
-      setQuery('');
-      setResults([]);
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
     }
   }, [isOpen]);
 
   useEffect(() => {
-    if (query.trim().length >= 2) {
-      setResults(searchProducts(query).slice(0, 6));
+    if (debouncedQuery.trim().length >= 3) {
+      searchProducts(debouncedQuery)
+        .then((searchResults) => setResults(searchResults.slice(0, 6)))
+        .catch(() => setResults([]));
     } else {
       setResults([]);
     }
-  }, [query]);
+  }, [debouncedQuery]);
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    if (isOpen) document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [isOpen, onClose]);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (query.trim()) {
+      navigate(`/search?q=${encodeURIComponent(query)}`);
+      onClose();
+      setQuery('');
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -46,87 +51,67 @@ export default function SearchBar({ isOpen, onClose }: SearchBarProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/40 z-50 backdrop-blur-[2px]"
+            className="fixed inset-0 bg-black/50 z-50"
             onClick={onClose}
           />
-
           <motion.div
-            initial={{ opacity: 0, y: -12 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="fixed top-24 left-1/2 -translate-x-1/2 w-full max-w-xl z-50 px-4"
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-24 left-1/2 -translate-x-1/2 w-full max-w-2xl z-50 px-4"
           >
-            <div className="bg-white shadow-2xl overflow-hidden">
-              {/* Input */}
-              <div className="flex items-center border-b border-[#E2D9CF]">
-                <Search className="w-[18px] h-[18px] text-[#9A9A9A] ml-4 flex-shrink-0" />
+            <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+              <form onSubmit={handleSubmit} className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
                 <input
                   ref={inputRef}
                   type="text"
                   value={query}
-                  onChange={e => setQuery(e.target.value)}
-                  placeholder="Search products, categories…"
-                  className="flex-1 px-3 py-4 text-[#1A1A1A] text-sm placeholder-[#ABABAB] focus:outline-none bg-transparent"
-                  autoComplete="off"
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="w-full pl-12 pr-12 py-4 text-lg border-0 focus:outline-none focus:ring-0"
                 />
                 <button
+                  type="button"
                   onClick={onClose}
-                  className="p-2 mr-2 text-[#9A9A9A] hover:text-[#1A1A1A] transition-colors"
-                  aria-label="Close search"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-[#F5F0E8] rounded-full"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-5 h-5 text-[#666666]" />
                 </button>
-              </div>
+              </form>
 
-              {/* Results */}
               {results.length > 0 && (
-                <div>
-                  <p className="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9A7535]">
-                    Products
-                  </p>
-                  <ul>
-                    {results.map(product => (
-                      <li key={product.id}>
-                        <Link
-                          to={`/category/${product.category}`}
-                          onClick={() => { onClose(); setQuery(''); }}
-                          className="flex items-center gap-3 px-4 py-3 hover:bg-[#F9F7F4] transition-colors group"
-                        >
-                          <div className="w-10 h-10 flex-shrink-0 overflow-hidden bg-[#F5F0E8]">
-                            <img
-                              src={product.images[0]}
-                              alt={product.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-[#1A1A1A] line-clamp-1">{product.name}</p>
-                            <p className="text-xs text-[#9A9A9A] capitalize">{product.category.replace(/-/g, ' ')}</p>
-                          </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            <span className="text-sm font-semibold text-[#1B4332]">
-                              ৳{(product.salePrice ?? product.price).toLocaleString()}
-                            </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-[#C0B8B0] opacity-0 group-hover:opacity-100 transition-opacity" />
-                          </div>
-                        </Link>
-                      </li>
+                <div className="border-t border-[#F5F0E8] p-4">
+                  <p className="text-xs text-[#666666] mb-3">Suggestions</p>
+                  <div className="space-y-2">
+                    {results.map((product) => (
+                      <Link
+                        key={product.id}
+                        to={`/product/${product.id}`}
+                        onClick={() => { onClose(); setQuery(''); }}
+                        className="flex items-center gap-3 p-2 hover:bg-[#F5F0E8] rounded-sm transition-colors"
+                      >
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          className="w-12 h-12 object-cover rounded-sm"
+                        />
+                        <div>
+                          <p className="font-medium text-[#2D2D2D] text-sm">{product.name}</p>
+                          <p className="text-xs text-[#666666]">{product.category.replace('-', ' ')}</p>
+                        </div>
+                        <span className="ml-auto text-[#1B4332] font-medium">
+                          ৳{(product.salePrice ?? product.price).toLocaleString()}
+                        </span>
+                      </Link>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               )}
 
-              {query.length >= 2 && results.length === 0 && (
-                <div className="px-4 py-6 text-center">
-                  <p className="text-sm text-[#9A9A9A]">No results for <span className="font-medium text-[#4A4A4A]">"{query}"</span></p>
-                </div>
-              )}
-
-              {query.length < 2 && (
-                <div className="px-4 py-4">
-                  <p className="text-xs text-[#ABABAB]">Type at least 2 characters to search</p>
+              {debouncedQuery.length >= 3 && results.length === 0 && (
+                <div className="border-t border-[#F5F0E8] p-4 text-center text-[#666666]">
+                  No products found for "{debouncedQuery}"
                 </div>
               )}
             </div>

@@ -1,127 +1,138 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Truck, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react';
-import HeroSection from '../../components/hero/HeroSection';
+import { ArrowRight, ChevronLeft, ChevronRight, Truck, Shield, Award, Heart } from 'lucide-react';
+import HeroScene from '../../components/hero/HeroScene';
 import ProductCard from '../../components/product/ProductCard';
-import { getFeaturedProducts, getNewArrivals } from '../../data';
-import { useProducts } from '../../context/ProductContext';
-
-const categories = [
-  {
-    slug: 'wearables',
-    name: 'Wearables',
-    nameBn: 'পোশাক',
-    image: 'https://images.pexels.com/photos/9778148/pexels-photo-9778148.jpeg',
-    count: '120+ styles',
-  },
-  {
-    slug: 'home-living',
-    name: 'Home & Living',
-    nameBn: 'ঘর ও জীবনযাত্রা',
-    image: 'https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg',
-    count: '60+ items',
-  },
-  {
-    slug: 'food-pitha',
-    name: 'Food & Pitha',
-    nameBn: 'খাবার ও পিঠা',
-    image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
-    count: '30+ varieties',
-  },
-  {
-    slug: 'jewelry',
-    name: 'Jewelry',
-    nameBn: 'গয়না',
-    image: 'https://images.pexels.com/photos/1413420/pexels-photo-1413420.jpeg',
-    count: '80+ pieces',
-  },
-  {
-    slug: 'gifts',
-    name: 'Gift Hampers',
-    nameBn: 'উপহার',
-    image: 'https://images.pexels.com/photos/2641170/pexels-photo-2641170.jpeg',
-    count: '20+ sets',
-  },
-];
-
-const promises = [
-  {
-    icon: Truck,
-    title: 'Free Delivery',
-    description: 'On all orders over ৳2,000 within Bangladesh',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Quality Guaranteed',
-    description: 'Every product is carefully inspected before dispatch',
-  },
-  {
-    icon: RefreshCw,
-    title: 'Easy Returns',
-    description: '7-day hassle-free return on eligible items',
-  },
-  {
-    icon: Sparkles,
-    title: 'Artisan Made',
-    description: 'Sourced directly from skilled Bangladeshi makers',
-  },
-];
-
-const inViewVariants = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0 },
-};
+import { fetchFeaturedProducts, fetchNewArrivals } from '../../lib/productService';
+import { getTopLevelCategories } from '../../lib/categoryService';
+import { Product, Category } from '../../types';
+import { SITE_SETTINGS } from '../../config';
 
 export default function HomePage() {
-  const { products: allProducts } = useProducts();
-  const featuredProductIds = useMemo(() => new Set(getFeaturedProducts().map(p => p.id)), []);
-  const newArrivalIds = useMemo(() => new Set(getNewArrivals().map(p => p.id)), []);
-  const featuredProducts = useMemo(() => allProducts.filter(p => featuredProductIds.has(p.id)), [allProducts, featuredProductIds]);
-  const newArrivals = useMemo(() => allProducts.filter(p => newArrivalIds.has(p.id)), [allProducts, newArrivalIds]);
+  const [currentBanner, setCurrentBanner] = useState(0);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
+  const [shopCategories, setShopCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    fetchFeaturedProducts(8).then(setFeaturedProducts).catch(() => setFeaturedProducts([]));
+    fetchNewArrivals(8).then(setNewArrivals).catch(() => setNewArrivals([]));
+    getTopLevelCategories().then(setShopCategories).catch(() => setShopCategories([]));
+  }, []);
+
+  const banners = [
+    { image: 'https://images.pexels.com/photos/10963904/pexels-photo-10963904.jpeg', title: 'Eid Collection', subtitle: 'Elegant Wearables for Everyone', link: '/category/wearables' },
+    { image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg', title: 'Homemade Delights', subtitle: 'Traditional Pitha & Food', link: '/category/food-pitha' },
+    { image: 'https://images.pexels.com/photos/2641170/pexels-photo-2641170.jpeg', title: 'Gift Hampers', subtitle: 'Curated with Love', link: '/category/gifts' },
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentBanner((prev) => (prev + 1) % banners.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const nextBanner = () => setCurrentBanner((prev) => (prev + 1) % banners.length);
+  const prevBanner = () => setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="relative min-h-[90vh] lg:min-h-screen flex items-center justify-center overflow-hidden">
+        <HeroScene />
 
-      {/* Hero */}
-      <HeroSection />
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-[#2D2D2D] mb-4"
+          >
+            {SITE_SETTINGS.hero.title}
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-lg md:text-xl text-[#666666] mb-8"
+          >
+            {SITE_SETTINGS.hero.subtitle}
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="flex flex-wrap justify-center gap-4"
+          >
+            <Link
+              to="/category/wearables"
+              className="px-8 py-3 bg-[#1B4332] text-white rounded-sm font-medium hover:bg-[#163828] transition-colors"
+            >
+              Shop Collection
+            </Link>
+            <Link
+              to="/category/new-arrivals"
+              className="px-8 py-3 border-2 border-[#1B4332] text-[#1B4332] rounded-sm font-medium hover:bg-[#1B4332] hover:text-white transition-colors"
+            >
+              New Arrivals
+            </Link>
+          </motion.div>
+        </div>
 
-      {/* Category Grid */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        >
+          <div className="w-6 h-10 border-2 border-[#1B4332] rounded-full flex justify-center">
+            <motion.div
+              animate={{ y: [0, 12, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="w-1.5 h-1.5 bg-[#1B4332] rounded-full mt-2"
+            />
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Categories */}
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9A7535] mb-2">Browse</p>
-              <h2 className="font-serif text-3xl md:text-4xl font-medium text-[#1A1A1A] tracking-tight">
-                Shop by Category
-              </h2>
-            </div>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-serif font-semibold text-[#2D2D2D] mb-3">Shop by Category</h2>
+            <p className="text-[#666666]">Explore our lifestyle collection</p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
-            {categories.map((cat, i) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {shopCategories.map((category, index) => (
               <motion.div
-                key={cat.slug}
-                variants={inViewVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.5, delay: i * 0.07 }}
+                key={category.slug}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
               >
-                <Link to={`/category/${cat.slug}`} className="group block">
-                  <div className="relative aspect-[4/5] overflow-hidden bg-[#F5F0E8] mb-3">
+                <Link
+                  to={`/category/${category.slug}`}
+                  className="group block"
+                >
+                  <div className="aspect-square rounded-lg overflow-hidden mb-3 bg-[#F5F0E8]">
                     <img
-                      src={cat.image}
-                      alt={cat.name}
-                      className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
-                      loading="lazy"
+                      src={category.image}
+                      alt={category.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                      }}
                     />
-                    <div className="absolute inset-0 bg-[#1A1A1A]/0 group-hover:bg-[#1A1A1A]/10 transition-colors duration-300" />
                   </div>
-                  <h3 className="text-sm font-semibold text-[#1A1A1A] group-hover:text-[#1B4332] transition-colors duration-150">
-                    {cat.name}
+                  <h3 className="font-medium text-[#2D2D2D] group-hover:text-[#1B4332] transition-colors">
+                    {category.name}
                   </h3>
-                  <p className="text-xs text-[#9A9A9A] mt-0.5">{cat.count}</p>
+                  <p className="text-xs text-[#666666]">{category.nameBn}</p>
                 </Link>
               </motion.div>
             ))}
@@ -130,297 +141,151 @@ export default function HomePage() {
       </section>
 
       {/* Featured Products */}
-      <section className="py-16 md:py-24 bg-[#F9F7F4]">
+      {featuredProducts.length > 0 && (
+      <section className="py-16 md:py-24 bg-[#F8F6F3]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-10">
+          <div className="flex items-center justify-between mb-8">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9A7535] mb-2">Curated</p>
-              <h2 className="font-serif text-3xl md:text-4xl font-medium text-[#1A1A1A] tracking-tight">
-                Featured Products
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-serif font-semibold text-[#2D2D2D] mb-2">Featured Products</h2>
+              <p className="text-[#666666]">Handpicked by our team</p>
             </div>
             <Link
-              to="/category/wearables"
-              className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-[#1B4332] hover:gap-2.5 transition-all duration-150"
+              to="/category/new-arrivals"
+              className="flex items-center gap-2 text-[#1B4332] font-medium hover:underline"
             >
-              View all <ArrowRight className="w-3.5 h-3.5" />
+              View All <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
-            {featuredProducts.slice(0, 8).map((product, i) => (
-              <motion.div
-                key={product.id}
-                variants={inViewVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.45, delay: i * 0.05 }}
-              >
-                <ProductCard product={product} />
-              </motion.div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {featuredProducts.slice(0, 8).map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
-          </div>
-
-          <div className="mt-10 text-center sm:hidden">
-            <Link to="/category/wearables" className="btn-outline inline-flex">
-              View all products <ArrowRight className="w-4 h-4" />
-            </Link>
           </div>
         </div>
       </section>
+      )}
 
-      {/* Editorial Banner */}
-      <section className="relative overflow-hidden">
-        <div className="aspect-[16/7] md:aspect-[16/5] lg:aspect-[16/4] relative">
-          <img
-            src="https://images.pexels.com/photos/10963904/pexels-photo-10963904.jpeg"
-            alt="Eid Collection 2025"
-            className="w-full h-full object-cover object-top"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#1A1A1A]/70 via-[#1A1A1A]/40 to-transparent flex items-center">
-            <div className="px-8 sm:px-12 lg:px-16 max-w-lg">
-              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#D4A84A] mb-3">
-                Eid Collection 2025
-              </p>
-              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-medium text-white leading-tight mb-5 tracking-tight">
-                Dress for<br />
-                Every Celebration
-              </h2>
-              <Link
-                to="/category/wearables"
-                className="inline-flex items-center gap-2 px-7 py-3.5 bg-white text-[#1A1A1A] text-sm font-semibold tracking-wide hover:bg-[#F5F0E8] transition-colors"
-              >
-                Explore Now <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+      {/* Banner Carousel */}
+      <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
+        {banners.map((banner, idx) => (
+          <div
+            key={idx}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              currentBanner === idx ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <div className="absolute inset-0 bg-black/40 z-10" />
+            <img
+              src={banner.image}
+              alt={banner.title}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 z-20 flex items-center justify-center text-center text-white px-4">
+              <div>
+                <h2 className="text-4xl md:text-6xl font-serif font-bold mb-4">{banner.title}</h2>
+                <p className="text-xl md:text-2xl mb-8">{banner.subtitle}</p>
+                <Link
+                  to={banner.link}
+                  className="px-8 py-3 bg-white text-[#1B4332] rounded-sm font-medium hover:bg-[#F5F0E8] transition-colors"
+                >
+                  Shop Now
+                </Link>
+              </div>
             </div>
           </div>
+        ))}
+
+        <button
+          onClick={prevBanner}
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+        >
+          <ChevronLeft className="w-6 h-6 text-white" />
+        </button>
+        <button
+          onClick={nextBanner}
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+        >
+          <ChevronRight className="w-6 h-6 text-white" />
+        </button>
+
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+          {banners.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentBanner(idx)}
+              className={`w-2 h-2 rounded-full transition-colors ${
+                currentBanner === idx ? 'bg-white' : 'bg-white/50'
+              }`}
+            />
+          ))}
         </div>
       </section>
 
       {/* New Arrivals */}
+      {newArrivals.length > 0 && (
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-10">
+          <div className="flex items-center justify-between mb-8">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9A7535] mb-2">Just In</p>
-              <h2 className="font-serif text-3xl md:text-4xl font-medium text-[#1A1A1A] tracking-tight">
-                New Arrivals
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-serif font-semibold text-[#2D2D2D] mb-2">New Arrivals</h2>
+              <p className="text-[#666666]">Fresh additions to our collection</p>
             </div>
             <Link
               to="/category/new-arrivals"
-              className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-[#1B4332] hover:gap-2.5 transition-all duration-150"
+              className="flex items-center gap-2 text-[#1B4332] font-medium hover:underline"
             >
-              View all <ArrowRight className="w-3.5 h-3.5" />
+              View All <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
-            {newArrivals.slice(0, 8).map((product, i) => (
-              <motion.div
-                key={product.id}
-                variants={inViewVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.45, delay: i * 0.05 }}
-              >
-                <ProductCard product={product} />
-              </motion.div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {newArrivals.map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>
       </section>
+      )}
 
-      {/* Brand Promises */}
-      <section className="py-14 md:py-20 border-y border-[#E2D9CF]">
+      {/* Trust Badges */}
+      <section className="py-16 bg-[#1B4332]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
-            {promises.map(({ icon: Icon, title, description }, i) => (
-              <motion.div
-                key={title}
-                variants={inViewVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: i * 0.08 }}
-                className="flex flex-col items-start gap-3"
-              >
-                <div className="w-10 h-10 bg-[#1B4332]/8 flex items-center justify-center">
-                  <Icon className="w-[18px] h-[18px] text-[#1B4332]" strokeWidth={1.75} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-[#1A1A1A] mb-1">{title}</h3>
-                  <p className="text-xs text-[#7A7A7A] leading-relaxed">{description}</p>
-                </div>
-              </motion.div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { icon: Truck, title: 'Fast Delivery', desc: '1-5 days across Bangladesh' },
+              { icon: Shield, title: 'Quality Assured', desc: 'Premium products only' },
+              { icon: Award, title: 'Authentic', desc: '100% genuine products' },
+              { icon: Heart, title: 'Made with Love', desc: 'Local artisans' },
+            ].map((item, idx) => (
+              <div key={idx} className="text-center text-white">
+                <item.icon className="w-10 h-10 mx-auto mb-3 opacity-80" />
+                <h3 className="font-medium mb-1">{item.title}</h3>
+                <p className="text-sm text-white/70">{item.desc}</p>
+              </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Food & Pitha Spotlight */}
-      <section className="py-16 md:py-24 bg-[#F9F7F4]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <motion.div
-              variants={inViewVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="relative"
-            >
-              <div className="aspect-[4/3] overflow-hidden bg-[#E8E2D8]">
-                <img
-                  src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg"
-                  alt="Traditional Bangladeshi pitha"
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-              <div className="absolute -bottom-4 -right-4 hidden sm:block w-32 h-32 bg-[#1B4332] flex items-center justify-center text-center p-4">
-                <div className="text-white">
-                  <span className="font-serif text-2xl font-medium block leading-none">৳850</span>
-                  <span className="text-[10px] opacity-70 tracking-wide">per box</span>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              variants={inViewVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.15 }}
-            >
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9A7535] mb-4">
-                Handmade with Love
-              </p>
-              <h2 className="font-serif text-3xl md:text-4xl font-medium text-[#1A1A1A] leading-tight tracking-tight mb-5">
-                Traditional Pitha<br />
-                &amp; Homemade Food
-              </h2>
-              <p className="text-[#6A6A6A] text-base leading-relaxed mb-8 max-w-md">
-                Made fresh using ancestral recipes passed down through generations. No preservatives, no shortcuts — just the authentic taste of Bangladesh.
-              </p>
-              <ul className="space-y-2.5 mb-8">
-                {['Chitoi, Patishapta & Bhapa Pitha', 'Homemade beef, chicken & mutton', 'Traditional snacks & sweets', 'Fresh to order, delivered frozen'].map(item => (
-                  <li key={item} className="flex items-center gap-2.5 text-sm text-[#4A4A4A]">
-                    <span className="w-1 h-1 rounded-full bg-[#9A7535] flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                to="/category/food-pitha"
-                className="inline-flex items-center gap-2 px-7 py-3.5 bg-[#1B4332] text-white text-sm font-medium tracking-wide hover:bg-[#163828] transition-colors group"
-              >
-                Order Now
-                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Gift Hampers Strip */}
-      <section className="py-16 md:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <motion.div
-              variants={inViewVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="order-2 lg:order-1"
-            >
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9A7535] mb-4">
-                Thoughtfully Curated
-              </p>
-              <h2 className="font-serif text-3xl md:text-4xl font-medium text-[#1A1A1A] leading-tight tracking-tight mb-5">
-                Gift Hampers<br />
-                for Every Occasion
-              </h2>
-              <p className="text-[#6A6A6A] text-base leading-relaxed mb-8 max-w-md">
-                From Eid and weddings to birthdays and housewarmings — our curated hampers are beautifully wrapped and ready to delight.
-              </p>
-              <div className="flex flex-wrap gap-3 mb-8">
-                {['Eid Hampers', 'Wedding Gifts', 'Corporate Sets', 'Birthday Boxes'].map(tag => (
-                  <span key={tag} className="px-3 py-1.5 border border-[#E2D9CF] text-xs font-medium text-[#4A4A4A]">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              <Link
-                to="/category/gifts"
-                className="inline-flex items-center gap-2 px-7 py-3.5 border border-[#1A1A1A] text-[#1A1A1A] text-sm font-medium tracking-wide hover:bg-[#1A1A1A] hover:text-white transition-colors group"
-              >
-                Browse Hampers
-                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            </motion.div>
-
-            <motion.div
-              variants={inViewVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.15 }}
-              className="order-1 lg:order-2 aspect-[4/3] overflow-hidden bg-[#F5F0E8]"
-            >
-              <img
-                src="https://images.pexels.com/photos/2641170/pexels-photo-2641170.jpeg"
-                alt="Gift hampers"
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </motion.div>
           </div>
         </div>
       </section>
 
       {/* Newsletter */}
-      <section className="py-16 md:py-20 bg-[#1B4332]">
+      <section className="py-16 md:py-24 bg-[#F8F6F3]">
         <div className="max-w-2xl mx-auto px-4 text-center">
-          <motion.div
-            variants={inViewVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            transition={{ duration: 0.55 }}
-          >
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#9A7535] mb-3">
-              Stay Updated
-            </p>
-            <h2 className="font-serif text-2xl sm:text-3xl font-medium text-white tracking-tight mb-3">
-              New arrivals, straight to your inbox
-            </h2>
-            <p className="text-white/55 text-sm mb-8">
-              Subscribe and get 10% off your first order. No spam — unsubscribe any time.
-            </p>
-            <form
-              className="flex flex-col sm:flex-row gap-0 max-w-sm mx-auto"
-              onSubmit={e => e.preventDefault()}
+          <h2 className="text-3xl font-serif font-semibold text-[#2D2D2D] mb-3">Stay Connected</h2>
+          <p className="text-[#666666] mb-6">Subscribe to our newsletter for updates on new collections and special offers.</p>
+          <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="flex-1 px-4 py-3 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+            />
+            <button
+              type="submit"
+              className="px-6 py-3 bg-[#1B4332] text-white rounded-sm font-medium hover:bg-[#163828] transition-colors"
             >
-              <input
-                type="email"
-                placeholder="your@email.com"
-                required
-                aria-label="Email address"
-                className="flex-1 px-4 py-3.5 bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:border-white/60 transition-colors"
-              />
-              <button
-                type="submit"
-                className="px-6 py-3.5 bg-white text-[#1B4332] text-sm font-semibold hover:bg-[#F5F0E8] transition-colors whitespace-nowrap"
-              >
-                Subscribe
-              </button>
-            </form>
-          </motion.div>
+              Subscribe
+            </button>
+          </form>
         </div>
       </section>
     </div>

@@ -1,15 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { Truck, CreditCard, MessageCircle, CheckCircle } from 'lucide-react';
+import { Truck, CreditCard, CheckCircle } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
-import { DELIVERY_AREAS, PAYMENT_METHODS, PAYMENT_CONFIG, BRAND_CONFIG, WHATSAPP_NUMBER } from '../../config';
+import { useAuth } from '../../context/AuthContext';
+import { DELIVERY_AREAS, PAYMENT_METHODS, WHATSAPP_NUMBER } from '../../config';
 import { PaymentMethod, ShippingInfo } from '../../types';
+import { createOrder, completeOrderPayment } from '../../lib/orderService';
+import { createBkashPayment } from '../../lib/bkashService';
+import { ensureCustomerProfile, updateCustomerProfile } from '../../lib/customerService';
+import { isValidEmail, isValidPhone } from '../../lib/validators';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
+  const { user, profile, refreshProfile } = useAuth();
   const { items, getSubtotal, getDeliveryFee, getTotal, deliveryArea, setDeliveryArea, clearCart } = useCart();
   const [step, setStep] = useState<'shipping' | 'payment' | 'confirm'>('shipping');
   const [selectedPayment, setSelectedPayment] = useState<PaymentMethod>('cod');
@@ -27,16 +33,32 @@ export default function CheckoutPage() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState('');
+  const [bkashTrxId, setBkashTrxId] = useState('');
 
   const subtotal = getSubtotal();
   const deliveryFee = deliveryArea?.fee ?? 60;
   const total = subtotal + deliveryFee;
 
+  useEffect(() => {
+    if (profile || user) {
+      setShipping((prev) => ({
+        ...prev,
+        name: profile?.name || user?.user_metadata?.name || prev.name,
+        phone: profile?.phone || user?.user_metadata?.phone || prev.phone,
+        email: profile?.email || user?.email || prev.email,
+        address: profile?.address || user?.user_metadata?.address || prev.address,
+      }));
+    }
+  }, [profile, user]);
+
   const validateShipping = () => {
     const newErrors: Record<string, string> = {};
     if (!shipping.name.trim()) newErrors.name = 'Name is required';
     if (!shipping.phone.trim()) newErrors.phone = 'Phone is required';
-    else if (!/^01[3-9]\d{8}$/.test(shipping.phone)) newErrors.phone = 'Invalid phone number';
+    else if (!isValidPhone(shipping.phone)) newErrors.phone = 'Invalid phone number';
+    if (!shipping.email.trim()) newErrors.email = 'Email is required';
+    else if (!isValidEmail(shipping.email)) newErrors.email = 'Invalid email address';
     if (!shipping.address.trim()) newErrors.address = 'Address is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -50,24 +72,78 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = async () => {
-    setIsProcessing(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    const newOrderNumber = `SK-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
-    setOrderNumber(newOrderNumber);
-
-    if (selectedPayment === 'cod' || !PAYMENT_CONFIG[selectedPayment]?.apiKey) {
-      const whatsappMessage = generateWhatsAppMessage(newOrderNumber);
-      const phone = WHATSAPP_NUMBER || '880XXXXXXXXXX';
-
-      if (WHATSAPP_NUMBER) {
-        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
-      }
+    if (!user) {
+      navigate('/auth?mode=login&returnTo=/checkout');
+      return;
     }
 
-    setOrderComplete(true);
-    setIsProcessing(false);
-    clearCart();
+    setIsProcessing(true);
+    setSubmitError('');
+
+    try {
+      const customer = await ensureCustomerProfile(user.id, {
+        name: shipping.name,
+        email: shipping.email,
+        phone: shipping.phone,
+        address: shipping.address,
+      });
+
+      await updateCustomerProfile(user.id, {
+        name: shipping.name,
+        phone: shipping.phone,
+        address: shipping.address,
+      });
+
+      const orderResult = await createOrder({
+        customerId: customer.id,
+        customerName: shipping.name,
+        customerPhone: shipping.phone,
+        customerEmail: shipping.email,
+        shippingAddress: shipping.address,
+        shippingAreaSlug: deliveryArea?.id ?? 'inside-dhaka',
+        shippingAreaLabel: deliveryArea?.name ?? shipping.area,
+        shippingNotes: shipping.notes,
+        paymentMethod: selectedPayment,
+        items,
+      });
+
+      const { orderNumber, orderId, total: orderTotal } = orderResult;
+      setOrderNumber(orderNumber);
+
+      if (selectedPayment === 'bkash') {
+        try {
+          sessionStorage.setItem('soukhin_pending_bkash_order', JSON.stringify({ orderNumber, orderId }));
+          const { bkashURL } = await createBkashPayment(orderId, orderTotal, orderNumber);
+          clearCart();
+          window.location.href = bkashURL;
+          return;
+        } catch {
+          if (bkashTrxId.trim()) {
+            await completeOrderPayment(orderId, bkashTrxId.trim());
+          } else {
+            setSubmitError(
+              'bKash gateway is not configured yet. Your order was created — complete payment via bKash and enter your Transaction ID below, or contact us.'
+            );
+            setIsProcessing(false);
+            return;
+          }
+        }
+      } else if (selectedPayment === 'cod') {
+        const whatsappMessage = generateWhatsAppMessage(orderNumber);
+        if (WHATSAPP_NUMBER) {
+          window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
+        }
+      }
+
+      await refreshProfile();
+      setOrderComplete(true);
+      clearCart();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to place order. Please try again.';
+      setSubmitError(message);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const generateWhatsAppMessage = (orderNum: string) => {
@@ -126,6 +202,9 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
           <h2 className="text-2xl font-semibold text-[#2D2D2D] mb-2">Order Confirmed!</h2>
           <p className="text-[#666666] mb-4">Thank you for your order, {shipping.name}!</p>
           <p className="text-lg font-medium text-[#1B4332] mb-6">Order #{orderNumber}</p>
+          <Link to={`/track-order?order=${encodeURIComponent(orderNumber)}`} className="text-sm text-[#1B4332] hover:underline mb-4 inline-block">
+            Track this order →
+          </Link>
           <p className="text-sm text-[#666666] mb-8">
             {selectedPayment === 'cod'
               ? 'We will call you to confirm your order. Pay when you receive your package.'
@@ -202,11 +281,13 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
                   </div>
 
                   <Input
-                    label="Email (Optional)"
+                    label="Email"
                     type="email"
                     value={shipping.email}
                     onChange={(e) => setShipping({ ...shipping, email: e.target.value })}
+                    error={errors.email}
                     placeholder="your@email.com"
+                    required
                   />
 
                   <div>
@@ -352,6 +433,19 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
                   <div className="p-4 bg-[#F8F6F3] rounded-sm">
                     <h3 className="font-medium text-sm text-[#666666] mb-2">Payment</h3>
                     <p className="font-medium">{selectedPayment.toUpperCase()}</p>
+                    {selectedPayment === 'bkash' && (
+                      <div className="mt-3">
+                        <Input
+                          label="bKash Transaction ID (if paying manually)"
+                          value={bkashTrxId}
+                          onChange={(e) => setBkashTrxId(e.target.value)}
+                          placeholder="Enter after sending payment"
+                        />
+                        <p className="text-xs text-[#666666] mt-1">
+                          If bKash gateway is enabled, you will be redirected automatically. Otherwise enter your Transaction ID here.
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   <div className="p-4 bg-[#F8F6F3] rounded-sm">
@@ -371,7 +465,12 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
 
                 <div className="mt-6 flex justify-between">
                   <Button variant="outline" onClick={() => setStep('payment')}>Back</Button>
-                  <Button onClick={handlePlaceOrder} loading={isProcessing} size="lg">Place Order</Button>
+                  <div className="text-right">
+                    {submitError && (
+                      <p className="text-sm text-red-500 mb-2 max-w-xs">{submitError}</p>
+                    )}
+                    <Button onClick={handlePlaceOrder} loading={isProcessing} size="lg">Place Order</Button>
+                  </div>
                 </div>
               </motion.div>
             )}

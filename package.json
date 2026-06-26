@@ -6,20 +6,24 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:production": "npm run build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "load-test": "node scripts/load-test.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
     "@supabase/supabase-js": "^2.57.4",
     "@types/three": "^0.184.1",
+    "browser-image-compression": "^2.0.2",
     "framer-motion": "^12.42.0",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.18.0",
+    "recharts": "^3.9.0",
     "three": "^0.185.0"
   },
   "devDependencies": {

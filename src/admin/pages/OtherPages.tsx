@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Package, Users, Star, Ticket, MessageSquare, FileText, AlertTriangle } from 'lucide-react';
-import { products, categories, customers, reviews, coupons, messages, auditLogs, adminUsers, getLowStockProducts } from '../../data';
+import { products, categories, customers, reviews, coupons, messages, auditLogs, getLowStockProducts } from '../../data';
+import { fetchAdminMessages, markMessageRead } from '../../lib/notificationService';
 import { Review, Message, AuditLog } from '../../types';
 
 // Inventory Page
@@ -317,13 +318,36 @@ export function CouponsPage() {
 
 // Messages Page
 export function MessagesPage() {
+  const [messagesList, setMessagesList] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+
+  useEffect(() => {
+    fetchAdminMessages()
+      .then((data) => setMessagesList(data))
+      .catch(() => setMessagesList([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleView = async (msg: Message) => {
+    setSelectedMessage(msg);
+    if (!msg.isRead) {
+      try {
+        await markMessageRead(msg.id);
+        setMessagesList((prev) => prev.map((m) => (m.id === msg.id ? { ...m, isRead: true } : m)));
+      } catch {
+        // ignore
+      }
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-[#2D2D2D]">Messages</h1>
-        <p className="text-sm text-[#666666]">{messages.filter(m => !m.isRead).length} unread</p>
+        <p className="text-sm text-[#666666]">
+          {loading ? 'Loading...' : `${messagesList.filter(m => !m.isRead).length} unread`}
+        </p>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -339,7 +363,10 @@ export function MessagesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F5F0E8]">
-              {messages.map((msg) => (
+              {messagesList.length === 0 && !loading && (
+                <tr><td colSpan={5} className="p-8 text-center text-sm text-[#666666]">No messages yet</td></tr>
+              )}
+              {messagesList.map((msg) => (
                 <tr key={msg.id} className={`hover:bg-[#F8F6F3] ${!msg.isRead ? 'bg-blue-50/30' : ''}`}>
                   <td className="p-4">
                     <p className="font-medium text-[#2D2D2D]">{msg.name}</p>
@@ -358,7 +385,7 @@ export function MessagesPage() {
                   </td>
                   <td className="p-4 text-right">
                     <button
-                      onClick={() => setSelectedMessage(msg)}
+                      onClick={() => handleView(msg)}
                       className="px-3 py-1 text-sm text-[#1B4332] hover:bg-[#1B4332]/10 rounded"
                     >
                       View
@@ -370,6 +397,20 @@ export function MessagesPage() {
           </table>
         </div>
       </div>
+
+      {selectedMessage && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setSelectedMessage(null)}>
+          <div className="bg-white rounded-lg p-6 max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-semibold text-lg mb-2">{selectedMessage.subject}</h3>
+            <p className="text-sm text-[#666666] mb-4">
+              From {selectedMessage.name} ({selectedMessage.email})
+              {selectedMessage.phone && ` · ${selectedMessage.phone}`}
+            </p>
+            <p className="text-sm text-[#2D2D2D] whitespace-pre-wrap">{selectedMessage.message}</p>
+            <button onClick={() => setSelectedMessage(null)} className="mt-4 text-sm text-[#1B4332] hover:underline">Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -417,72 +458,6 @@ export function AuditLogPage() {
                   </td>
                   <td className="p-4 text-sm text-[#666666] max-w-xs truncate">
                     {log.newValue || log.oldValue}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Users Page
-export function UsersPage() {
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-[#2D2D2D]">User Management</h1>
-          <p className="text-sm text-[#666666]">{adminUsers.length} admin users</p>
-        </div>
-        <button className="px-4 py-2 bg-[#1B4332] text-white rounded hover:bg-[#163828]">
-          Add User
-        </button>
-      </div>
-
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-[#F8F6F3] text-sm text-[#666666]">
-                <th className="text-left p-4 font-medium">User</th>
-                <th className="text-left p-4 font-medium">Email</th>
-                <th className="text-left p-4 font-medium">Role</th>
-                <th className="text-left p-4 font-medium">Last Login</th>
-                <th className="text-right p-4 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#F5F0E8]">
-              {adminUsers.map((user: any) => (
-                <tr key={user.id} className="hover:bg-[#F8F6F3]">
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#1B4332] rounded-full flex items-center justify-center">
-                        <span className="text-white font-medium">{user.name.charAt(0)}</span>
-                      </div>
-                      <p className="font-medium text-[#2D2D2D]">{user.name}</p>
-                    </div>
-                  </td>
-                  <td className="p-4 text-sm text-[#666666]">{user.email}</td>
-                  <td className="p-4">
-                    <span className="px-2 py-1 bg-[#1B4332]/10 text-[#1B4332] text-xs font-medium rounded capitalize">
-                      {user.role.replace('-', ' ')}
-                    </span>
-                  </td>
-                  <td className="p-4 text-sm text-[#666666]">
-                    {user.lastLogin ? new Date(user.lastLogin).toLocaleString('en-GB') : 'Never'}
-                  </td>
-                  <td className="p-4 text-right space-x-2">
-                    <button className="px-3 py-1 text-sm text-[#1B4332] hover:bg-[#1B4332]/10 rounded">
-                      Edit
-                    </button>
-                    {user.role !== 'owner' && (
-                      <button className="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded">
-                        Remove
-                      </button>
-                    )}
                   </td>
                 </tr>
               ))}
