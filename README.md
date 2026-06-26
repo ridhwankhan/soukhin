@@ -18,7 +18,18 @@ Production-ready storefront and admin dashboard. **React + Vite + Supabase + Ver
 
 Full details: **[DEPLOY_FROM_ZERO.md](./DEPLOY_FROM_ZERO.md)**
 
-### Vercel environment variables (use `VITE_` not `NEXT_PUBLIC_`)
+### Can I just import the env file?
+
+| Where | Import .env? | How |
+|-------|--------------|-----|
+| **Your PC** (local) | ✅ Yes | `copy env.import.template .env` → edit → `npm run dev` |
+| **Vercel** (live site) | ✅ Yes | Fill `env.import.template` → **Import .env** on deploy screen |
+| **GitHub** | ❌ No | Never push `.env` — secrets would be public |
+| **Supabase** | ❌ No | Database uses SQL paste (`ONE_CLICK_DATABASE_SETUP.sql`), not env file |
+
+Use **[env.import.template](./env.import.template)** — fill it once, import on Vercel.
+
+### Vercel environment variables (manual names if needed)
 
 | Variable | Example |
 |----------|---------|

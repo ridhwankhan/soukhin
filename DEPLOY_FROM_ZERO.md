@@ -83,17 +83,45 @@ Do this twice — once for local testing, once after Vercel (Part B).
 2. Click **Add New…** → **Project**  
 3. Find **`ridhwankhan/soukhin`** → click **Import**
 
-### B2. Settings on the import screen
+### B2. Environment variables — YES, you can import a file
 
-Before clicking Deploy, expand **Environment Variables** and add **exactly these 3**:
+You do **not** need to type each variable one by one.
 
-| Name | Value |
-|------|--------|
-| `VITE_SUPABASE_URL` | `https://yxctdtihkmslpidscfph.supabase.co` |
-| `VITE_SUPABASE_ANON_KEY` | your `sb_publishable_...` key from Supabase |
-| `VITE_SITE_URL` | leave blank for now — fill after first deploy |
+#### Option A — Import on Vercel (easiest)
 
-Also check:
+1. On your PC, open **`env.import.template`** from the Soukhin folder (or [on GitHub](https://github.com/ridhwankhan/soukhin/blob/main/env.import.template))
+2. Replace the placeholders:
+   - `PASTE_YOUR_sb_publishable_KEY_HERE` → your key from Supabase → Settings → API → **Publishable**
+   - `YOUR-APP-NAME.vercel.app` → leave as-is for first deploy, fix after you get the real URL
+3. Save the file (e.g. as `my-vercel.env`)
+4. On Vercel import screen → expand **Environment Variables**
+5. Click **Import .env** (or **Browse** / paste the file contents)
+6. Select your filled file — all 4 variables appear at once
+7. Check **Production**, **Preview**, and **Development** are all ticked
+
+#### Option B — Copy/paste lines
+
+Paste these 4 lines into Vercel’s env box (after filling real values):
+
+```
+VITE_SUPABASE_URL=https://yxctdtihkmslpidscfph.supabase.co
+VITE_SUPABASE_ANON_KEY=sb_publishable_your_key_here
+VITE_SITE_URL=https://your-app.vercel.app
+VITE_BKASH_ENABLED=false
+```
+
+#### Local dev on your PC
+
+```bash
+copy env.import.template .env
+```
+
+Edit `.env` with your real key. Run `npm run dev`.  
+The `.env` file stays **only on your computer** — never uploaded to GitHub.
+
+> **Why not commit `.env` to GitHub?** It contains secrets. Anyone could steal your database access. GitHub + Vercel both block this on purpose.
+
+Also check before Deploy:
 - **Framework Preset:** Vite  
 - **Build Command:** `npm run build`  
 - **Output Directory:** `dist`  
