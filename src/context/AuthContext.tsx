@@ -191,21 +191,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const onVisible = () => {
       if (document.visibilityState !== 'visible' || !mounted) return;
+
+      if (window.location.pathname.startsWith('/admin')) {
+        touchSession('admin');
+        return;
+      }
+
       touchSession('customer');
-      void withTimeout(supabase.auth.getSession(), 8_000, { data: { session: null }, error: null }).then(
-        ({ data }) => {
-          if (!mounted) return;
-          if (!data.session?.user) {
-            setSession(null);
-            setUser(null);
-            setProfile(null);
-            return;
+      void withTimeout(supabase.auth.getUser(), 8_000, null).then((result) => {
+        if (!mounted || result === null) return;
+
+        const { data, error } = result;
+        if (error || !data.user) return;
+
+        setUser(data.user);
+        void withTimeout(supabase.auth.getSession(), 8_000, { data: { session: null }, error: null }).then(
+          ({ data: sessionData }) => {
+            if (!mounted || !sessionData.session) return;
+            setSession(sessionData.session);
+            void loadProfile(sessionData.session.user);
           }
-          setSession(data.session);
-          setUser(data.session.user);
-          void loadProfile(data.session.user);
-        }
-      );
+        );
+      });
     };
 
     document.addEventListener('visibilitychange', onVisible);

@@ -27,8 +27,8 @@ export default function ProductsPage() {
     [categories]
   );
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
+  const loadData = useCallback(async (options?: { silent?: boolean }) => {
+    if (!options?.silent) setLoading(true);
     try {
       const [prods, cats] = await Promise.all([
         fetchAllProducts(false),
@@ -37,9 +37,9 @@ export default function ProductsPage() {
       setProducts(prods);
       setCategories(cats);
     } catch {
-      setProducts([]);
+      if (!options?.silent) setProducts([]);
     } finally {
-      setLoading(false);
+      if (!options?.silent) setLoading(false);
     }
   }, []);
 
@@ -189,16 +189,20 @@ export default function ProductsPage() {
         onClose={() => { setSelectedProduct(null); setIsEditing(false); setIsNew(false); }}
         size="xl"
       >
-        {selectedProduct && categories.length > 0 && (
-          <ProductForm
-            product={selectedProduct}
-            categories={categories}
-            isEditing={isEditing}
-            isNew={isNew}
-            categoryIdMap={categoryIdMap}
-            onClose={() => { setSelectedProduct(null); setIsEditing(false); setIsNew(false); }}
-            onSaved={loadData}
-          />
+        {selectedProduct && (
+          categories.length > 0 ? (
+            <ProductForm
+              product={selectedProduct}
+              categories={categories}
+              isEditing={isEditing}
+              isNew={isNew}
+              categoryIdMap={categoryIdMap}
+              onClose={() => { setSelectedProduct(null); setIsEditing(false); setIsNew(false); }}
+              onSaved={() => loadData({ silent: !!selectedProduct })}
+            />
+          ) : (
+            <div className="p-8 text-center text-sm text-ink-secondary">Loading categories…</div>
+          )
         )}
       </Modal>
     </div>

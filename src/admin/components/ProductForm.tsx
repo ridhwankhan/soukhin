@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Upload, X, Loader2 } from 'lucide-react';
 import { Product } from '../../types';
 import { AssignableCategory } from '../../lib/categoryService';
@@ -14,6 +14,39 @@ interface ProductFormProps {
   categoryIdMap: Record<string, string>;
   onClose: () => void;
   onSaved: () => void;
+}
+
+const PRODUCT_DRAFT_KEY = 'soukhin_admin_product_draft';
+
+type ProductDraft = {
+  form: {
+    name: string;
+    nameBn: string;
+    categorySlug: string;
+    price: number;
+    salePrice: number | '';
+    stock: number;
+    sku: string;
+    description: string;
+    descriptionBn: string;
+    sizeOptions: string;
+    colorOptions: string;
+    foodNote: string;
+    deliveryNote: string;
+    tags: string;
+    badges: string;
+    isActive: boolean;
+    isFeatured: boolean;
+  };
+  imageUrls: string[];
+};
+
+function clearProductDraft() {
+  try {
+    sessionStorage.removeItem(PRODUCT_DRAFT_KEY);
+  } catch {
+    // ignore
+  }
 }
 
 export default function ProductForm({
@@ -54,6 +87,37 @@ export default function ProductForm({
   });
 
   const canEdit = isEditing || isNew;
+
+  useEffect(() => {
+    if (!isNew) return;
+    try {
+      const raw = sessionStorage.getItem(PRODUCT_DRAFT_KEY);
+      if (!raw) return;
+      const draft = JSON.parse(raw) as ProductDraft;
+      setForm(draft.form);
+      setImageUrls(draft.imageUrls ?? []);
+    } catch {
+      // ignore corrupt draft
+    }
+  }, [isNew]);
+
+  useEffect(() => {
+    if (!isNew || !canEdit) return;
+    const timer = window.setTimeout(() => {
+      try {
+        const draft: ProductDraft = { form, imageUrls };
+        sessionStorage.setItem(PRODUCT_DRAFT_KEY, JSON.stringify(draft));
+      } catch {
+        // ignore quota errors
+      }
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, [isNew, canEdit, form, imageUrls]);
+
+  const handleClose = () => {
+    if (isNew) clearProductDraft();
+    onClose();
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
@@ -122,8 +186,9 @@ export default function ProductForm({
       };
 
       await saveProduct(input);
+      if (isNew) clearProductDraft();
       onSaved();
-      onClose();
+      handleClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save product.');
     } finally {
@@ -140,7 +205,7 @@ export default function ProductForm({
         </h2>
         {canEdit && (
           <div className="flex gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={handleClose}>Cancel</Button>
             <Button type="submit" loading={saving || uploading}>
               {uploading ? 'Uploading images...' : 'Save'}
             </Button>

@@ -43,14 +43,27 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [adminError, setAdminError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const loadAdmin = useCallback(async () => {
+  const loadAdmin = useCallback(async (options?: { preserveOnFailure?: boolean }) => {
     const result = await withTimeout(fetchMyAdminProfileWithRetry(3), 15_000, {
       admin: null,
       error: 'Profile load timed out',
     });
-    setAdmin(result.admin);
-    setAdminError(result.admin ? null : result.error ?? null);
-    return result.admin;
+
+    if (result.admin) {
+      setAdmin(result.admin);
+      setAdminError(null);
+      return result.admin;
+    }
+
+    if (options?.preserveOnFailure) {
+      setAdmin((prev) => prev);
+      if (result.error) setAdminError(result.error);
+      return null;
+    }
+
+    setAdmin(null);
+    setAdminError(result.error ?? null);
+    return null;
   }, []);
 
   const setAdminProfile = useCallback((profile: AdminUser | null) => {
@@ -113,21 +126,28 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
     const onVisible = () => {
       if (document.visibilityState !== 'visible' || !mounted) return;
-      if (window.location.pathname.startsWith('/admin')) touchSession('admin');
-      void withTimeout(supabase.auth.getSession(), 8_000, { data: { session: null }, error: null }).then(
-        ({ data }) => {
-          if (!mounted) return;
-          if (!data.session?.user) {
-            setSession(null);
-            setUser(null);
-            setAdmin(null);
-            return;
+
+      // On admin pages, only extend idle timer — do not re-fetch session (tab blur
+      // often times out getSession and was wiping admin state + closing open forms).
+      if (window.location.pathname.startsWith('/admin')) {
+        touchSession('admin');
+        return;
+      }
+
+      void withTimeout(supabase.auth.getUser(), 8_000, null).then((result) => {
+        if (!mounted || result === null) return;
+
+        const { data, error } = result;
+        if (error || !data.user) return;
+
+        setUser(data.user);
+        void withTimeout(supabase.auth.getSession(), 8_000, { data: { session: null }, error: null }).then(
+          ({ data: sessionData }) => {
+            if (sessionData.session) setSession(sessionData.session);
           }
-          setSession(data.session);
-          setUser(data.session.user);
-          void loadAdmin();
-        }
-      );
+        );
+        void loadAdmin({ preserveOnFailure: true });
+      });
     };
 
     document.addEventListener('visibilitychange', onVisible);
