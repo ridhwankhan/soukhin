@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MessageCircle, X, Mail } from 'lucide-react';
-import { CONTACT_EMAIL, WHATSAPP_NUMBER } from '../../config';
+import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_PHONE_URL, WHATSAPP_URL } from '../../config';
 
 export default function SupportFab() {
   const [open, setOpen] = useState(false);
@@ -15,19 +15,26 @@ export default function SupportFab() {
             <p className="text-xs text-[#666666] dark:text-white/60 mt-0.5">We usually reply within a few hours.</p>
           </div>
           <div className="p-2 space-y-1">
-            {WHATSAPP_NUMBER ? (
-              <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-[#2D2D2D] dark:text-white hover:bg-[#F5F0E8] dark:hover:bg-white/5 transition-colors"
-              >
-                <span className="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center flex-shrink-0">
-                  <MessageCircle className="w-4 h-4 fill-white" />
-                </span>
-                WhatsApp
-              </a>
-            ) : null}
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-[#2D2D2D] dark:text-white hover:bg-[#F5F0E8] dark:hover:bg-white/5 transition-colors"
+            >
+              <span className="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center flex-shrink-0">
+                <MessageCircle className="w-4 h-4 fill-white" />
+              </span>
+              WhatsApp ({CONTACT_PHONE})
+            </a>
+            <a
+              href={CONTACT_PHONE_URL}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-[#2D2D2D] dark:text-white hover:bg-[#F5F0E8] dark:hover:bg-white/5 transition-colors"
+            >
+              <span className="w-8 h-8 rounded-full bg-[#1B4332] text-white flex items-center justify-center flex-shrink-0 text-xs font-semibold">
+                📞
+              </span>
+              Call {CONTACT_PHONE}
+            </a>
             <a
               href={`mailto:${CONTACT_EMAIL}`}
               className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-[#2D2D2D] dark:text-white hover:bg-[#F5F0E8] dark:hover:bg-white/5 transition-colors"

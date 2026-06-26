@@ -27,7 +27,7 @@ export const BRAND_CONFIG = {
   social: {
     facebook: '',
     instagram: '',
-    whatsapp: '',
+    whatsapp: '8801577577168',
   },
 
   currency: {

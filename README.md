@@ -6,7 +6,55 @@
 
 Production-ready storefront and admin dashboard. **React + Vite + Supabase + Vercel.**
 
-**Your Supabase project:** `https://yxctdtihkmslpidscfph.supabase.co`
+**Your Supabase project:** `https://yxctdtihkmslpidscfph.supabase.co`  
+**Live site:** `https://soukhin.vercel.app`
+
+---
+
+## Login credentials (how to access everything)
+
+### Store owner — admin dashboard
+
+| Field | Value |
+|-------|--------|
+| **URL** | [https://soukhin.vercel.app/admin/login](https://soukhin.vercel.app/admin/login) |
+| **Email** | `shoukhin.lifestyle.bd@gmail.com` |
+| **Password** | The password **you set** in Supabase (see below) |
+| **Role** | Owner (full access) |
+
+The password is **not stored in GitHub** (security). You create or reset it in Supabase:
+
+1. [Supabase Dashboard](https://supabase.com/dashboard) → your project → **Authentication** → **Users**
+2. If no user exists: **Add user** → email `shoukhin.lifestyle.bd@gmail.com` → choose a password → ✅ **Auto Confirm User**
+3. If user exists: click the user → **Send password recovery** or set a new password
+4. Confirm **Table Editor → `admin_users`** has a row with the same email and role `owner` (created by `ONE_CLICK_DATABASE_SETUP.sql`)
+
+After login you can manage products, orders, staff, and settings.
+
+### Customer accounts (shoppers)
+
+| Field | Value |
+|-------|--------|
+| **Sign up / sign in** | [https://soukhin.vercel.app/auth](https://soukhin.vercel.app/auth) |
+| **Who** | Anyone — customers create their own account with email + password |
+| **Note** | Email must be verified before checkout |
+
+### Adding staff (inventory manager, order manager, etc.)
+
+1. Log in as Owner at `/admin/login`
+2. Go to **Admin → Users** (`/admin/users`)
+3. Add staff email + role → **Send invite**
+4. They set a password from the invite email and sign in at `/admin/login`
+
+---
+
+## Store contact (on the website)
+
+| Channel | Details |
+|---------|---------|
+| **Email** | [shoukhin.lifestyle.bd@gmail.com](mailto:shoukhin.lifestyle.bd@gmail.com) |
+| **Phone / WhatsApp** | [01577577168](https://wa.me/8801577577168) |
+| **Developer** | [ridhwankhan03@gmail.com](mailto:ridhwankhan03@gmail.com) |
 
 ---
 
@@ -35,7 +83,8 @@ Use **[env.import.template](./env.import.template)** — fill it once, import on
 |----------|---------|
 | `VITE_SUPABASE_URL` | `https://yxctdtihkmslpidscfph.supabase.co` |
 | `VITE_SUPABASE_ANON_KEY` | `sb_publishable_...` from Supabase → Settings → API |
-| `VITE_SITE_URL` | `https://your-app.vercel.app` |
+| `VITE_SITE_URL` | `https://soukhin.vercel.app` |
+| `VITE_WHATSAPP_NUMBER` | `8801577577168` (01577577168 in international format) |
 
 ---
 
@@ -192,8 +241,9 @@ BKASH_BASE_URL=https://tokenized.sandbox.bka.sh/v1.2.0-beta
 ```
 VITE_SUPABASE_URL=https://xxx.supabase.co
 VITE_SUPABASE_ANON_KEY=your_anon_key
-VITE_SITE_URL=https://your-app.vercel.app
+VITE_SITE_URL=https://soukhin.vercel.app
 VITE_BKASH_ENABLED=false
+VITE_WHATSAPP_NUMBER=8801577577168
 ```
 
 7. Click **Deploy**
@@ -218,7 +268,7 @@ VITE_BKASH_ENABLED=false
 - [ ] Create customer account on storefront, verify email, place test order
 - [ ] Test order tracking at `/track-order`
 - [ ] Add inventory managers under **Admin → Users** → Send invite
-- [ ] Set `WHATSAPP_NUMBER` in `src/config/site.ts` and redeploy for COD WhatsApp messages
+- [ ] WhatsApp `8801577577168` is set in code; add `VITE_WHATSAPP_NUMBER=8801577577168` on Vercel if you override env
 - [ ] When bKash merchant ready: set secrets, `VITE_BKASH_ENABLED=true`, redeploy
 
 ---
@@ -247,6 +297,7 @@ npm run load-test      # stress-test public endpoints (optional)
 | `VITE_SUPABASE_URL` | Vercel + `.env` | Supabase project URL |
 | `VITE_SUPABASE_ANON_KEY` | Vercel + `.env` | Public API key |
 | `VITE_SITE_URL` | Vercel + `.env` | Your live URL (bKash origin check) |
+| `VITE_WHATSAPP_NUMBER` | Vercel + `.env` | `8801577577168` — store WhatsApp |
 | `VITE_BKASH_ENABLED` | Vercel | `true` when bKash is configured |
 | Edge function secrets | Supabase only | bKash keys, service role, `SITE_URL` |
 
@@ -292,8 +343,9 @@ React 18 · TypeScript · Vite · Tailwind CSS · Supabase · Three.js · Framer
 
 ## Support contact
 
-Store email: **shoukhin.lifestyle.bd@gmail.com**
-
----
+- **Store email:** shoukhin.lifestyle.bd@gmail.com  
+- **Phone / WhatsApp:** 01577577168 ([wa.me/8801577577168](https://wa.me/8801577577168))  
+- **Admin login:** https://soukhin.vercel.app/admin/login (owner email above + Supabase password)  
+- **Developer:** ridhwankhan03@gmail.com
 
 MIT License · Built for the Bangladeshi ecommerce community.

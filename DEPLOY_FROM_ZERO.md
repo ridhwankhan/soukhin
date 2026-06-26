@@ -96,18 +96,19 @@ You do **not** need to type each variable one by one.
 3. Save the file (e.g. as `my-vercel.env`)
 4. On Vercel import screen → expand **Environment Variables**
 5. Click **Import .env** (or **Browse** / paste the file contents)
-6. Select your filled file — all 4 variables appear at once
+6. Select your filled file — all 5 variables appear at once
 7. Check **Production**, **Preview**, and **Development** are all ticked
 
 #### Option B — Copy/paste lines
 
-Paste these 4 lines into Vercel’s env box (after filling real values):
+Paste these 5 lines into Vercel’s env box (after filling real values):
 
 ```
 VITE_SUPABASE_URL=https://yxctdtihkmslpidscfph.supabase.co
 VITE_SUPABASE_ANON_KEY=sb_publishable_your_key_here
-VITE_SITE_URL=https://your-app.vercel.app
+VITE_SITE_URL=https://soukhin.vercel.app
 VITE_BKASH_ENABLED=false
+VITE_WHATSAPP_NUMBER=8801577577168
 ```
 
 #### Local dev on your PC
@@ -161,7 +162,12 @@ Also check before Deploy:
 | Add products | `/admin/products` after login |
 | Add inventory managers | `/admin/users` after login |
 
-**Login:** email from `admin_users` + password you created in Authentication → Users
+**Login:** `shoukhin.lifestyle.bd@gmail.com` + password you set in **Authentication → Users** (see Part A4)
+
+| Channel | Contact |
+|---------|---------|
+| Email | shoukhin.lifestyle.bd@gmail.com |
+| Phone / WhatsApp | 01577577168 |
 
 ---
 
@@ -219,7 +225,7 @@ This app uses **`VITE_`** not `NEXT_PUBLIC_`. Ignore the Next.js tab in Supabase
 - [ ] Created user in Authentication → Users (Auto Confirm ON)  
 - [ ] Set Auth URL Configuration  
 - [ ] Vercel project imported from GitHub  
-- [ ] 3 env vars set on Vercel  
+- [ ] 5 env vars set on Vercel (including `VITE_WHATSAPP_NUMBER`)  
 - [ ] Redeployed after setting `VITE_SITE_URL`  
 - [ ] Logged in at `/admin/login`  
 - [ ] Added a product in Admin → Products  

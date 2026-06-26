@@ -1,16 +1,21 @@
 import { SiteSettings } from '../types';
 
-// Store contact email
+// Store contact
 export const CONTACT_EMAIL = 'shoukhin.lifestyle.bd@gmail.com';
+export const CONTACT_PHONE = '01577577168';
+/** International format for tel: / wa.me (no + or spaces) */
+export const CONTACT_PHONE_DIAL = '8801577577168';
 
 // Site developer credit (footer)
 export const DEVELOPER_NAME = 'Ridhwan';
 export const DEVELOPER_EMAIL = 'ridhwankhan03@gmail.com';
 
-// WhatsApp number (format: country code + number, no spaces or symbols)
-// Example: "8801712345678" for Bangladesh — set in Vercel as VITE_WHATSAPP_NUMBER
+// WhatsApp — defaults to store number; override with VITE_WHATSAPP_NUMBER on Vercel
 export const WHATSAPP_NUMBER =
-  (import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined)?.trim() || '';
+  (import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined)?.trim() || CONTACT_PHONE_DIAL;
+
+export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
+export const CONTACT_PHONE_URL = `tel:+${CONTACT_PHONE_DIAL}`;
 
 export const SITE_SETTINGS: SiteSettings = {
   hero: {

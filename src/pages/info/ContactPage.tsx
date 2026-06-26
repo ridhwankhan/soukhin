@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MapPin, MessageCircle, Clock } from 'lucide-react';
-import { CONTACT_EMAIL } from '../../config';
+import { Mail, MapPin, MessageCircle, Clock, Phone } from 'lucide-react';
+import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_PHONE_URL, WHATSAPP_URL } from '../../config';
 import { submitContactMessage } from '../../lib/contactService';
 import { isValidEmail } from '../../lib/validators';
 import Button from '../../components/ui/Button';
@@ -163,12 +163,31 @@ export default function ContactPage() {
                   </div>
 
                   <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-[#1B4332]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Phone className="w-5 h-5 text-[#1B4332]" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-[#2D2D2D]">Phone</h3>
+                      <a href={CONTACT_PHONE_URL} className="text-sm text-[#1B4332] hover:underline">
+                        {CONTACT_PHONE}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
                     <div className="w-10 h-10 bg-[#25D366]/10 rounded-full flex items-center justify-center flex-shrink-0">
                       <MessageCircle className="w-5 h-5 text-[#25D366]" />
                     </div>
                     <div>
                       <h3 className="font-medium text-[#2D2D2D]">WhatsApp</h3>
-                      <p className="text-sm text-[#666666]">Message us anytime</p>
+                      <a
+                        href={WHATSAPP_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-[#1B4332] hover:underline"
+                      >
+                        {CONTACT_PHONE} — message us anytime
+                      </a>
                     </div>
                   </div>
                 </div>
