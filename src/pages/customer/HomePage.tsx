@@ -2,12 +2,11 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, ChevronRight, Truck, Shield, Award, Heart } from 'lucide-react';
-import HeroScene from '../../components/hero/HeroScene';
+import HeroSection from '../../components/hero/HeroSection';
 import ProductCard from '../../components/product/ProductCard';
 import { fetchFeaturedProducts, fetchNewArrivals } from '../../lib/productService';
 import { getTopLevelCategories } from '../../lib/categoryService';
 import { Product, Category } from '../../types';
-import { SITE_SETTINGS } from '../../config';
 
 export default function HomePage() {
   const [currentBanner, setCurrentBanner] = useState(0);
@@ -39,63 +38,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative min-h-[90vh] lg:min-h-screen flex items-center justify-center overflow-hidden">
-        <HeroScene />
-
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-[#2D2D2D] mb-4"
-          >
-            {SITE_SETTINGS.hero.title}
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-lg md:text-xl text-[#666666] mb-8"
-          >
-            {SITE_SETTINGS.hero.subtitle}
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-wrap justify-center gap-4"
-          >
-            <Link
-              to="/category/wearables"
-              className="px-8 py-3 bg-[#1B4332] text-white rounded-sm font-medium hover:bg-[#163828] transition-colors"
-            >
-              Shop Collection
-            </Link>
-            <Link
-              to="/category/new-arrivals"
-              className="px-8 py-3 border-2 border-[#1B4332] text-[#1B4332] rounded-sm font-medium hover:bg-[#1B4332] hover:text-white transition-colors"
-            >
-              New Arrivals
-            </Link>
-          </motion.div>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
-          <div className="w-6 h-10 border-2 border-[#1B4332] rounded-full flex justify-center">
-            <motion.div
-              animate={{ y: [0, 12, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="w-1.5 h-1.5 bg-[#1B4332] rounded-full mt-2"
-            />
-          </div>
-        </motion.div>
-      </section>
+      <HeroSection />
 
       {/* Categories */}
       <section className="py-16 md:py-24 bg-white">
