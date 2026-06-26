@@ -79,7 +79,7 @@ export async function inviteStaffByEmail(email: string): Promise<{ invited: bool
     },
     body: JSON.stringify({
       email: email.trim().toLowerCase(),
-      redirectTo: `${window.location.origin}/admin/login`,
+      redirectTo: `${window.location.origin}/auth?mode=login&returnTo=${encodeURIComponent('/admin')}`,
     }),
   });
 

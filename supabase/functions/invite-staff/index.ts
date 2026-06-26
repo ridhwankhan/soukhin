@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
 
     const body = await req.json();
     const email = String(body.email ?? '').trim().toLowerCase();
-    const redirectTo = body.redirectTo ?? `${Deno.env.get('SITE_URL') ?? ''}/admin/login`;
+    const redirectTo = body.redirectTo ?? `${Deno.env.get('SITE_URL') ?? ''}/auth?mode=login&returnTo=${encodeURIComponent('/admin')}`;
 
     if (!email) {
       return new Response(JSON.stringify({ error: 'Email is required' }), {
@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
         return new Response(
           JSON.stringify({
             invited: false,
-            message: 'This email already has an account. They can sign in at /admin/login directly.',
+            message: 'This email already has an account. They can sign in at /auth directly.',
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
@@ -96,7 +96,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         invited: true,
-        message: `Invite sent to ${email}. They must set a password via the email link, then sign in at /admin/login.`,
+        message: `Invite sent to ${email}. They must set a password via the email link, then sign in at /auth.`,
         userId: inviteData.user?.id,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

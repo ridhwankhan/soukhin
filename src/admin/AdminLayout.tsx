@@ -27,8 +27,6 @@ import { useAdminAuth } from '../context/AdminAuthContext';
 import NotificationPanel from './components/NotificationPanel';
 import { ROLE_LABELS } from '../config';
 import { Permission } from '../types';
-
-const navItems = [
   {
     label: 'Dashboard',
     icon: LayoutDashboard,

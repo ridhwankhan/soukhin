@@ -158,7 +158,7 @@ Also check before Deploy:
 
 | What | URL |
 |------|-----|
-| Staff login | `https://YOUR-VERCEL-URL.vercel.app/admin/login` |
+| Staff login | `https://YOUR-VERCEL-URL.vercel.app/auth` (staff emails → dashboard) |
 | Add products | `/admin/products` after login |
 | Add inventory managers | `/admin/users` after login |
 
@@ -227,7 +227,7 @@ This app uses **`VITE_`** not `NEXT_PUBLIC_`. Ignore the Next.js tab in Supabase
 - [ ] Vercel project imported from GitHub  
 - [ ] 5 env vars set on Vercel (including `VITE_WHATSAPP_NUMBER`)  
 - [ ] Redeployed after setting `VITE_SITE_URL`  
-- [ ] Logged in at `/admin/login`  
+- [ ] Logged in at `/auth` as owner → opens dashboard  
 - [ ] Added a product in Admin → Products  
 
 You’re live. 🎉

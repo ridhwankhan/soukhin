@@ -90,8 +90,8 @@ export default function Footer() {
                 </li>
               ))}
               <li className="pt-2 border-t border-white/10 mt-2">
-                <Link to="/admin/login" className="text-sm text-white/50 hover:text-white transition-colors">
-                  Staff Login
+                <Link to="/auth?mode=login&returnTo=%2Fadmin" className="text-sm text-white/50 hover:text-white transition-colors">
+                  Staff Sign In
                 </Link>
               </li>
             </ul>

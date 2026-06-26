@@ -84,7 +84,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     clearSessionMarkers('admin');
     await signOutAdmin();
     setAdmin(null);
-    navigate('/admin/login');
+    navigate('/');
   }, [navigate]);
 
   const { showWarning, idleRemainingMs, extendSession } = useSessionManager({

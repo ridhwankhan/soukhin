@@ -3,6 +3,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useAdminAuth } from '../../context/AdminAuthContext';
+import { getStaffPostLoginPath } from '../../lib/staffAuth';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { CONTACT_EMAIL } from '../../config';
@@ -17,6 +19,7 @@ export default function AuthPage() {
   const justVerified = searchParams.get('verified') === '1';
 
   const { user, profile, loading, isEmailVerified, signIn, signUp, resendVerificationEmail } = useAuth();
+  const { admin, loading: adminLoading } = useAdminAuth();
 
   const [activeMode, setActiveMode] = useState<AuthMode>(mode);
   const [error, setError] = useState('');
@@ -38,16 +41,23 @@ export default function AuthPage() {
   }, [mode]);
 
   useEffect(() => {
+    if (loading || adminLoading) return;
+
+    if (user && isEmailVerified && admin) {
+      navigate(getStaffPostLoginPath(admin.role, returnTo.startsWith('/') ? returnTo : '/'), { replace: true });
+      return;
+    }
+
     if (!loading && user && isEmailVerified && profile) {
       navigate(returnTo.startsWith('/') ? returnTo : '/', { replace: true });
     }
     if (!loading && user && isEmailVerified && !profile && activeMode !== 'register') {
-      navigate('/account', { replace: true });
+      navigate(returnTo.startsWith('/') ? returnTo : '/account', { replace: true });
     }
     if (!loading && user && !isEmailVerified) {
       setActiveMode('verify');
     }
-  }, [loading, user, isEmailVerified, profile, navigate, returnTo, activeMode]);
+  }, [loading, adminLoading, user, isEmailVerified, profile, admin, navigate, returnTo, activeMode]);
 
   useEffect(() => {
     if (justVerified) {
@@ -67,6 +77,11 @@ export default function AuthPage() {
 
     if (result.error) {
       setError(result.error);
+      return;
+    }
+
+    if (result.isStaff && result.staffRole) {
+      navigate(getStaffPostLoginPath(result.staffRole, returnTo.startsWith('/') ? returnTo : '/'), { replace: true });
       return;
     }
 
@@ -120,7 +135,7 @@ export default function AuthPage() {
     setSuccess('Verification email sent. Please check your inbox.');
   };
 
-  if (loading) {
+  if (loading || adminLoading) {
     return (
       <div className="min-h-screen bg-[#F8F6F3] flex items-center justify-center">
         <div className="w-10 h-10 border-2 border-[#1B4332] border-t-transparent rounded-full animate-spin" />
@@ -145,7 +160,7 @@ export default function AuthPage() {
               ? 'Sign up to shop, track orders, and manage your details.'
               : activeMode === 'verify'
               ? 'Confirm your email to start shopping with Soukhin.'
-              : 'Sign in to continue shopping.'}
+              : 'Sign in to shop — staff emails go to the dashboard automatically.'}
           </p>
         </div>
 
@@ -308,11 +323,6 @@ export default function AuthPage() {
         <p className="text-center mt-6">
           <Link to="/" className="text-sm text-[#1B4332] hover:underline">
             ← Back to shopping
-          </Link>
-        </p>
-        <p className="text-center mt-3">
-          <Link to="/admin/login" className="text-xs text-[#666666] hover:text-[#1B4332] hover:underline">
-            Staff / admin login →
           </Link>
         </p>
       </div>

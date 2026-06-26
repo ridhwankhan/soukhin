@@ -111,6 +111,6 @@ export const FOOTER_LINKS = {
     { href: '/terms', label: 'Terms & Conditions' },
   ],
   staff: [
-    { href: '/admin/login', label: 'Staff Login' },
+    { href: '/auth?mode=login&returnTo=%2Fadmin', label: 'Staff Sign In' },
   ],
 };

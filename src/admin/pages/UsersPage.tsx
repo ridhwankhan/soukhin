@@ -158,7 +158,7 @@ export default function UsersPage() {
         <ol className="list-decimal list-inside space-y-1">
           <li>Add a person with their email and role (e.g. Inventory Manager).</li>
           <li>Click <strong>Send invite</strong> — they receive an email to set a password.</li>
-          <li>They sign in at <code className="text-xs bg-white px-1 rounded">/admin/login</code> with that email.</li>
+          <li>They sign in at <code className="text-xs bg-white px-1 rounded">/auth</code> with that email (same as customers).</li>
         </ol>
         {admin?.role === 'admin' && (
           <p className="mt-2 text-amber-700">As Admin you can assign Moderator, Order Manager, and Inventory Manager roles only.</p>

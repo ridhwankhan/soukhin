@@ -7,6 +7,8 @@ import { NAV_LINKS, NAV_DROPDOWNS, BRAND_CONFIG } from '../../config';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
+import { useAdminAuth } from '../../context/AdminAuthContext';
+import { canStaffUseStorefront } from '../../lib/staffAuth';
 
 interface HeaderProps {
   onCartClick: () => void;
@@ -23,6 +25,8 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
   const { getItemCount } = useCart();
   const { items: wishlistItems } = useWishlist();
   const { user, profile, isEmailVerified } = useAuth();
+  const { admin } = useAdminAuth();
+  const canShopAsStaff = admin ? canStaffUseStorefront(admin.role) : false;
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const isHome = location.pathname === '/';
@@ -205,18 +209,29 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
               )}
             </button>
 
-            {user && isEmailVerified ? (
+            {user && isEmailVerified && admin ? (
+              <Link
+                to="/admin"
+                className="hidden md:flex items-center gap-2 px-3 py-2 hover:bg-[#F5F0E8] dark:hover:bg-white/10 rounded-full transition-colors text-sm font-medium text-[#1B4332] dark:text-white/90"
+                title="Staff dashboard"
+              >
+                <Shield className="w-4 h-4" />
+                Dashboard
+              </Link>
+            ) : null}
+
+            {user && isEmailVerified && (!admin || canShopAsStaff) ? (
               <Link
                 to="/account"
-                className="hidden md:flex items-center gap-2 p-2 hover:bg-[#F5F0E8] rounded-full transition-colors"
-                title={profile?.name || 'My Account'}
+                className="hidden md:flex items-center gap-2 p-2 hover:bg-[#F5F0E8] dark:hover:bg-white/10 rounded-full transition-colors"
+                title={profile?.name || admin?.name || 'My Account'}
               >
-                <User className="w-5 h-5 text-[#2D2D2D]" />
+                <User className="w-5 h-5 text-[#2D2D2D] dark:text-white/90" />
               </Link>
-            ) : (
+            ) : user && isEmailVerified && admin ? null : (
               <Link
                 to="/auth"
-                className="hidden md:flex items-center gap-2 px-3 py-2 hover:bg-[#F5F0E8] rounded-full transition-colors text-sm font-medium text-[#2D2D2D]"
+                className="hidden md:flex items-center gap-2 px-3 py-2 hover:bg-[#F5F0E8] dark:hover:bg-white/10 rounded-full transition-colors text-sm font-medium text-[#2D2D2D] dark:text-white/90"
               >
                 <LogIn className="w-4 h-4" />
                 Sign In
@@ -311,28 +326,30 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
                   </div>
                 );
               })}
-              {user && isEmailVerified ? (
+              {user && isEmailVerified && admin ? (
+                <Link
+                  to="/admin"
+                  className="block px-4 py-3 rounded-sm text-sm font-medium hover:bg-[#F5F0E8] dark:hover:bg-white/5 mt-2 border-t border-[#F5F0E8] dark:border-white/10 pt-4 flex items-center gap-2 text-[#1B4332] dark:text-white/90"
+                >
+                  <Shield className="w-4 h-4" />
+                  Staff Dashboard
+                </Link>
+              ) : null}
+              {user && isEmailVerified && (!admin || canShopAsStaff) ? (
                 <Link
                   to="/account"
-                  className="block px-4 py-3 rounded-sm text-sm font-medium hover:bg-[#F5F0E8] mt-2 border-t border-[#F5F0E8] pt-4"
+                  className="block px-4 py-3 rounded-sm text-sm font-medium hover:bg-[#F5F0E8] dark:hover:bg-white/5 mt-2 border-t border-[#F5F0E8] dark:border-white/10 pt-4"
                 >
                   My Account
                 </Link>
-              ) : (
+              ) : !user || !isEmailVerified ? (
                 <Link
                   to="/auth"
-                  className="block px-4 py-3 rounded-sm text-sm font-medium hover:bg-[#F5F0E8] mt-2 border-t border-[#F5F0E8] pt-4"
+                  className="block px-4 py-3 rounded-sm text-sm font-medium hover:bg-[#F5F0E8] dark:hover:bg-white/5 mt-2 border-t border-[#F5F0E8] dark:border-white/10 pt-4"
                 >
                   Sign In / Register
                 </Link>
-              )}
-              <Link
-                to="/admin/login"
-                className="block px-4 py-3 rounded-sm text-sm font-medium hover:bg-[#F5F0E8] dark:hover:bg-white/5 text-[#666666] dark:text-white/70 flex items-center gap-2"
-              >
-                <Shield className="w-4 h-4" />
-                Staff / Admin Login
-              </Link>
+              ) : null}
             </div>
           </motion.div>
         )}

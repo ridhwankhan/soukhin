@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import { Permission } from '../../types';
+import { getUnifiedLoginPath } from '../../lib/staffAuth';
 
 interface AdminProtectedRouteProps {
   children: React.ReactNode;
@@ -23,7 +24,7 @@ export default function AdminProtectedRoute({ children, permission }: AdminProte
   }
 
   if (!admin) {
-    return <Navigate to="/admin/login" state={{ from: location.pathname }} replace />;
+    return <Navigate to={getUnifiedLoginPath(location.pathname)} replace />;
   }
 
   if (permission && !can(permission)) {

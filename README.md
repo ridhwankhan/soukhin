@@ -17,10 +17,17 @@ Production-ready storefront and admin dashboard. **React + Vite + Supabase + Ver
 
 | Field | Value |
 |-------|--------|
-| **URL** | [https://soukhin.vercel.app/admin/login](https://soukhin.vercel.app/admin/login) |
+| **Sign in** | [https://soukhin.vercel.app/auth](https://soukhin.vercel.app/auth) — same page as customers |
 | **Email** | `shoukhin.lifestyle.bd@gmail.com` |
 | **Password** | The password **you set** in Supabase (see below) |
-| **Role** | Owner (full access) |
+| **After login** | Redirects automatically to `/admin` dashboard |
+
+Staff and owner use the **same Sign In button** on the storefront. No separate `/admin/login` page needed (that URL redirects to Sign In).
+
+| Role | After sign-in | Can shop on storefront? |
+|------|---------------|-------------------------|
+| **Owner / Admin** | Admin dashboard | Browse store via **View Store** in dashboard menu |
+| **Inventory / Order manager / Moderator** | Admin dashboard (or checkout if they were shopping) | Yes — cart, wishlist, and checkout |
 
 The password is **not stored in GitHub** (security). You create or reset it in Supabase:
 
@@ -41,10 +48,10 @@ After login you can manage products, orders, staff, and settings.
 
 ### Adding staff (inventory manager, order manager, etc.)
 
-1. Log in as Owner at `/admin/login`
+1. Log in as Owner at `/auth`
 2. Go to **Admin → Users** (`/admin/users`)
 3. Add staff email + role → **Send invite**
-4. They set a password from the invite email and sign in at `/admin/login`
+4. They set a password from the invite email and sign in at **`/auth`** (same page as customers)
 
 ---
 
@@ -62,7 +69,7 @@ After login you can manage products, orders, staff, and settings.
 
 1. **Supabase** — SQL Editor → paste all of [`supabase/ONE_CLICK_DATABASE_SETUP.sql`](./supabase/ONE_CLICK_DATABASE_SETUP.sql) → **RUN** → create user in Authentication  
 2. **Vercel** — import [github.com/ridhwankhan/soukhin](https://github.com/ridhwankhan/soukhin) → add env vars → Deploy  
-3. **Test** — open `https://your-app.vercel.app/admin/login`
+3. **Test** — open `https://your-app.vercel.app/auth` and sign in as owner
 
 Full details: **[DEPLOY_FROM_ZERO.md](./DEPLOY_FROM_ZERO.md)**
 
@@ -100,7 +107,7 @@ Use **[env.import.template](./env.import.template)** — fill it once, import on
 - Contact form with spam protection
 - Order history on account page
 
-### Admin dashboard (`/admin/login`)
+### Admin dashboard (`/admin` — sign in via `/auth`)
 - Role-based access: **Owner**, **Admin**, **Moderator**, **Order Manager**, **Inventory Manager**
 - **Staff & role management** (Owner + Admin): add emails, assign roles, send invite, deactivate
 - Products CRUD with compressed image upload to Supabase Storage
@@ -124,7 +131,7 @@ Use **[env.import.template](./env.import.template)** — fill it once, import on
 1. Go to **Admin → Users** (`/admin/users`)
 2. Click **Add Staff Member** — enter name, email, role
 3. Click **Send invite** — they get an email to set a password
-4. They sign in at **`/admin/login`** with that email
+4. They sign in at **`/auth`** with that email (redirects to dashboard).
 
 > **Owner only** can promote someone to Admin or Owner. Admins can add multiple Inventory Managers, Order Managers, etc.
 
@@ -189,7 +196,7 @@ In **Authentication → Users → Add user**:
 - Password: strong password
 - ✅ Auto Confirm User (so you can log in immediately)
 
-Sign in at `https://your-app.vercel.app/admin/login` after deploy.
+Sign in at `https://your-app.vercel.app/auth` after deploy.
 
 ---
 
@@ -263,7 +270,7 @@ VITE_WHATSAPP_NUMBER=8801577577168
 - [ ] Vercel env vars set, site loads
 - [ ] Supabase Auth redirect URLs match Vercel URL
 - [ ] `invite-staff` function deployed (for team invites)
-- [ ] Sign in at `/admin/login` as owner
+- [ ] Sign in at `/auth` as owner → lands on `/admin`
 - [ ] Add products under **Admin → Products** (upload images)
 - [ ] Create customer account on storefront, verify email, place test order
 - [ ] Test order tracking at `/track-order`
@@ -345,7 +352,7 @@ React 18 · TypeScript · Vite · Tailwind CSS · Supabase · Three.js · Framer
 
 - **Store email:** shoukhin.lifestyle.bd@gmail.com  
 - **Phone / WhatsApp:** 01577577168 ([wa.me/8801577577168](https://wa.me/8801577577168))  
-- **Admin login:** https://soukhin.vercel.app/admin/login (owner email above + Supabase password)  
+- **Admin sign-in:** https://soukhin.vercel.app/auth (owner email above + Supabase password)  
 - **Developer:** ridhwankhan03@gmail.com
 
 MIT License · Built for the Bangladeshi ecommerce community.

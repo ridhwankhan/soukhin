@@ -18,12 +18,15 @@ import {
   updateCustomerProfile,
 } from '../lib/customerService';
 import { consumePendingAction, consumeReturnPath, PendingAction, savePendingAction } from '../lib/pendingAction';
-import { checkStaffEmail } from '../lib/adminService';
+import { checkStaffEmail, fetchMyAdminProfile } from '../lib/adminService';
+import { canStaffUseStorefront } from '../lib/staffAuth';
 import { isValidEmail, isValidPhone, normalizePhone } from '../lib/validators';
 import { checkClientRateLimit, formatRetryAfter } from '../lib/rateLimit';
 import { clearSessionMarkers } from '../lib/sessionManager';
 import { useSessionManager } from '../hooks/useSessionManager';
 import SessionTimeoutWarning from '../components/auth/SessionTimeoutWarning';
+import { AdminRole } from '../types';
+
 interface SignUpInput {
   name: string;
   email: string;
@@ -38,7 +41,7 @@ interface AuthContextType {
   profile: CustomerProfile | null;
   loading: boolean;
   isEmailVerified: boolean;
-  signIn: (email: string, password: string) => Promise<{ error?: string }>;
+  signIn: (email: string, password: string) => Promise<{ error?: string; isStaff?: boolean; staffRole?: AdminRole }>;
   signUp: (input: SignUpInput) => Promise<{ error?: string; needsEmailVerification?: boolean }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -107,13 +110,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const completeAuthFlow = useCallback(
     async (authUser: User) => {
+      const adminProfile = await fetchMyAdminProfile();
+
+      if (adminProfile && !canStaffUseStorefront(adminProfile.role)) {
+        navigate('/admin', { replace: true });
+        return;
+      }
+
       await loadProfile(authUser);
       const pending = consumePendingAction();
       if (pending) {
         handlePendingAction(pending);
+        return;
+      }
+
+      if (adminProfile) {
+        navigate('/admin', { replace: true });
       }
     },
-    [handlePendingAction, loadProfile]
+    [handlePendingAction, loadProfile, navigate]
   );
 
   useEffect(() => {
@@ -169,9 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: `Too many sign-in attempts. Try again in ${formatRetryAfter(attemptLimit.retryAfterMs)}.` };
     }
 
-    if (await checkStaffEmail(normalizedEmail)) {
-      return { error: 'Staff accounts must sign in at /admin/login.' };
-    }
+    const isStaff = await checkStaffEmail(normalizedEmail);
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email: normalizedEmail,
@@ -179,8 +192,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (error) return { error: error.message };
+
     if (data.user && !data.user.email_confirmed_at) {
-      return { error: 'Please verify your email before signing in. Check your inbox for the confirmation link.' };
+      await supabase.auth.signOut();
+      return {
+        error: isStaff
+          ? 'Please verify your email before signing in. Check your inbox for the confirmation link.'
+          : 'Please verify your email before signing in. Check your inbox for the confirmation link.',
+      };
+    }
+
+    if (isStaff) {
+      const admin = await fetchMyAdminProfile();
+      if (!admin) {
+        await supabase.auth.signOut();
+        return { error: 'Your staff account is not active. Contact the store owner.' };
+      }
+      return { isStaff: true, staffRole: admin.role };
     }
 
     return {};
