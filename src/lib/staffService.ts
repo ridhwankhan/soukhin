@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { getAuthRedirectUrl } from '../config/site';
 import { AdminRole, AdminUser } from '../types';
 
 export interface StaffMember extends AdminUser {
@@ -79,7 +80,7 @@ export async function inviteStaffByEmail(email: string): Promise<{ invited: bool
     },
     body: JSON.stringify({
       email: email.trim().toLowerCase(),
-      redirectTo: `${window.location.origin}/auth?mode=login&returnTo=${encodeURIComponent('/admin')}`,
+      redirectTo: getAuthRedirectUrl(`/auth?mode=login&returnTo=${encodeURIComponent('/admin')}`),
     }),
   });
 

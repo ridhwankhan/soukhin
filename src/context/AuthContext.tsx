@@ -18,6 +18,7 @@ import {
   updateCustomerProfile,
 } from '../lib/customerService';
 import { consumePendingAction, consumeReturnPath, PendingAction, savePendingAction } from '../lib/pendingAction';
+import { getAuthRedirectUrl } from '../config/site';
 import { checkStaffEmail, fetchMyAdminProfileWithRetry } from '../lib/adminService';
 import { isValidEmail, isValidPhone, normalizePhone } from '../lib/validators';
 import { checkClientRateLimit, formatRetryAfter } from '../lib/rateLimit';
@@ -288,7 +289,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email: normalizedEmail,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth?verified=1`,
+        emailRedirectTo: getAuthRedirectUrl('/auth?verified=1'),
         data: {
           name: name.trim(),
           phone: normalizePhone(phone),
@@ -397,7 +398,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { error } = await supabase.auth.resend({
       type: 'signup',
       email: user.email,
-      options: { emailRedirectTo: `${window.location.origin}/auth?verified=1` },
+      options: { emailRedirectTo: getAuthRedirectUrl('/auth?verified=1') },
     });
 
     if (error) return { error: error.message };

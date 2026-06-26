@@ -16,6 +16,26 @@ export const WHATSAPP_NUMBER =
 
 export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
 
+/** Canonical origin for auth email links — must match Supabase → Auth → URL Configuration. */
+export function getSiteOrigin(): string {
+  const configured = (import.meta.env.VITE_SITE_URL as string | undefined)?.trim().replace(/\/$/, '');
+  const current =
+    typeof window !== 'undefined' && window.location?.origin
+      ? window.location.origin.replace(/\/$/, '')
+      : '';
+
+  if (import.meta.env.PROD && configured) return configured;
+  if (configured && !/localhost|127\.0\.0\.1/i.test(configured)) return configured;
+  return current || configured || 'http://localhost:5173';
+}
+
+/** Redirect target embedded in Supabase confirmation / magic-link emails. */
+export function getAuthRedirectUrl(path = '/auth?verified=1'): string {
+  const base = getSiteOrigin();
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return `${base}${normalized}`;
+}
+
 export const SITE_SETTINGS: SiteSettings = {
   hero: {
     title: 'Tasteful Living, Delivered',
