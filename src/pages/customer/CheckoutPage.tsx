@@ -176,10 +176,10 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
 
   if (items.length === 0 && !orderComplete) {
     return (
-      <div className="min-h-screen bg-[#F8F6F3] flex items-center justify-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
         <div className="text-center p-8">
-          <h2 className="text-2xl font-semibold text-[#2D2D2D] mb-4">Your cart is empty</h2>
-          <p className="text-[#666666] mb-6">Add some products to checkout</p>
+          <h2 className="text-2xl font-semibold text-ink mb-4">Your cart is empty</h2>
+          <p className="text-ink-secondary mb-6">Add some products to checkout</p>
           <Link to="/">
             <Button>Continue Shopping</Button>
           </Link>
@@ -190,7 +190,7 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
 
   if (orderComplete) {
     return (
-      <div className="min-h-screen bg-[#F8F6F3] flex items-center justify-center">
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -199,13 +199,13 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-10 h-10 text-green-600" />
           </div>
-          <h2 className="text-2xl font-semibold text-[#2D2D2D] mb-2">Order Confirmed!</h2>
-          <p className="text-[#666666] mb-4">Thank you for your order, {shipping.name}!</p>
-          <p className="text-lg font-medium text-[#1B4332] mb-6">Order #{orderNumber}</p>
-          <Link to={`/track-order?order=${encodeURIComponent(orderNumber)}`} className="text-sm text-[#1B4332] hover:underline mb-4 inline-block">
+          <h2 className="text-2xl font-semibold text-ink mb-2">Order Confirmed!</h2>
+          <p className="text-ink-secondary mb-4">Thank you for your order, {shipping.name}!</p>
+          <p className="text-lg font-medium text-accent mb-6">Order #{orderNumber}</p>
+          <Link to={`/track-order?order=${encodeURIComponent(orderNumber)}`} className="text-sm text-accent hover:underline mb-4 inline-block">
             Track this order →
           </Link>
-          <p className="text-sm text-[#666666] mb-8">
+          <p className="text-sm text-ink-secondary mb-8">
             {selectedPayment === 'cod'
               ? 'We will call you to confirm your order. Pay when you receive your package.'
               : 'We have received your order and will process it shortly.'}
@@ -219,8 +219,8 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F6F3]">
-      <div className="bg-[#1B4332] text-white py-8">
+    <div className="min-h-screen bg-canvas">
+      <div className="bg-accent text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-2xl md:text-3xl font-serif font-semibold">Checkout</h1>
         </div>
@@ -234,10 +234,10 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                   step === s
-                    ? 'bg-[#1B4332] text-white'
+                    ? 'bg-accent text-white'
                     : idx < ['shipping', 'payment', 'confirm'].indexOf(step)
                     ? 'bg-green-500 text-white'
-                    : 'bg-[#D4C4B5] text-[#666666]'
+                    : 'bg-[#D4C4B5] text-ink-secondary'
                 }`}
               >
                 {idx + 1}
@@ -255,9 +255,9 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 onSubmit={handleShippingSubmit}
-                className="bg-white rounded-lg p-6 shadow-sm"
+                className="bg-elevated rounded-lg p-6 shadow-sm"
               >
-                <h2 className="text-xl font-semibold text-[#2D2D2D] mb-6 flex items-center gap-2">
+                <h2 className="text-xl font-semibold text-ink mb-6 flex items-center gap-2">
                   <Truck className="w-5 h-5" />
                   Shipping Information
                 </h2>
@@ -291,7 +291,7 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
                   />
 
                   <div>
-                    <label className="block text-sm font-medium text-[#2D2D2D] mb-1.5">Delivery Area</label>
+                    <label className="block text-sm font-medium text-ink mb-1.5">Delivery Area</label>
                     <div className="grid grid-cols-3 gap-3">
                       {DELIVERY_AREAS.map((area) => (
                         <button
@@ -303,13 +303,13 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
                           }}
                           className={`p-3 border rounded-sm text-left transition-colors ${
                             deliveryArea?.id === area.id
-                              ? 'border-[#1B4332] bg-[#1B4332]/5'
-                              : 'border-[#D4C4B5] hover:border-[#1B4332]'
+                              ? 'border-accent bg-accent/5'
+                              : 'border-line hover:border-accent'
                           }`}
                         >
                           <p className="font-medium text-sm">{area.name}</p>
-                          <p className="text-xs text-[#666666]">{area.estimatedDays}</p>
-                          <p className="text-xs font-medium text-[#1B4332] mt-1">
+                          <p className="text-xs text-ink-secondary">{area.estimatedDays}</p>
+                          <p className="text-xs font-medium text-accent mt-1">
                             {area.fee === 0 ? 'Free' : `৳${area.fee}`}
                           </p>
                         </button>
@@ -318,25 +318,25 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-[#2D2D2D] mb-1.5">Address</label>
+                    <label className="block text-sm font-medium text-ink mb-1.5">Address</label>
                     <textarea
                       value={shipping.address}
                       onChange={(e) => setShipping({ ...shipping, address: e.target.value })}
                       placeholder="House no, Road, Area, Landmark..."
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332] resize-none"
+                      className="w-full px-4 py-2.5 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent resize-none"
                     />
                     {errors.address && <p className="mt-1 text-sm text-red-500">{errors.address}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-[#2D2D2D] mb-1.5">Order Notes (Optional)</label>
+                    <label className="block text-sm font-medium text-ink mb-1.5">Order Notes (Optional)</label>
                     <textarea
                       value={shipping.notes}
                       onChange={(e) => setShipping({ ...shipping, notes: e.target.value })}
                       placeholder="Any special instructions..."
                       rows={2}
-                      className="w-full px-4 py-2.5 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332] resize-none"
+                      className="w-full px-4 py-2.5 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent resize-none"
                     />
                   </div>
                 </div>
@@ -351,9 +351,9 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="bg-white rounded-lg p-6 shadow-sm"
+                className="bg-elevated rounded-lg p-6 shadow-sm"
               >
-                <h2 className="text-xl font-semibold text-[#2D2D2D] mb-6 flex items-center gap-2">
+                <h2 className="text-xl font-semibold text-ink mb-6 flex items-center gap-2">
                   <CreditCard className="w-5 h-5" />
                   Payment Method
                 </h2>
@@ -370,10 +370,10 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
                         disabled={!isEnabled}
                         className={`w-full p-4 border rounded-sm text-left transition-all ${
                           selectedPayment === method.id
-                            ? 'border-[#1B4332] bg-[#1B4332]/5'
+                            ? 'border-accent bg-accent/5'
                             : isEnabled
-                            ? 'border-[#D4C4B5] hover:border-[#1B4332]'
-                            : 'border-[#D4C4B5] opacity-50 cursor-not-allowed'
+                            ? 'border-line hover:border-accent'
+                            : 'border-line opacity-50 cursor-not-allowed'
                         }`}
                       >
                         <div className="flex items-center justify-between">
@@ -381,20 +381,20 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
                             <div
                               className={`w-5 h-5 rounded-full border-2 ${
                                 selectedPayment === method.id
-                                  ? 'border-[#1B4332] bg-[#1B4332]'
-                                  : 'border-[#D4C4B5]'
+                                  ? 'border-accent bg-accent'
+                                  : 'border-line'
                               } flex items-center justify-center`}
                             >
                               {selectedPayment === method.id && (
-                                <div className="w-2 h-2 bg-white rounded-full" />
+                                <div className="w-2 h-2 bg-elevated rounded-full" />
                               )}
                             </div>
                             <span className="font-medium">{method.name}</span>
                           </div>
-                          {!isEnabled && <span className="text-xs text-[#666666]">Coming soon</span>}
+                          {!isEnabled && <span className="text-xs text-ink-secondary">Coming soon</span>}
                         </div>
                         {selectedPayment === method.id && (
-                          <p className="mt-2 text-sm text-[#666666] pl-8">
+                          <p className="mt-2 text-sm text-ink-secondary pl-8">
                             {method.instructions}
                           </p>
                         )}
@@ -414,24 +414,24 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="bg-white rounded-lg p-6 shadow-sm"
+                className="bg-elevated rounded-lg p-6 shadow-sm"
               >
-                <h2 className="text-xl font-semibold text-[#2D2D2D] mb-6 flex items-center gap-2">
+                <h2 className="text-xl font-semibold text-ink mb-6 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5" />
                   Review Your Order
                 </h2>
 
                 <div className="space-y-4">
-                  <div className="p-4 bg-[#F8F6F3] rounded-sm">
-                    <h3 className="font-medium text-sm text-[#666666] mb-2">Shipping to</h3>
+                  <div className="p-4 bg-canvas rounded-sm">
+                    <h3 className="font-medium text-sm text-ink-secondary mb-2">Shipping to</h3>
                     <p className="font-medium">{shipping.name}</p>
-                    <p className="text-sm text-[#666666]">{shipping.phone}</p>
-                    <p className="text-sm text-[#666666]">{shipping.address}</p>
-                    <p className="text-sm text-[#666666]">{deliveryArea?.name}</p>
+                    <p className="text-sm text-ink-secondary">{shipping.phone}</p>
+                    <p className="text-sm text-ink-secondary">{shipping.address}</p>
+                    <p className="text-sm text-ink-secondary">{deliveryArea?.name}</p>
                   </div>
 
-                  <div className="p-4 bg-[#F8F6F3] rounded-sm">
-                    <h3 className="font-medium text-sm text-[#666666] mb-2">Payment</h3>
+                  <div className="p-4 bg-canvas rounded-sm">
+                    <h3 className="font-medium text-sm text-ink-secondary mb-2">Payment</h3>
                     <p className="font-medium">{selectedPayment.toUpperCase()}</p>
                     {selectedPayment === 'bkash' && (
                       <div className="mt-3">
@@ -441,21 +441,21 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
                           onChange={(e) => setBkashTrxId(e.target.value)}
                           placeholder="Enter after sending payment"
                         />
-                        <p className="text-xs text-[#666666] mt-1">
+                        <p className="text-xs text-ink-secondary mt-1">
                           If bKash gateway is enabled, you will be redirected automatically. Otherwise enter your Transaction ID here.
                         </p>
                       </div>
                     )}
                   </div>
 
-                  <div className="p-4 bg-[#F8F6F3] rounded-sm">
-                    <h3 className="font-medium text-sm text-[#666666] mb-2">Items ({items.length})</h3>
+                  <div className="p-4 bg-canvas rounded-sm">
+                    <h3 className="font-medium text-sm text-ink-secondary mb-2">Items ({items.length})</h3>
                     {items.map((item) => (
                       <div key={`${item.product.id}-${item.selectedSize}`} className="flex items-center gap-3 mb-2 last:mb-0">
                         <img src={item.product.images[0]} alt="" className="w-12 h-12 object-cover rounded" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{item.product.name}</p>
-                          <p className="text-xs text-[#666666]">Qty: {item.quantity}</p>
+                          <p className="text-xs text-ink-secondary">Qty: {item.quantity}</p>
                         </div>
                         <p className="font-medium">৳{((item.product.salePrice ?? item.product.price) * item.quantity).toLocaleString()}</p>
                       </div>
@@ -478,8 +478,8 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg p-6 shadow-sm sticky top-24">
-              <h3 className="font-semibold text-[#2D2D2D] mb-4">Order Summary</h3>
+            <div className="bg-elevated rounded-lg p-6 shadow-sm sticky top-24">
+              <h3 className="font-semibold text-ink mb-4">Order Summary</h3>
 
               <div className="space-y-4 mb-6">
                 {items.map((item) => (
@@ -487,25 +487,25 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
                     <img src={item.product.images[0]} alt="" className="w-14 h-14 object-cover rounded" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{item.product.name}</p>
-                      <p className="text-xs text-[#666666]">Qty: {item.quantity}</p>
+                      <p className="text-xs text-ink-secondary">Qty: {item.quantity}</p>
                     </div>
                     <p className="text-sm font-medium">৳{((item.product.salePrice ?? item.product.price) * item.quantity).toLocaleString()}</p>
                   </div>
                 ))}
               </div>
 
-              <div className="border-t border-[#F5F0E8] pt-4 space-y-2">
+              <div className="border-t border-line pt-4 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-[#666666]">Subtotal</span>
+                  <span className="text-ink-secondary">Subtotal</span>
                   <span>৳{subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-[#666666]">Delivery</span>
+                  <span className="text-ink-secondary">Delivery</span>
                   <span>৳{deliveryFee.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-lg font-semibold pt-2 border-t border-[#F5F0E8]">
+                <div className="flex justify-between text-lg font-semibold pt-2 border-t border-line">
                   <span>Total</span>
-                  <span className="text-[#1B4332]">৳{total.toLocaleString()}</span>
+                  <span className="text-accent">৳{total.toLocaleString()}</span>
                 </div>
               </div>
             </div>

@@ -19,16 +19,16 @@ export default function EmptyCategoryModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="md">
       <div className="p-8 text-center">
-        <div className="w-16 h-16 bg-[#1B4332]/10 rounded-full flex items-center justify-center mx-auto mb-5">
-          <Package className="w-8 h-8 text-[#1B4332]" />
+        <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-5">
+          <Package className="w-8 h-8 text-accent" />
         </div>
-        <h2 className="text-xl font-serif font-semibold text-[#2D2D2D] mb-2">
+        <h2 className="text-xl font-serif font-semibold text-ink mb-2">
           {categoryName} — Coming Soon
         </h2>
         {categoryNameBn && (
           <p className="text-sm text-[#B8860B] mb-3">{categoryNameBn}</p>
         )}
-        <p className="text-[#666666] text-sm leading-relaxed mb-6">
+        <p className="text-ink-secondary text-sm leading-relaxed mb-6">
           We are curating beautiful products for this category. Check back soon — new items will be added regularly.
         </p>
         <div className="flex items-center justify-center gap-2 text-xs text-[#999999] mb-6">

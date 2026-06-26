@@ -52,13 +52,13 @@ export default function BkashCallbackPage() {
   }, [orderId, paymentID, status]);
 
   return (
-    <div className="min-h-screen bg-[#F8F6F3] flex items-center justify-center px-4">
-      <div className="bg-white rounded-lg shadow-sm p-8 max-w-md w-full text-center">
+    <div className="min-h-screen bg-canvas flex items-center justify-center px-4">
+      <div className="bg-elevated rounded-lg shadow-sm p-8 max-w-md w-full text-center">
         {state === 'loading' && (
           <>
-            <Loader2 className="w-12 h-12 text-[#1B4332] animate-spin mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-[#2D2D2D] mb-2">Processing Payment</h2>
-            <p className="text-sm text-[#666666]">Please wait while we confirm your bKash payment...</p>
+            <Loader2 className="w-12 h-12 text-accent animate-spin mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-ink mb-2">Processing Payment</h2>
+            <p className="text-sm text-ink-secondary">Please wait while we confirm your bKash payment...</p>
           </>
         )}
 
@@ -67,10 +67,10 @@ export default function BkashCallbackPage() {
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
-            <h2 className="text-xl font-semibold text-[#2D2D2D] mb-2">Payment Successful!</h2>
-            {orderNumber && <p className="text-[#1B4332] font-medium mb-2">Order #{orderNumber}</p>}
-            <p className="text-sm text-[#666666] mb-1">Transaction ID:</p>
-            <p className="text-sm font-mono bg-[#F8F6F3] p-2 rounded mb-6">{transactionId}</p>
+            <h2 className="text-xl font-semibold text-ink mb-2">Payment Successful!</h2>
+            {orderNumber && <p className="text-accent font-medium mb-2">Order #{orderNumber}</p>}
+            <p className="text-sm text-ink-secondary mb-1">Transaction ID:</p>
+            <p className="text-sm font-mono bg-canvas p-2 rounded mb-6">{transactionId}</p>
             <div className="flex flex-col gap-3">
               <Link to={`/track-order?order=${encodeURIComponent(orderNumber)}`}>
                 <Button className="w-full">Track Order</Button>
@@ -85,8 +85,8 @@ export default function BkashCallbackPage() {
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <XCircle className="w-8 h-8 text-red-600" />
             </div>
-            <h2 className="text-xl font-semibold text-[#2D2D2D] mb-2">Payment Failed</h2>
-            <p className="text-sm text-[#666666] mb-6">{error}</p>
+            <h2 className="text-xl font-semibold text-ink mb-2">Payment Failed</h2>
+            <p className="text-sm text-ink-secondary mb-6">{error}</p>
             <Link to="/checkout"><Button className="w-full">Try Again</Button></Link>
           </>
         )}

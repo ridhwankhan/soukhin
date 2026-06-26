@@ -8,21 +8,21 @@ export default function WishlistPage() {
   const { items, clearWishlist } = useWishlist();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-elevated">
       {/* Header */}
-      <div className="bg-[#F9F7F4] border-b border-[#E2D9CF] py-10 md:py-14">
+      <div className="bg-canvas border-b border-line py-10 md:py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center gap-2 text-xs text-[#9A9A9A] mb-4">
-            <Link to="/" className="hover:text-[#1B4332] transition-colors">Home</Link>
+          <nav className="flex items-center gap-2 text-xs text-ink-muted mb-4">
+            <Link to="/" className="hover:text-accent transition-colors">Home</Link>
             <span>/</span>
-            <span className="text-[#4A4A4A]">Wishlist</span>
+            <span className="text-ink-secondary">Wishlist</span>
           </nav>
           <div className="flex items-end justify-between">
             <div>
-              <h1 className="font-serif text-3xl md:text-4xl font-medium text-[#1A1A1A] tracking-tight">
+              <h1 className="font-serif text-3xl md:text-4xl font-medium text-ink tracking-tight">
                 Wishlist
               </h1>
-              <p className="text-[#9A9A9A] text-sm mt-1">{items.length} saved {items.length === 1 ? 'item' : 'items'}</p>
+              <p className="text-ink-muted text-sm mt-1">{items.length} saved {items.length === 1 ? 'item' : 'items'}</p>
             </div>
             {items.length > 0 && (
               <button
@@ -40,11 +40,11 @@ export default function WishlistPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {items.length === 0 ? (
           <div className="py-24 text-center">
-            <div className="w-16 h-16 border-2 border-[#E2D9CF] flex items-center justify-center mx-auto mb-5">
+            <div className="w-16 h-16 border-2 border-line flex items-center justify-center mx-auto mb-5">
               <Heart className="w-7 h-7 text-[#C0B8B0]" />
             </div>
-            <h2 className="text-lg font-semibold text-[#1A1A1A] mb-2">Your wishlist is empty</h2>
-            <p className="text-[#9A9A9A] text-sm mb-8">Save items you love by clicking the heart icon on any product.</p>
+            <h2 className="text-lg font-semibold text-ink mb-2">Your wishlist is empty</h2>
+            <p className="text-ink-muted text-sm mb-8">Save items you love by clicking the heart icon on any product.</p>
             <Link to="/" className="btn-primary inline-flex">
               Start Shopping
             </Link>

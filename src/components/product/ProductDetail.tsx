@@ -33,7 +33,7 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
   return (
     <div className="grid md:grid-cols-2 gap-8 p-6 md:p-8">
       <div className="space-y-4">
-        <div className="relative aspect-square bg-[#F5F0E8] rounded-lg overflow-hidden">
+        <div className="relative aspect-square bg-surface rounded-lg overflow-hidden">
           <img
             src={product.images[selectedImage]}
             alt={product.name}
@@ -55,7 +55,7 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
                 key={idx}
                 onClick={() => setSelectedImage(idx)}
                 className={`relative w-20 h-20 flex-shrink-0 rounded-sm overflow-hidden border-2 transition-colors ${
-                  selectedImage === idx ? 'border-[#1B4332]' : 'border-transparent'
+                  selectedImage === idx ? 'border-accent' : 'border-transparent'
                 }`}
               >
                 <img src={img} alt="" className="w-full h-full object-cover" />
@@ -70,15 +70,15 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
           <p className="text-sm text-[#B8860B] uppercase tracking-wide mb-2">
             {product.category.replace('-', ' ')}
           </p>
-          <h2 className="text-2xl md:text-3xl font-semibold text-[#2D2D2D] font-serif">{product.name}</h2>
-          <p className="text-[#666666] mt-1">{product.nameBn}</p>
+          <h2 className="text-2xl md:text-3xl font-semibold text-ink font-serif">{product.name}</h2>
+          <p className="text-ink-secondary mt-1">{product.nameBn}</p>
         </div>
 
         <div className="flex items-baseline gap-3">
-          <span className="text-3xl font-bold text-[#1B4332]">{BRAND_CONFIG.currency.symbol}{displayPrice.toLocaleString()}</span>
+          <span className="text-3xl font-bold text-accent">{BRAND_CONFIG.currency.symbol}{displayPrice.toLocaleString()}</span>
           {hasDiscount && (
             <>
-              <span className="text-xl text-[#666666] line-through">{BRAND_CONFIG.currency.symbol}{product.price.toLocaleString()}</span>
+              <span className="text-xl text-ink-secondary line-through">{BRAND_CONFIG.currency.symbol}{product.price.toLocaleString()}</span>
               <span className="px-2 py-1 bg-[#C2704A] text-white text-sm rounded-sm">
                 {Math.round((1 - product.salePrice! / product.price) * 100)}% off
               </span>
@@ -86,11 +86,11 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
           )}
         </div>
 
-        <p className="text-[#666666] leading-relaxed">{product.description}</p>
+        <p className="text-ink-secondary leading-relaxed">{product.description}</p>
 
         {product.sizeOptions && product.sizeOptions.length > 0 && (
           <div>
-            <p className="text-sm font-medium text-[#2D2D2D] mb-2">Size</p>
+            <p className="text-sm font-medium text-ink mb-2">Size</p>
             <div className="flex flex-wrap gap-2">
               {product.sizeOptions.map(size => (
                 <button
@@ -98,8 +98,8 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
                   onClick={() => setSelectedSize(size)}
                   className={`px-4 py-2 border rounded-sm transition-colors ${
                     selectedSize === size
-                      ? 'border-[#1B4332] bg-[#1B4332] text-white'
-                      : 'border-[#D4C4B5] hover:border-[#1B4332]'
+                      ? 'border-accent bg-accent text-white'
+                      : 'border-line hover:border-accent'
                   }`}
                 >
                   {size}
@@ -111,7 +111,7 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
 
         {product.colorOptions && product.colorOptions.length > 0 && (
           <div>
-            <p className="text-sm font-medium text-[#2D2D2D] mb-2">Color</p>
+            <p className="text-sm font-medium text-ink mb-2">Color</p>
             <div className="flex flex-wrap gap-2">
               {product.colorOptions.map(color => (
                 <button
@@ -119,8 +119,8 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
                   onClick={() => setSelectedColor(color)}
                   className={`px-4 py-2 border rounded-sm transition-colors ${
                     selectedColor === color
-                      ? 'border-[#1B4332] bg-[#1B4332] text-white'
-                      : 'border-[#D4C4B5] hover:border-[#1B4332]'
+                      ? 'border-accent bg-accent text-white'
+                      : 'border-line hover:border-accent'
                   }`}
                 >
                   {color}
@@ -131,17 +131,17 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
         )}
 
         <div className="flex items-center gap-4">
-          <div className="flex items-center border border-[#D4C4B5] rounded-sm">
+          <div className="flex items-center border border-line rounded-sm">
             <button
               onClick={() => setQuantity(q => Math.max(1, q - 1))}
-              className="p-3 hover:bg-[#F5F0E8] transition-colors"
+              className="p-3 hover:bg-surface transition-colors"
             >
               <Minus className="w-4 h-4" />
             </button>
             <span className="px-4 py-3 font-medium min-w-[60px] text-center">{quantity}</span>
             <button
               onClick={() => setQuantity(q => Math.min(product.stock, q + 1))}
-              className="p-3 hover:bg-[#F5F0E8] transition-colors"
+              className="p-3 hover:bg-surface transition-colors"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -162,20 +162,20 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
             className={`p-3 rounded-sm border transition-colors ${
               isWishlisted
                 ? 'border-[#C2704A] bg-[#C2704A] text-white'
-                : 'border-[#D4C4B5] hover:border-[#C2704A]'
+                : 'border-line hover:border-[#C2704A]'
             }`}
           >
             <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
           </button>
         </div>
 
-        <div className="border-t border-[#D4C4B5] pt-6 space-y-3">
-          <div className="flex items-center gap-3 text-sm text-[#666666]">
-            <Package className="w-4 h-4 text-[#1B4332]" />
+        <div className="border-t border-line pt-6 space-y-3">
+          <div className="flex items-center gap-3 text-sm text-ink-secondary">
+            <Package className="w-4 h-4 text-accent" />
             <span>SKU: {product.sku}</span>
           </div>
-          <div className="flex items-center gap-3 text-sm text-[#666666]">
-            <Package className="w-4 h-4 text-[#1B4332]" />
+          <div className="flex items-center gap-3 text-sm text-ink-secondary">
+            <Package className="w-4 h-4 text-accent" />
             <span>{product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}</span>
           </div>
           {product.foodNote && (
@@ -185,8 +185,8 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
             </div>
           )}
           {product.deliveryNote && (
-            <div className="flex items-center gap-3 text-sm text-[#666666]">
-              <Truck className="w-4 h-4 text-[#1B4332]" />
+            <div className="flex items-center gap-3 text-sm text-ink-secondary">
+              <Truck className="w-4 h-4 text-accent" />
               <span>{product.deliveryNote}</span>
             </div>
           )}

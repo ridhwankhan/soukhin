@@ -49,8 +49,8 @@ export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <div className="min-h-screen bg-[#F8F6F3]">
-      <div className="bg-[#1B4332] text-white py-16">
+    <div className="min-h-screen bg-canvas">
+      <div className="bg-accent text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -71,22 +71,22 @@ export default function FAQPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="bg-white rounded-sm shadow-sm overflow-hidden"
+              className="bg-elevated rounded-sm shadow-sm overflow-hidden"
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full flex items-center justify-between p-5 text-left hover:bg-[#F8F6F3] transition-colors"
+                className="w-full flex items-center justify-between p-5 text-left hover:bg-canvas transition-colors"
               >
-                <span className="font-medium text-[#2D2D2D] pr-4">{faq.q}</span>
+                <span className="font-medium text-ink pr-4">{faq.q}</span>
                 <ChevronDown
-                  className={`w-5 h-5 text-[#666666] flex-shrink-0 transition-transform ${
+                  className={`w-5 h-5 text-ink-secondary flex-shrink-0 transition-transform ${
                     openIndex === index ? 'rotate-180' : ''
                   }`}
                 />
               </button>
               {openIndex === index && (
                 <div className="px-5 pb-5 pt-0">
-                  <p className="text-[#666666] leading-relaxed">{faq.a}</p>
+                  <p className="text-ink-secondary leading-relaxed">{faq.a}</p>
                 </div>
               )}
             </motion.div>
@@ -94,10 +94,10 @@ export default function FAQPage() {
         </div>
 
         <div className="mt-12 text-center">
-          <p className="text-[#666666] mb-4">Can't find your answer?</p>
+          <p className="text-ink-secondary mb-4">Can't find your answer?</p>
           <a
             href="/contact"
-            className="inline-block px-6 py-3 bg-[#1B4332] text-white rounded-sm font-medium hover:bg-[#163828] transition-colors"
+            className="inline-block px-6 py-3 bg-accent text-white rounded-sm font-medium hover:bg-accent-hover transition-colors"
           >
             Contact Us
           </a>

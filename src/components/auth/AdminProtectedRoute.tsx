@@ -14,10 +14,10 @@ export default function AdminProtectedRoute({ children, permission }: AdminProte
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8F6F3]">
+      <div className="min-h-screen flex items-center justify-center bg-canvas">
         <div className="text-center">
-          <div className="w-10 h-10 border-2 border-[#1B4332] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-[#666666]">Verifying staff access...</p>
+          <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-ink-secondary">Verifying staff access...</p>
         </div>
       </div>
     );
@@ -29,13 +29,13 @@ export default function AdminProtectedRoute({ children, permission }: AdminProte
 
   if (permission && !can(permission)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8F6F3] px-4">
-        <div className="bg-white rounded-lg shadow-sm p-8 max-w-md text-center">
-          <h2 className="text-xl font-semibold text-[#2D2D2D] mb-2">Access Denied</h2>
-          <p className="text-sm text-[#666666] mb-4">
+      <div className="min-h-screen flex items-center justify-center bg-canvas px-4">
+        <div className="bg-elevated rounded-lg shadow-sm p-8 max-w-md text-center">
+          <h2 className="text-xl font-semibold text-ink mb-2">Access Denied</h2>
+          <p className="text-sm text-ink-secondary mb-4">
             Your role ({admin.role}) does not have permission for this section.
           </p>
-          <a href="/admin" className="text-[#1B4332] hover:underline text-sm">Back to dashboard</a>
+          <a href="/admin" className="text-accent hover:underline text-sm">Back to dashboard</a>
         </div>
       </div>
     );

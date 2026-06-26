@@ -124,7 +124,7 @@ export default function UsersPage() {
 
   if (!can('view-users')) {
     return (
-      <div className="p-8 text-center text-[#666666]">
+      <div className="p-8 text-center text-ink-secondary">
         You do not have permission to view staff members.
       </div>
     );
@@ -134,8 +134,8 @@ export default function UsersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-[#2D2D2D]">Staff & Roles</h1>
-          <p className="text-sm text-[#666666]">
+          <h1 className="text-2xl font-semibold text-ink">Staff & Roles</h1>
+          <p className="text-sm text-ink-secondary">
             {loading ? 'Loading...' : `${staff.filter((s) => s.isActive).length} active staff — assign roles and invite team members`}
           </p>
         </div>
@@ -153,23 +153,23 @@ export default function UsersPage() {
         <div className="p-3 bg-green-50 border border-green-200 rounded-sm text-sm text-green-700">{success}</div>
       )}
 
-      <div className="bg-[#1B4332]/5 border border-[#1B4332]/10 rounded-lg p-4 text-sm text-[#666666]">
-        <p className="font-medium text-[#2D2D2D] mb-1">How it works</p>
+      <div className="bg-accent/5 border border-accent/10 rounded-lg p-4 text-sm text-ink-secondary">
+        <p className="font-medium text-ink mb-1">How it works</p>
         <ol className="list-decimal list-inside space-y-1">
           <li>Add a person with their email and role (e.g. Inventory Manager).</li>
           <li>Click <strong>Send invite</strong> — they receive an email to set a password.</li>
-          <li>They sign in at <code className="text-xs bg-white px-1 rounded">/auth</code> with that email (same as customers).</li>
+          <li>They sign in at <code className="text-xs bg-elevated px-1 rounded">/auth</code> with that email (same as customers).</li>
         </ol>
         {admin?.role === 'admin' && (
           <p className="mt-2 text-amber-700">As Admin you can assign Moderator, Order Manager, and Inventory Manager roles only.</p>
         )}
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-elevated rounded-lg shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-[#F8F6F3] text-sm text-[#666666]">
+              <tr className="bg-canvas text-sm text-ink-secondary">
                 <th className="text-left p-4 font-medium">Name</th>
                 <th className="text-left p-4 font-medium">Email</th>
                 <th className="text-left p-4 font-medium">Role</th>
@@ -183,15 +183,15 @@ export default function UsersPage() {
                 <motion.tr key={member.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 bg-[#1B4332] rounded-full flex items-center justify-center text-white text-sm font-medium">
+                      <div className="w-9 h-9 bg-accent rounded-full flex items-center justify-center text-white text-sm font-medium">
                         {member.name.charAt(0)}
                       </div>
-                      <span className="font-medium text-[#2D2D2D]">{member.name}</span>
+                      <span className="font-medium text-ink">{member.name}</span>
                     </div>
                   </td>
-                  <td className="p-4 text-sm text-[#666666]">{member.email}</td>
+                  <td className="p-4 text-sm text-ink-secondary">{member.email}</td>
                   <td className="p-4">
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#1B4332]/10 text-[#1B4332] text-xs font-medium rounded">
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-accent/10 text-accent text-xs font-medium rounded">
                       <Shield className="w-3 h-3" />
                       {ROLE_LABELS[member.role]}
                     </span>
@@ -205,7 +205,7 @@ export default function UsersPage() {
                       <span className="text-xs text-amber-700 font-medium">Pending invite</span>
                     )}
                   </td>
-                  <td className="p-4 text-sm text-[#666666]">
+                  <td className="p-4 text-sm text-ink-secondary">
                     {member.lastLogin ? new Date(member.lastLogin).toLocaleString('en-GB') : 'Never'}
                   </td>
                   {canManage && (
@@ -214,7 +214,7 @@ export default function UsersPage() {
                         <button
                           onClick={() => handleInvite(member)}
                           disabled={invitingId === member.id}
-                          className="inline-flex items-center gap-1 px-2 py-1 text-xs text-[#1B4332] hover:bg-[#1B4332]/10 rounded"
+                          className="inline-flex items-center gap-1 px-2 py-1 text-xs text-accent hover:bg-accent/10 rounded"
                           title="Send invite email"
                         >
                           <Mail className="w-3.5 h-3.5" />
@@ -223,7 +223,7 @@ export default function UsersPage() {
                       )}
                       <button
                         onClick={() => openEdit(member)}
-                        className="px-2 py-1 text-xs text-[#666666] hover:bg-[#F5F0E8] rounded"
+                        className="px-2 py-1 text-xs text-ink-secondary hover:bg-surface rounded"
                       >
                         Edit role
                       </button>
@@ -247,7 +247,7 @@ export default function UsersPage() {
 
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} size="md">
         <form onSubmit={handleSave} className="p-6 space-y-4">
-          <h2 className="text-xl font-semibold text-[#2D2D2D]">
+          <h2 className="text-xl font-semibold text-ink">
             {editing ? 'Edit staff member' : 'Add staff member'}
           </h2>
 
@@ -266,17 +266,17 @@ export default function UsersPage() {
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
           <div>
-            <label className="block text-sm font-medium text-[#2D2D2D] mb-1.5">Role</label>
+            <label className="block text-sm font-medium text-ink mb-1.5">Role</label>
             <select
               value={form.role}
               onChange={(e) => setForm({ ...form, role: e.target.value as AdminRole })}
-              className="w-full px-4 py-2.5 border border-[#D4C4B5] rounded-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+              className="w-full px-4 py-2.5 border border-line rounded-sm bg-elevated focus:outline-none focus:ring-2 focus:ring-accent"
             >
               {roles.map((role) => (
                 <option key={role} value={role}>{ROLE_LABELS[role]}</option>
               ))}
             </select>
-            <p className="text-xs text-[#666666] mt-1">
+            <p className="text-xs text-ink-secondary mt-1">
               {form.role === 'inventory-manager' && 'Can add/edit products and manage stock.'}
               {form.role === 'order-manager' && 'Can view and update customer orders.'}
               {form.role === 'moderator' && 'Can manage reviews and customer messages.'}

@@ -45,15 +45,15 @@ export default function AccountPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8F6F3] flex items-center justify-center">
-        <div className="w-10 h-10 border-2 border-[#1B4332] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F6F3]">
-      <div className="bg-[#1B4332] text-white py-8">
+    <div className="min-h-screen bg-canvas">
+      <div className="bg-accent text-white py-8">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h1 className="text-2xl md:text-3xl font-serif font-semibold">My Account</h1>
         </div>
@@ -63,15 +63,15 @@ export default function AccountPage() {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-lg shadow-sm p-6"
+          className="bg-elevated rounded-lg shadow-sm p-6"
         >
-          <div className="flex items-center gap-4 mb-6 pb-6 border-b border-[#F5F0E8]">
-            <div className="w-14 h-14 bg-[#1B4332] rounded-full flex items-center justify-center">
+          <div className="flex items-center gap-4 mb-6 pb-6 border-b border-line">
+            <div className="w-14 h-14 bg-accent rounded-full flex items-center justify-center">
               <User className="w-7 h-7 text-white" />
             </div>
             <div>
-              <p className="font-semibold text-[#2D2D2D]">{profile?.name || user?.user_metadata?.name || 'Customer'}</p>
-              <p className="text-sm text-[#666666] flex items-center gap-1">
+              <p className="font-semibold text-ink">{profile?.name || user?.user_metadata?.name || 'Customer'}</p>
+              <p className="text-sm text-ink-secondary flex items-center gap-1">
                 <Mail className="w-3.5 h-3.5" />
                 {user?.email}
               </p>
@@ -100,25 +100,25 @@ export default function AccountPage() {
               required
             />
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1.5">Delivery Address</label>
+              <label className="block text-sm font-medium text-ink mb-1.5">Delivery Address</label>
               <textarea
                 value={form.address}
                 onChange={(e) => setForm({ ...form, address: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-2.5 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332] resize-none"
+                className="w-full px-4 py-2.5 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent resize-none"
                 placeholder="House, road, area, landmark..."
               />
             </div>
 
             {profile && (
-              <div className="grid grid-cols-2 gap-4 p-4 bg-[#F8F6F3] rounded-sm text-sm">
+              <div className="grid grid-cols-2 gap-4 p-4 bg-canvas rounded-sm text-sm">
                 <div>
-                  <p className="text-[#666666]">Total Orders</p>
-                  <p className="font-semibold text-[#1B4332]">{profile.totalOrders}</p>
+                  <p className="text-ink-secondary">Total Orders</p>
+                  <p className="font-semibold text-accent">{profile.totalOrders}</p>
                 </div>
                 <div>
-                  <p className="text-[#666666]">Total Spent</p>
-                  <p className="font-semibold text-[#1B4332]">৳{profile.totalSpent.toLocaleString()}</p>
+                  <p className="text-ink-secondary">Total Spent</p>
+                  <p className="font-semibold text-accent">৳{profile.totalSpent.toLocaleString()}</p>
                 </div>
               </div>
             )}
@@ -136,7 +136,7 @@ export default function AccountPage() {
         </motion.div>
 
         <p className="text-center mt-6">
-          <Link to="/" className="text-sm text-[#1B4332] hover:underline">
+          <Link to="/" className="text-sm text-accent hover:underline">
             ← Continue shopping
           </Link>
         </p>

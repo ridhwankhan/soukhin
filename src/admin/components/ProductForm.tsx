@@ -134,8 +134,8 @@ export default function ProductForm({
 
   return (
     <form onSubmit={handleSubmit} className="p-6 max-h-[85vh] overflow-y-auto">
-      <div className="flex items-center justify-between mb-6 sticky top-0 bg-white pb-4 border-b border-[#F5F0E8] z-10">
-        <h2 className="text-xl font-semibold text-[#2D2D2D]">
+      <div className="flex items-center justify-between mb-6 sticky top-0 bg-elevated pb-4 border-b border-line z-10">
+        <h2 className="text-xl font-semibold text-ink">
           {isNew ? 'Add Product' : isEditing ? 'Edit Product' : 'Product Details'}
         </h2>
         {canEdit && (
@@ -162,7 +162,7 @@ export default function ProductForm({
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               disabled={!canEdit}
               required
-              className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm disabled:bg-[#F8F6F3]"
+              className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas"
             />
           </div>
           <div>
@@ -172,27 +172,27 @@ export default function ProductForm({
               value={form.nameBn}
               onChange={(e) => setForm({ ...form, nameBn: e.target.value })}
               disabled={!canEdit}
-              className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm disabled:bg-[#F8F6F3]"
+              className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">Price (৳)</label>
-              <input type="number" min={0} value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} disabled={!canEdit} required className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm disabled:bg-[#F8F6F3]" />
+              <input type="number" min={0} value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} disabled={!canEdit} required className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Sale Price</label>
-              <input type="number" min={0} value={form.salePrice} onChange={(e) => setForm({ ...form, salePrice: e.target.value })} disabled={!canEdit} className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm disabled:bg-[#F8F6F3]" />
+              <input type="number" min={0} value={form.salePrice} onChange={(e) => setForm({ ...form, salePrice: e.target.value })} disabled={!canEdit} className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">Stock</label>
-              <input type="number" min={0} value={form.stock} onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })} disabled={!canEdit} required className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm disabled:bg-[#F8F6F3]" />
+              <input type="number" min={0} value={form.stock} onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })} disabled={!canEdit} required className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">SKU</label>
-              <input type="text" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} disabled={!canEdit} required className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm disabled:bg-[#F8F6F3]" />
+              <input type="text" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} disabled={!canEdit} required className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas" />
             </div>
           </div>
           <div>
@@ -202,7 +202,7 @@ export default function ProductForm({
               onChange={(e) => setForm({ ...form, categorySlug: e.target.value })}
               disabled={!canEdit}
               required
-              className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm disabled:bg-[#F8F6F3]"
+              className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas"
             >
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.slug}>{cat.name}</option>
@@ -211,18 +211,18 @@ export default function ProductForm({
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Description</label>
-            <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} disabled={!canEdit} rows={4} className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm disabled:bg-[#F8F6F3] resize-none" />
+            <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} disabled={!canEdit} rows={4} className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas resize-none" />
           </div>
         </div>
 
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-2">Product Images</label>
-            <p className="text-xs text-[#666666] mb-3">Images are auto-compressed to WebP (~400KB) for fast loading without visible quality loss.</p>
+            <p className="text-xs text-ink-secondary mb-3">Images are auto-compressed to WebP (~400KB) for fast loading without visible quality loss.</p>
 
             <div className="flex flex-wrap gap-2 mb-3">
               {imageUrls.map((url, i) => (
-                <div key={url} className="relative w-20 h-20 rounded overflow-hidden border border-[#D4C4B5]">
+                <div key={url} className="relative w-20 h-20 rounded overflow-hidden border border-line">
                   <img src={url} alt="" className="w-full h-full object-cover" />
                   {canEdit && (
                     <button type="button" onClick={() => removeImageUrl(i)} className="absolute top-0.5 right-0.5 p-0.5 bg-red-500 text-white rounded-full">
@@ -232,7 +232,7 @@ export default function ProductForm({
                 </div>
               ))}
               {previews.map((url, i) => (
-                <div key={url} className="relative w-20 h-20 rounded overflow-hidden border-2 border-dashed border-[#1B4332]">
+                <div key={url} className="relative w-20 h-20 rounded overflow-hidden border-2 border-dashed border-accent">
                   <img src={url} alt="" className="w-full h-full object-cover opacity-80" />
                   {canEdit && (
                     <button type="button" onClick={() => removePending(i)} className="absolute top-0.5 right-0.5 p-0.5 bg-red-500 text-white rounded-full">
@@ -249,7 +249,7 @@ export default function ProductForm({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-[#D4C4B5] rounded-sm w-full hover:border-[#1B4332] hover:bg-[#F8F6F3] transition-colors text-sm text-[#666666]"
+                  className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-line rounded-sm w-full hover:border-accent hover:bg-canvas transition-colors text-sm text-ink-secondary"
                 >
                   {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                   Upload images (auto-compressed)
@@ -260,15 +260,15 @@ export default function ProductForm({
 
           <div>
             <label className="block text-sm font-medium mb-1">Sizes (comma-separated)</label>
-            <input type="text" value={form.sizeOptions} onChange={(e) => setForm({ ...form, sizeOptions: e.target.value })} disabled={!canEdit} placeholder="S, M, L, XL" className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm disabled:bg-[#F8F6F3]" />
+            <input type="text" value={form.sizeOptions} onChange={(e) => setForm({ ...form, sizeOptions: e.target.value })} disabled={!canEdit} placeholder="S, M, L, XL" className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Colors (comma-separated)</label>
-            <input type="text" value={form.colorOptions} onChange={(e) => setForm({ ...form, colorOptions: e.target.value })} disabled={!canEdit} placeholder="Red, Blue, Green" className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm disabled:bg-[#F8F6F3]" />
+            <input type="text" value={form.colorOptions} onChange={(e) => setForm({ ...form, colorOptions: e.target.value })} disabled={!canEdit} placeholder="Red, Blue, Green" className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Badges (comma-separated)</label>
-            <input type="text" value={form.badges} onChange={(e) => setForm({ ...form, badges: e.target.value })} disabled={!canEdit} placeholder="new, best-seller" className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm disabled:bg-[#F8F6F3]" />
+            <input type="text" value={form.badges} onChange={(e) => setForm({ ...form, badges: e.target.value })} disabled={!canEdit} placeholder="new, best-seller" className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas" />
           </div>
           <div className="flex gap-6">
             <label className="flex items-center gap-2 text-sm">

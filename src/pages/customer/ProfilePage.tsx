@@ -30,17 +30,17 @@ export default function ProfilePage() {
   const memberSince = new Date(customer.createdAt).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 
   return (
-    <div className="min-h-screen bg-[#F9F7F4]">
+    <div className="min-h-screen bg-canvas">
       {/* Profile Header */}
-      <div className="bg-white border-b border-[#E2D9CF]">
+      <div className="bg-elevated border-b border-line">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
           <div className="flex items-center gap-5">
-            <div className="w-16 h-16 md:w-20 md:h-20 bg-[#1B4332] flex items-center justify-center flex-shrink-0">
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-accent flex items-center justify-center flex-shrink-0">
               <span className="text-white font-serif text-2xl font-semibold">{initials}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <h1 className="font-serif text-xl md:text-2xl font-medium text-[#1A1A1A] truncate">{customer.name}</h1>
-              <p className="text-sm text-[#7A7A7A] mt-0.5">{customer.email}</p>
+              <h1 className="font-serif text-xl md:text-2xl font-medium text-ink truncate">{customer.name}</h1>
+              <p className="text-sm text-ink-muted mt-0.5">{customer.email}</p>
               <p className="text-xs text-[#C0B8B0] mt-1">Member since {memberSince}</p>
             </div>
             <button
@@ -53,15 +53,15 @@ export default function ProfilePage() {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-0 mt-6 border-b border-[#E2D9CF] -mb-px">
+          <div className="flex gap-0 mt-6 border-b border-line -mb-px">
             {TABS.map(t => (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
                 className={`flex items-center gap-1.5 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                   tab === t.id
-                    ? 'border-[#1B4332] text-[#1B4332]'
-                    : 'border-transparent text-[#7A7A7A] hover:text-[#1A1A1A]'
+                    ? 'border-accent text-accent'
+                    : 'border-transparent text-ink-muted hover:text-ink'
                 }`}
               >
                 <t.icon className="w-3.5 h-3.5" />
@@ -101,21 +101,21 @@ function OverviewTab({ customer, wishlistCount, onTabChange }: {
           <button
             key={c.label}
             onClick={() => onTabChange(c.tab)}
-            className="bg-white border border-[#E2D9CF] p-5 text-left hover:border-[#1B4332] transition-colors group"
+            className="bg-elevated border border-line p-5 text-left hover:border-accent transition-colors group"
           >
             <div className="flex items-center gap-3 mb-2">
-              <c.icon className="w-4 h-4 text-[#9A9A9A] group-hover:text-[#1B4332] transition-colors" />
-              <span className="text-xs text-[#9A9A9A] uppercase tracking-wide font-semibold">{c.label}</span>
+              <c.icon className="w-4 h-4 text-ink-muted group-hover:text-accent transition-colors" />
+              <span className="text-xs text-ink-muted uppercase tracking-wide font-semibold">{c.label}</span>
             </div>
-            <p className="text-2xl font-serif font-medium text-[#1A1A1A]">{c.value}</p>
-            <p className="text-xs text-[#9A9A9A] mt-0.5">{c.sub}</p>
+            <p className="text-2xl font-serif font-medium text-ink">{c.value}</p>
+            <p className="text-xs text-ink-muted mt-0.5">{c.sub}</p>
           </button>
         ))}
       </div>
 
       {/* Account info */}
-      <div className="bg-white border border-[#E2D9CF] p-6">
-        <h2 className="text-sm font-semibold text-[#1A1A1A] mb-4">Account Information</h2>
+      <div className="bg-elevated border border-line p-6">
+        <h2 className="text-sm font-semibold text-ink mb-4">Account Information</h2>
         <dl className="space-y-3">
           {[
             { label: 'Full Name', value: customer.name },
@@ -124,14 +124,14 @@ function OverviewTab({ customer, wishlistCount, onTabChange }: {
             { label: 'Delivery Address', value: customer.address || '—' },
           ].map(row => (
             <div key={row.label} className="flex items-start gap-4">
-              <dt className="w-32 flex-shrink-0 text-xs text-[#9A9A9A] uppercase tracking-wide font-semibold pt-0.5">{row.label}</dt>
-              <dd className="text-sm text-[#1A1A1A]">{row.value}</dd>
+              <dt className="w-32 flex-shrink-0 text-xs text-ink-muted uppercase tracking-wide font-semibold pt-0.5">{row.label}</dt>
+              <dd className="text-sm text-ink">{row.value}</dd>
             </div>
           ))}
         </dl>
         <button
           onClick={() => onTabChange('settings')}
-          className="mt-5 text-xs font-semibold text-[#1B4332] hover:underline uppercase tracking-wide"
+          className="mt-5 text-xs font-semibold text-accent hover:underline uppercase tracking-wide"
         >
           Edit details →
         </button>
@@ -143,13 +143,13 @@ function OverviewTab({ customer, wishlistCount, onTabChange }: {
 function OrdersTab() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-      <div className="bg-white border border-[#E2D9CF] py-20 text-center">
-        <div className="w-12 h-12 bg-[#F9F7F4] flex items-center justify-center mx-auto mb-4">
+      <div className="bg-elevated border border-line py-20 text-center">
+        <div className="w-12 h-12 bg-canvas flex items-center justify-center mx-auto mb-4">
           <ShoppingBag className="w-5 h-5 text-[#C0B8B0]" />
         </div>
-        <p className="text-sm font-medium text-[#1A1A1A] mb-1.5">No orders yet</p>
-        <p className="text-xs text-[#9A9A9A] mb-6">Your order history will appear here after you place your first order.</p>
-        <Link to="/" className="inline-flex px-6 py-2.5 bg-[#1B4332] text-white text-sm font-medium hover:bg-[#163828] transition-colors">
+        <p className="text-sm font-medium text-ink mb-1.5">No orders yet</p>
+        <p className="text-xs text-ink-muted mb-6">Your order history will appear here after you place your first order.</p>
+        <Link to="/" className="inline-flex px-6 py-2.5 bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-colors">
           Start Shopping
         </Link>
       </div>
@@ -161,13 +161,13 @@ function WishlistTabContent({ wishlistItems }: { wishlistItems: any[] }) {
   if (!wishlistItems.length) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-        <div className="bg-white border border-[#E2D9CF] py-20 text-center">
-          <div className="w-12 h-12 bg-[#F9F7F4] flex items-center justify-center mx-auto mb-4">
+        <div className="bg-elevated border border-line py-20 text-center">
+          <div className="w-12 h-12 bg-canvas flex items-center justify-center mx-auto mb-4">
             <Heart className="w-5 h-5 text-[#C0B8B0]" />
           </div>
-          <p className="text-sm font-medium text-[#1A1A1A] mb-1.5">Your wishlist is empty</p>
-          <p className="text-xs text-[#9A9A9A] mb-6">Save items you love by clicking the heart icon.</p>
-          <Link to="/" className="inline-flex px-6 py-2.5 bg-[#1B4332] text-white text-sm font-medium hover:bg-[#163828] transition-colors">
+          <p className="text-sm font-medium text-ink mb-1.5">Your wishlist is empty</p>
+          <p className="text-xs text-ink-muted mb-6">Save items you love by clicking the heart icon.</p>
+          <Link to="/" className="inline-flex px-6 py-2.5 bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-colors">
             Explore Collection
           </Link>
         </div>
@@ -179,10 +179,10 @@ function WishlistTabContent({ wishlistItems }: { wishlistItems: any[] }) {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {wishlistItems.map((product: any) => (
           <Link key={product.id} to={`/category/${product.category}`} className="group">
-            <div className="aspect-[3/4] overflow-hidden bg-[#F5F0E8] mb-2">
+            <div className="aspect-[3/4] overflow-hidden bg-surface mb-2">
               <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
             </div>
-            <p className="text-xs font-medium text-[#1A1A1A] line-clamp-1">{product.name}</p>
+            <p className="text-xs font-medium text-ink line-clamp-1">{product.name}</p>
           </Link>
         ))}
       </div>
@@ -215,17 +215,17 @@ function SettingsTab({ customer, updateCustomer, onLogout }: {
       )}
 
       {/* Personal info */}
-      <div className="bg-white border border-[#E2D9CF] p-6">
+      <div className="bg-elevated border border-line p-6">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-sm font-semibold text-[#1A1A1A]">Personal Information</h2>
+          <h2 className="text-sm font-semibold text-ink">Personal Information</h2>
           {!editing ? (
-            <button onClick={() => setEditing(true)} className="flex items-center gap-1.5 text-xs font-semibold text-[#1B4332] hover:underline uppercase tracking-wide">
+            <button onClick={() => setEditing(true)} className="flex items-center gap-1.5 text-xs font-semibold text-accent hover:underline uppercase tracking-wide">
               <Edit2 className="w-3 h-3" /> Edit
             </button>
           ) : (
             <div className="flex items-center gap-3">
-              <button onClick={() => setEditing(false)} className="text-xs text-[#9A9A9A] hover:text-[#1A1A1A]"><X className="w-4 h-4" /></button>
-              <button onClick={handleSave} className="flex items-center gap-1.5 text-xs font-semibold text-[#1B4332] hover:underline uppercase tracking-wide">
+              <button onClick={() => setEditing(false)} className="text-xs text-ink-muted hover:text-ink"><X className="w-4 h-4" /></button>
+              <button onClick={handleSave} className="flex items-center gap-1.5 text-xs font-semibold text-accent hover:underline uppercase tracking-wide">
                 <Check className="w-3 h-3" /> Save
               </button>
             </div>
@@ -239,32 +239,32 @@ function SettingsTab({ customer, updateCustomer, onLogout }: {
             { id: 'address', label: 'Delivery Address', type: 'text' },
           ].map(({ id, label, type }) => (
             <div key={id}>
-              <label className="block text-xs font-semibold uppercase tracking-wide text-[#9A9A9A] mb-1.5">{label}</label>
+              <label className="block text-xs font-semibold uppercase tracking-wide text-ink-muted mb-1.5">{label}</label>
               {editing ? (
                 <input
                   type={type}
                   value={(form as any)[id]}
                   onChange={e => setForm(f => ({ ...f, [id]: e.target.value }))}
-                  className="w-full px-4 py-2.5 border border-[#E2D9CF] text-sm text-[#1A1A1A] focus:outline-none focus:border-[#1B4332] transition-colors"
+                  className="w-full px-4 py-2.5 border border-line text-sm text-ink focus:outline-none focus:border-accent transition-colors"
                 />
               ) : (
-                <p className="text-sm text-[#1A1A1A] py-2.5">{(form as any)[id] || <span className="text-[#C0B8B0]">Not set</span>}</p>
+                <p className="text-sm text-ink py-2.5">{(form as any)[id] || <span className="text-[#C0B8B0]">Not set</span>}</p>
               )}
             </div>
           ))}
 
           {/* Email (non-editable) */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wide text-[#9A9A9A] mb-1.5">Email address</label>
-            <p className="text-sm text-[#1A1A1A] py-2.5">{customer.email}</p>
+            <label className="block text-xs font-semibold uppercase tracking-wide text-ink-muted mb-1.5">Email address</label>
+            <p className="text-sm text-ink py-2.5">{customer.email}</p>
             <p className="text-xs text-[#C0B8B0]">Email cannot be changed</p>
           </div>
         </div>
       </div>
 
       {/* Danger zone */}
-      <div className="bg-white border border-[#E2D9CF] p-6">
-        <h2 className="text-sm font-semibold text-[#1A1A1A] mb-4">Session</h2>
+      <div className="bg-elevated border border-line p-6">
+        <h2 className="text-sm font-semibold text-ink mb-4">Session</h2>
         <button
           onClick={onLogout}
           className="flex items-center gap-2 px-4 py-2.5 border border-[#B5603E] text-sm font-medium text-[#B5603E] hover:bg-[#B5603E] hover:text-white transition-colors"

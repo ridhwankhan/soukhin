@@ -78,8 +78,8 @@ export default function ProductsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-[#2D2D2D]">Products</h1>
-          <p className="text-sm text-[#666666]">
+          <h1 className="text-2xl font-semibold text-ink">Products</h1>
+          <p className="text-sm text-ink-secondary">
             {loading ? 'Loading...' : `${filteredProducts.length} products — saved to database`}
           </p>
         </div>
@@ -90,21 +90,21 @@ export default function ProductsPage() {
         )}
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-4 flex flex-wrap gap-4">
+      <div className="bg-elevated rounded-lg shadow-sm p-4 flex flex-wrap gap-4">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#666666]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-secondary" />
           <input
             type="text"
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+            className="w-full pl-10 pr-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="px-4 py-2 border border-[#D4C4B5] rounded-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+          className="px-4 py-2 border border-line rounded-sm bg-elevated focus:outline-none focus:ring-2 focus:ring-accent"
         >
           <option value="all">All Categories</option>
           {categories.map((cat) => (
@@ -113,9 +113,9 @@ export default function ProductsPage() {
         </select>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-elevated rounded-lg shadow-sm overflow-hidden">
         {filteredProducts.length === 0 && !loading ? (
-          <div className="p-12 text-center text-[#666666]">
+          <div className="p-12 text-center text-ink-secondary">
             <p className="mb-2">No products yet.</p>
             <p className="text-sm mb-4">Add your first product with images — they will appear on the storefront instantly.</p>
             {canManage && (
@@ -126,7 +126,7 @@ export default function ProductsPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-[#F8F6F3] text-sm text-[#666666]">
+                <tr className="bg-canvas text-sm text-ink-secondary">
                   <th className="text-left p-4 font-medium">Product</th>
                   <th className="text-left p-4 font-medium">Category</th>
                   <th className="text-left p-4 font-medium">Price</th>
@@ -137,18 +137,18 @@ export default function ProductsPage() {
               </thead>
               <tbody className="divide-y divide-[#F5F0E8]">
                 {filteredProducts.map((product) => (
-                  <motion.tr key={product.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-[#F8F6F3]">
+                  <motion.tr key={product.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-canvas">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <img src={product.images[0]} alt="" className="w-12 h-12 object-cover rounded" />
                         <div>
-                          <p className="font-medium text-[#2D2D2D]">{product.name}</p>
-                          <p className="text-xs text-[#666666]">{product.sku}</p>
+                          <p className="font-medium text-ink">{product.name}</p>
+                          <p className="text-xs text-ink-secondary">{product.sku}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="p-4 text-sm text-[#666666] capitalize">{product.category.replace(/-/g, ' ')}</td>
-                    <td className="p-4 font-medium text-[#1B4332]">
+                    <td className="p-4 text-sm text-ink-secondary capitalize">{product.category.replace(/-/g, ' ')}</td>
+                    <td className="p-4 font-medium text-accent">
                       {BRAND_CONFIG.currency.symbol}{(product.salePrice ?? product.price).toLocaleString()}
                     </td>
                     <td className="p-4">
@@ -162,13 +162,13 @@ export default function ProductsPage() {
                       </span>
                     </td>
                     <td className="p-4 text-right space-x-1">
-                      <button onClick={() => { setSelectedProduct(product); setIsEditing(false); setIsNew(false); }} className="p-2 hover:bg-[#1B4332]/10 rounded" title="View">
-                        <Eye className="w-4 h-4 text-[#1B4332]" />
+                      <button onClick={() => { setSelectedProduct(product); setIsEditing(false); setIsNew(false); }} className="p-2 hover:bg-accent/10 rounded" title="View">
+                        <Eye className="w-4 h-4 text-accent" />
                       </button>
                       {canManage && (
                         <>
-                          <button onClick={() => { setSelectedProduct(product); setIsEditing(true); setIsNew(false); }} className="p-2 hover:bg-[#1B4332]/10 rounded" title="Edit">
-                            <Edit2 className="w-4 h-4 text-[#666666]" />
+                          <button onClick={() => { setSelectedProduct(product); setIsEditing(true); setIsNew(false); }} className="p-2 hover:bg-accent/10 rounded" title="Edit">
+                            <Edit2 className="w-4 h-4 text-ink-secondary" />
                           </button>
                           <button onClick={() => handleDelete(product)} className="p-2 hover:bg-red-50 rounded" title="Delete">
                             <Trash2 className="w-4 h-4 text-red-500" />

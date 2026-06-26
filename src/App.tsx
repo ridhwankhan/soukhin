@@ -60,7 +60,7 @@ function CustomerLayout({ children }: { children: React.ReactNode }) {
   const isHome = location.pathname === '/';
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-[#0F1411] transition-colors duration-200">
+    <div className="min-h-screen flex flex-col bg-canvas text-ink transition-colors duration-200">
       <Header
         onCartClick={() => setCartOpen(true)}
         searchOpen={searchOpen}

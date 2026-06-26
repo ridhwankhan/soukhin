@@ -8,13 +8,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ children, variant = 'primary', size = 'md', loading, className = '', disabled, ...props }, ref) => {
-    const base = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]';
+    const base =
+      'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]';
 
     const variants = {
-      primary: 'bg-[#1B4332] text-white hover:bg-[#163828] focus-visible:ring-[#1B4332]',
-      secondary: 'bg-[#F5F0E8] text-[#1A1A1A] hover:bg-[#EDE5D8] focus-visible:ring-[#9A7535]',
-      outline: 'border border-[#1B4332] text-[#1B4332] hover:bg-[#1B4332] hover:text-white focus-visible:ring-[#1B4332]',
-      ghost: 'text-[#4A4A4A] hover:bg-[#F5F0E8] focus-visible:ring-[#9A7535]',
+      primary: 'bg-accent text-accent-fg hover:bg-accent-hover',
+      secondary: 'bg-surface text-ink hover:bg-muted',
+      outline: 'border border-accent text-accent hover:bg-accent hover:text-accent-fg',
+      ghost: 'text-ink-secondary hover:bg-surface hover:text-ink',
     };
 
     const sizes = {

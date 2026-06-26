@@ -7,7 +7,7 @@ export default function Footer() {
   const developerMailto = `mailto:${DEVELOPER_EMAIL}?subject=Soukhin%20website`;
 
   return (
-    <footer className="bg-[#111A14] text-white">
+    <footer className="bg-footer text-footer-fg">
       {/* Main */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8">
@@ -15,7 +15,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-4 space-y-5">
             <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-9 h-9 bg-[#1B4332] flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 bg-accent flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-serif text-lg font-bold leading-none">শ</span>
               </div>
               <div>

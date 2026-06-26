@@ -28,22 +28,22 @@ const values = [
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-elevated">
       {/* Header */}
-      <div className="bg-[#F9F7F4] border-b border-[#E2D9CF] py-14 md:py-20">
+      <div className="bg-canvas border-b border-line py-14 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center gap-2 text-xs text-[#9A9A9A] mb-5">
-            <Link to="/" className="hover:text-[#1B4332] transition-colors">Home</Link>
+          <nav className="flex items-center gap-2 text-xs text-ink-muted mb-5">
+            <Link to="/" className="hover:text-accent transition-colors">Home</Link>
             <span>/</span>
-            <span className="text-[#4A4A4A]">About</span>
+            <span className="text-ink-secondary">About</span>
           </nav>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55 }}
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9A7535] mb-3">Our Story</p>
-            <h1 className="font-serif text-4xl md:text-5xl font-medium text-[#1A1A1A] tracking-tight max-w-2xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent mb-3">Our Story</p>
+            <h1 className="font-serif text-4xl md:text-5xl font-medium text-ink tracking-tight max-w-2xl">
               Born from a love of Bangladeshi craft
             </h1>
           </motion.div>
@@ -61,7 +61,7 @@ export default function AboutPage() {
         >
           <div className="space-y-5 text-[#5A5A5A] text-base leading-relaxed">
             <p>
-              <strong className="text-[#1A1A1A] font-semibold">{BRAND_CONFIG.name}</strong> — meaning "tasteful" or "refined" in Bangla — was born from a simple belief: that everyday life deserves beauty, quality, and authenticity.
+              <strong className="text-ink font-semibold">{BRAND_CONFIG.name}</strong> — meaning "tasteful" or "refined" in Bangla — was born from a simple belief: that everyday life deserves beauty, quality, and authenticity.
             </p>
             <p>
               From the intricate craftsmanship of traditional three-piece ensembles to the nostalgic flavors of homemade pitha, every item in our collection tells a story. We work directly with skilled artisans, local producers, and trusted partners across Bangladesh.
@@ -74,7 +74,7 @@ export default function AboutPage() {
 
         {/* Values */}
         <div className="mb-16">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9A7535] mb-8">What we stand for</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent mb-8">What we stand for</p>
           <div className="grid md:grid-cols-2 gap-6">
             {values.map(({ icon: Icon, title, body }, i) => (
               <motion.div
@@ -83,12 +83,12 @@ export default function AboutPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.45, delay: i * 0.07 }}
-                className="border border-[#E2D9CF] p-6"
+                className="border border-line p-6"
               >
-                <div className="w-9 h-9 bg-[#F9F7F4] flex items-center justify-center mb-4">
-                  <Icon className="w-4 h-4 text-[#1B4332]" strokeWidth={1.75} />
+                <div className="w-9 h-9 bg-canvas flex items-center justify-center mb-4">
+                  <Icon className="w-4 h-4 text-accent" strokeWidth={1.75} />
                 </div>
-                <h3 className="text-sm font-semibold text-[#1A1A1A] mb-2">{title}</h3>
+                <h3 className="text-sm font-semibold text-ink mb-2">{title}</h3>
                 <p className="text-sm text-[#6A6A6A] leading-relaxed">{body}</p>
               </motion.div>
             ))}
@@ -96,8 +96,8 @@ export default function AboutPage() {
         </div>
 
         {/* CTA */}
-        <div className="bg-[#1B4332] p-10 md:p-14 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#9A7535] mb-4">
+        <div className="bg-accent p-10 md:p-14 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent mb-4">
             Join Us
           </p>
           <h2 className="font-serif text-2xl md:text-3xl font-medium text-white mb-4 tracking-tight">
@@ -108,7 +108,7 @@ export default function AboutPage() {
           </p>
           <Link
             to="/"
-            className="inline-flex items-center px-7 py-3.5 bg-white text-[#1B4332] text-sm font-semibold hover:bg-[#F5F0E8] transition-colors"
+            className="inline-flex items-center px-7 py-3.5 bg-elevated text-accent text-sm font-semibold hover:bg-surface transition-colors"
           >
             Shop the Collection
           </Link>

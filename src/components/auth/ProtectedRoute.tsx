@@ -12,10 +12,10 @@ export default function ProtectedRoute({ children, requireProfile = true }: Prot
 
   if (loading) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center bg-[#F8F6F3]">
+      <div className="min-h-[50vh] flex items-center justify-center bg-canvas">
         <div className="text-center">
-          <div className="w-10 h-10 border-2 border-[#1B4332] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-[#666666]">Loading your account...</p>
+          <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-ink-secondary">Loading your account...</p>
         </div>
       </div>
     );

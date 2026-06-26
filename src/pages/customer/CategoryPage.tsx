@@ -123,8 +123,8 @@ export default function CategoryPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold text-[#2D2D2D] mb-4">Category not found</h1>
-          <Link to="/" className="text-[#1B4332] hover:underline">Go back home</Link>
+          <h1 className="text-2xl font-semibold text-ink mb-4">Category not found</h1>
+          <Link to="/" className="text-accent hover:underline">Go back home</Link>
         </div>
       </div>
     );
@@ -133,8 +133,8 @@ export default function CategoryPage() {
   const displayCategory = category || (subcats[0] ? { name: subcats[0].name, nameBn: subcats[0].nameBn } : { name: 'Products', nameBn: '' });
 
   return (
-    <div className="min-h-screen bg-[#F8F6F3]">
-      <div className="bg-[#1B4332] text-white py-12 md:py-16">
+    <div className="min-h-screen bg-canvas">
+      <div className="bg-accent text-white py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Breadcrumbs items={[{ label: displayCategory?.name || 'Products' }]} className="mb-5 text-white/50 [&_a]:text-white/70 [&_a:hover]:text-white [&_span]:text-white/90" />
           <div className="text-center">
@@ -150,9 +150,9 @@ export default function CategoryPage() {
         {subcats.length > 0 && (
           <div className="mb-8">
             <div className="flex flex-wrap gap-3">
-              <Link to={`/category/${slug}`} className="px-4 py-2 text-sm rounded-sm bg-[#1B4332] text-white">All {category?.name || 'Products'}</Link>
+              <Link to={`/category/${slug}`} className="px-4 py-2 text-sm rounded-sm bg-accent text-white">All {category?.name || 'Products'}</Link>
               {subcats.map((subcat) => (
-                <Link key={subcat.slug} to={`/category/${subcat.slug}`} className="px-4 py-2 text-sm rounded-sm border border-[#D4C4B5] text-[#2D2D2D] hover:border-[#1B4332] hover:text-[#1B4332]">
+                <Link key={subcat.slug} to={`/category/${subcat.slug}`} className="px-4 py-2 text-sm rounded-sm border border-line text-ink hover:border-accent hover:text-accent">
                   {subcat.name}
                 </Link>
               ))}
@@ -164,7 +164,7 @@ export default function CategoryPage() {
           <>
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-4">
-                <button onClick={() => setFiltersOpen(true)} className="flex items-center gap-2 px-4 py-2 border border-[#D4C4B5] rounded-sm hover:bg-white">
+                <button onClick={() => setFiltersOpen(true)} className="flex items-center gap-2 px-4 py-2 border border-line rounded-sm hover:bg-elevated">
                   <SlidersHorizontal className="w-4 h-4" />
                   <span>Filters</span>
                 </button>
@@ -173,8 +173,8 @@ export default function CategoryPage() {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-[#666666]">{filteredProducts.length} products</span>
-                <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortOption)} className="appearance-none pl-4 pr-10 py-2 border border-[#D4C4B5] rounded-sm bg-white text-sm">
+                <span className="text-sm text-ink-secondary">{filteredProducts.length} products</span>
+                <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortOption)} className="appearance-none pl-4 pr-10 py-2 border border-line rounded-sm bg-elevated text-sm">
                   {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
@@ -182,8 +182,8 @@ export default function CategoryPage() {
 
             {filteredProducts.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-[#666666]">No products match your filters.</p>
-                <button onClick={clearFilters} className="mt-4 text-[#1B4332] hover:underline">Clear filters</button>
+                <p className="text-ink-secondary">No products match your filters.</p>
+                <button onClick={clearFilters} className="mt-4 text-accent hover:underline">Clear filters</button>
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
@@ -198,7 +198,7 @@ export default function CategoryPage() {
         )}
 
         {loading && (
-          <div className="text-center py-16 text-[#666666]">Loading products...</div>
+          <div className="text-center py-16 text-ink-secondary">Loading products...</div>
         )}
       </div>
 
@@ -213,7 +213,7 @@ export default function CategoryPage() {
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold">Filters</h2>
-            <button onClick={() => setFiltersOpen(false)} className="p-2 hover:bg-[#F5F0E8] rounded-full"><X className="w-5 h-5" /></button>
+            <button onClick={() => setFiltersOpen(false)} className="p-2 hover:bg-surface rounded-full"><X className="w-5 h-5" /></button>
           </div>
           <div className="space-y-6">
             <div>
@@ -226,7 +226,7 @@ export default function CategoryPage() {
           </div>
           <div className="mt-8 flex gap-4">
             <button onClick={clearFilters} className="flex-1 py-3 border rounded-sm">Clear All</button>
-            <button onClick={() => setFiltersOpen(false)} className="flex-1 py-3 bg-[#1B4332] text-white rounded-sm">Apply</button>
+            <button onClick={() => setFiltersOpen(false)} className="flex-1 py-3 bg-accent text-white rounded-sm">Apply</button>
           </div>
         </div>
       </Modal>

@@ -67,15 +67,15 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
   };
 
   const headerSurface = scrolled
-    ? 'bg-white/95 dark:bg-[#111A14]/95 backdrop-blur-md shadow-md border-b border-[#1B4332]/5 dark:border-white/10'
+    ? 'bg-elevated/95 backdrop-blur-md shadow-md border-b border-line'
     : isHome
-    ? 'bg-[#F9F7F4]/80 dark:bg-[#111A14]/80 backdrop-blur-xl border-b border-white/50 dark:border-white/10 shadow-sm'
-    : 'bg-white/90 dark:bg-[#111A14]/90 backdrop-blur-md shadow-sm';
+    ? 'bg-canvas/80 backdrop-blur-xl border-b border-line shadow-sm'
+    : 'bg-elevated/90 backdrop-blur-md shadow-sm';
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 supports-[backdrop-filter]:backdrop-blur-xl ${headerSurface}`}>
+    <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 supports-[backdrop-filter]:backdrop-blur-xl text-ink ${headerSurface}`}>
       {/* Announcement bar */}
-      <div className="bg-[#1B4332] text-white text-center py-2 text-sm">
+      <div className="bg-announcement text-announcement-fg text-center py-2 text-sm">
         <span>Free delivery on orders over ৳2000 | Use code: SOUKHIN10</span>
       </div>
 
@@ -83,15 +83,15 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-[#1B4332] rounded-sm flex items-center justify-center">
-              <span className="text-white font-serif text-xl font-bold">শ</span>
+            <div className="w-10 h-10 bg-accent rounded-sm flex items-center justify-center">
+              <span className="text-accent-fg font-serif text-xl font-bold">শ</span>
             </div>
             <div className="hidden sm:block">
               <span className={`font-serif text-xl font-semibold transition-colors ${
-                scrolled ? 'text-[#1B4332]' : 'text-[#1B4332]'
+                scrolled ? 'text-accent' : 'text-accent'
               }`}>{BRAND_CONFIG.name}</span>
               <p className={`text-xs transition-colors ${
-                scrolled ? 'text-[#666666]' : 'text-[#666666]'
+                scrolled ? 'text-ink-secondary' : 'text-ink-secondary'
               }`}>{BRAND_CONFIG.nameBn}</p>
             </div>
           </Link>
@@ -110,10 +110,10 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
                 >
                   <Link
                     to={link.href}
-                    className={`flex items-center gap-1 text-sm font-medium transition-colors hover:text-[#1B4332] ${
+                    className={`flex items-center gap-1 text-sm font-medium transition-colors hover:text-accent ${
                       location.pathname === link.href || (link.href !== '/' && location.pathname.startsWith(link.href))
-                        ? 'text-[#1B4332]'
-                        : scrolled ? 'text-[#2D2D2D]' : 'text-[#2D2D2D]'
+                        ? 'text-accent'
+                        : scrolled ? 'text-ink' : 'text-ink'
                     }`}
                   >
                     {link.label}
@@ -134,10 +134,10 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
                         transition={{ duration: 0.2 }}
                         className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-max"
                       >
-                        <div className="bg-white rounded-lg shadow-xl border border-gray-100 p-6 flex gap-8">
+                        <div className="bg-elevated rounded-lg shadow-xl border border-line p-6 flex gap-8">
                           {Object.entries(dropdownContent).map(([section, items]) => (
                             <div key={section}>
-                              <h3 className="text-xs font-semibold text-[#1B4332] uppercase tracking-wider mb-3 border-b border-[#1B4332]/20 pb-2">
+                              <h3 className="text-xs font-semibold text-accent uppercase tracking-wider mb-3 border-b border-accent/20 pb-2">
                                 {section}
                               </h3>
                               <div className="space-y-2">
@@ -145,7 +145,7 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
                                   <Link
                                     key={item.href}
                                     to={item.href}
-                                    className="block text-sm text-[#2D2D2D] hover:text-[#1B4332] py-1 transition-colors"
+                                    className="block text-sm text-ink hover:text-accent py-1 transition-colors"
                                   >
                                     <span>{item.label}</span>
                                     <span className="text-xs text-[#999999] ml-1">{item.labelBn}</span>
@@ -168,11 +168,11 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
             {!isHome && (
               <Link
                 to="/"
-                className="p-2 hover:bg-[#F5F0E8] dark:hover:bg-white/10 rounded-full transition-colors"
+                className="p-2 hover:bg-surface rounded-full transition-colors"
                 title="Back to Home"
                 aria-label="Back to Home"
               >
-                <Home className="w-5 h-5 text-[#2D2D2D] dark:text-white/90" />
+                <Home className="w-5 h-5 text-ink/90" />
               </Link>
             )}
 
@@ -180,16 +180,16 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
 
             <button
               onClick={onSearchToggle}
-              className="p-2 hover:bg-[#F5F0E8] rounded-full transition-colors"
+              className="p-2 hover:bg-surface rounded-full transition-colors"
             >
-              <Search className="w-5 h-5 text-[#2D2D2D]" />
+              <Search className="w-5 h-5 text-ink" />
             </button>
 
             <Link
               to="/wishlist"
-              className="p-2 hover:bg-[#F5F0E8] rounded-full transition-colors relative"
+              className="p-2 hover:bg-surface rounded-full transition-colors relative"
             >
-              <Heart className="w-5 h-5 text-[#2D2D2D]" />
+              <Heart className="w-5 h-5 text-ink" />
               {wishlistItems.length > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#C2704A] text-white text-xs rounded-full flex items-center justify-center">
                   {wishlistItems.length}
@@ -199,11 +199,11 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
 
             <button
               onClick={onCartClick}
-              className="p-2 hover:bg-[#F5F0E8] rounded-full transition-colors relative"
+              className="p-2 hover:bg-surface rounded-full transition-colors relative"
             >
-              <ShoppingBag className="w-5 h-5 text-[#2D2D2D]" />
+              <ShoppingBag className="w-5 h-5 text-ink" />
               {getItemCount() > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#1B4332] text-white text-xs rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs rounded-full flex items-center justify-center">
                   {getItemCount()}
                 </span>
               )}
@@ -212,7 +212,7 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
             {user && isEmailVerified && admin ? (
               <Link
                 to="/admin"
-                className="hidden md:flex items-center gap-2 px-3 py-2 hover:bg-[#F5F0E8] dark:hover:bg-white/10 rounded-full transition-colors text-sm font-medium text-[#1B4332] dark:text-white/90"
+                className="hidden md:flex items-center gap-2 px-3 py-2 hover:bg-surface rounded-full transition-colors text-sm font-medium text-accent/90"
                 title="Staff dashboard"
               >
                 <Shield className="w-4 h-4" />
@@ -223,15 +223,15 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
             {user && isEmailVerified && (!admin || canShopAsStaff) ? (
               <Link
                 to="/account"
-                className="hidden md:flex items-center gap-2 p-2 hover:bg-[#F5F0E8] dark:hover:bg-white/10 rounded-full transition-colors"
+                className="hidden md:flex items-center gap-2 p-2 hover:bg-surface rounded-full transition-colors"
                 title={profile?.name || admin?.name || 'My Account'}
               >
-                <User className="w-5 h-5 text-[#2D2D2D] dark:text-white/90" />
+                <User className="w-5 h-5 text-ink/90" />
               </Link>
             ) : user && isEmailVerified && admin ? null : (
               <Link
                 to="/auth"
-                className="hidden md:flex items-center gap-2 px-3 py-2 hover:bg-[#F5F0E8] dark:hover:bg-white/10 rounded-full transition-colors text-sm font-medium text-[#2D2D2D] dark:text-white/90"
+                className="hidden md:flex items-center gap-2 px-3 py-2 hover:bg-surface rounded-full transition-colors text-sm font-medium text-ink/90"
               >
                 <LogIn className="w-4 h-4" />
                 Sign In
@@ -241,7 +241,7 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 hover:bg-[#F5F0E8] rounded-full transition-colors"
+              className="lg:hidden p-2 hover:bg-surface rounded-full transition-colors"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -256,7 +256,7 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-white border-t border-[#F5F0E8] max-h-[80vh] overflow-y-auto"
+            className="lg:hidden bg-elevated border-t border-line max-h-[80vh] overflow-y-auto"
           >
             <div className="px-4 py-4">
               {NAV_LINKS.map(link => {
@@ -271,8 +271,8 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
                           onClick={() => toggleMobileSubmenu(link.label)}
                           className={`w-full flex items-center justify-between px-4 py-3 rounded-sm text-sm font-medium transition-colors ${
                             location.pathname.startsWith(link.href)
-                              ? 'bg-[#1B4332] text-white'
-                              : 'hover:bg-[#F5F0E8]'
+                              ? 'bg-accent text-white'
+                              : 'hover:bg-surface'
                           }`}
                         >
                           <span>
@@ -287,18 +287,18 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: 'auto', opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
-                              className="overflow-hidden bg-[#F8F6F3] ml-4 rounded-md my-1"
+                              className="overflow-hidden bg-canvas ml-4 rounded-md my-1"
                             >
                               {Object.entries(dropdownContent).map(([section, items]) => (
                                 <div key={section} className="py-2">
-                                  <p className="px-4 text-xs font-semibold text-[#1B4332] uppercase tracking-wider mb-1">
+                                  <p className="px-4 text-xs font-semibold text-accent uppercase tracking-wider mb-1">
                                     {section}
                                   </p>
                                   {items.map((item) => (
                                     <Link
                                       key={item.href}
                                       to={item.href}
-                                      className="block px-4 py-2 text-sm text-[#2D2D2D] hover:text-[#1B4332] hover:bg-white transition-colors"
+                                      className="block px-4 py-2 text-sm text-ink hover:text-accent hover:bg-elevated transition-colors"
                                     >
                                       {item.label}
                                       <span className="text-xs text-[#999999] ml-1">{item.labelBn}</span>
@@ -315,8 +315,8 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
                         to={link.href}
                         className={`block px-4 py-3 rounded-sm text-sm font-medium transition-colors ${
                           location.pathname === link.href
-                            ? 'bg-[#1B4332] text-white'
-                            : 'hover:bg-[#F5F0E8]'
+                            ? 'bg-accent text-white'
+                            : 'hover:bg-surface'
                         }`}
                       >
                         <span>{link.label}</span>
@@ -329,7 +329,7 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
               {user && isEmailVerified && admin ? (
                 <Link
                   to="/admin"
-                  className="block px-4 py-3 rounded-sm text-sm font-medium hover:bg-[#F5F0E8] dark:hover:bg-white/5 mt-2 border-t border-[#F5F0E8] dark:border-white/10 pt-4 flex items-center gap-2 text-[#1B4332] dark:text-white/90"
+                  className="block px-4 py-3 rounded-sm text-sm font-medium hover:bg-surface hover:bg-muted mt-2 border-t border-line pt-4 flex items-center gap-2 text-accent/90"
                 >
                   <Shield className="w-4 h-4" />
                   Staff Dashboard
@@ -338,14 +338,14 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
               {user && isEmailVerified && (!admin || canShopAsStaff) ? (
                 <Link
                   to="/account"
-                  className="block px-4 py-3 rounded-sm text-sm font-medium hover:bg-[#F5F0E8] dark:hover:bg-white/5 mt-2 border-t border-[#F5F0E8] dark:border-white/10 pt-4"
+                  className="block px-4 py-3 rounded-sm text-sm font-medium hover:bg-surface hover:bg-muted mt-2 border-t border-line pt-4"
                 >
                   My Account
                 </Link>
               ) : !user || !isEmailVerified ? (
                 <Link
                   to="/auth"
-                  className="block px-4 py-3 rounded-sm text-sm font-medium hover:bg-[#F5F0E8] dark:hover:bg-white/5 mt-2 border-t border-[#F5F0E8] dark:border-white/10 pt-4"
+                  className="block px-4 py-3 rounded-sm text-sm font-medium hover:bg-surface hover:bg-muted mt-2 border-t border-line pt-4"
                 >
                   Sign In / Register
                 </Link>

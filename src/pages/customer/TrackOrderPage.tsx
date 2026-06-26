@@ -55,8 +55,8 @@ export default function TrackOrderPage() {
   const steps = order ? getOrderStatusSteps(order.status) : [];
 
   return (
-    <div className="min-h-screen bg-[#F8F6F3]">
-      <div className="bg-[#1B4332] text-white py-12">
+    <div className="min-h-screen bg-canvas">
+      <div className="bg-accent text-white py-12">
         <div className="max-w-2xl mx-auto px-4 text-center">
           <h1 className="text-3xl font-serif font-semibold mb-2">Track Your Order</h1>
           <p className="text-white/70 text-sm">Enter your order number and phone to see status</p>
@@ -67,7 +67,7 @@ export default function TrackOrderPage() {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-lg shadow-sm p-6 mb-6"
+          className="bg-elevated rounded-lg shadow-sm p-6 mb-6"
         >
           <form onSubmit={handleTrack} className="space-y-4">
             <Input
@@ -99,32 +99,32 @@ export default function TrackOrderPage() {
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-lg shadow-sm p-6 space-y-6"
+            className="bg-elevated rounded-lg shadow-sm p-6 space-y-6"
           >
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-[#666666]">Order</p>
-                <p className="text-xl font-semibold text-[#1B4332]">#{order.orderNumber}</p>
-                <p className="text-sm text-[#666666] mt-1">
+                <p className="text-sm text-ink-secondary">Order</p>
+                <p className="text-xl font-semibold text-accent">#{order.orderNumber}</p>
+                <p className="text-sm text-ink-secondary mt-1">
                   Placed {new Date(order.createdAt).toLocaleDateString('en-GB', {
                     day: 'numeric', month: 'long', year: 'numeric',
                   })}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-lg font-semibold text-[#2D2D2D]">৳{order.total.toLocaleString()}</p>
-                <p className="text-xs text-[#666666] capitalize">{order.paymentMethod} · {order.paymentStatus}</p>
+                <p className="text-lg font-semibold text-ink">৳{order.total.toLocaleString()}</p>
+                <p className="text-xs text-ink-secondary capitalize">{order.paymentMethod} · {order.paymentStatus}</p>
               </div>
             </div>
 
             <div>
-              <h3 className="text-sm font-medium text-[#2D2D2D] mb-4">Order Status</h3>
+              <h3 className="text-sm font-medium text-ink mb-4">Order Status</h3>
               <div className="space-y-3">
                 {steps.map((step, idx) => (
                   <div key={idx} className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      step.current ? 'bg-[#1B4332] text-white' :
-                      step.done ? 'bg-green-100 text-green-600' : 'bg-[#F5F0E8] text-[#999999]'
+                      step.current ? 'bg-accent text-white' :
+                      step.done ? 'bg-green-100 text-green-600' : 'bg-surface text-[#999999]'
                     }`}>
                       {step.done && !step.current ? (
                         <CheckCircle className="w-4 h-4" />
@@ -134,7 +134,7 @@ export default function TrackOrderPage() {
                         <Package className="w-4 h-4" />
                       )}
                     </div>
-                    <span className={`text-sm ${step.current ? 'font-semibold text-[#1B4332]' : 'text-[#666666]'}`}>
+                    <span className={`text-sm ${step.current ? 'font-semibold text-accent' : 'text-ink-secondary'}`}>
                       {step.label}
                     </span>
                   </div>
@@ -144,10 +144,10 @@ export default function TrackOrderPage() {
 
             {order.items.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-[#2D2D2D] mb-3">Items</h3>
+                <h3 className="text-sm font-medium text-ink mb-3">Items</h3>
                 <div className="space-y-2">
                   {order.items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between text-sm p-3 bg-[#F8F6F3] rounded-sm">
+                    <div key={idx} className="flex justify-between text-sm p-3 bg-canvas rounded-sm">
                       <span>{item.product.name} × {item.quantity}</span>
                       <span className="font-medium">৳{(item.price * item.quantity).toLocaleString()}</span>
                     </div>
@@ -156,20 +156,20 @@ export default function TrackOrderPage() {
               </div>
             )}
 
-            <div className="p-4 bg-[#F8F6F3] rounded-sm text-sm">
-              <p className="text-[#666666]">Delivery to</p>
+            <div className="p-4 bg-canvas rounded-sm text-sm">
+              <p className="text-ink-secondary">Delivery to</p>
               <p className="font-medium">{order.shipping.address}</p>
-              <p className="text-[#666666]">{order.shipping.area}</p>
+              <p className="text-ink-secondary">{order.shipping.area}</p>
             </div>
           </motion.div>
         )}
 
         {searched && !order && !error && !loading && (
-          <p className="text-center text-sm text-[#666666]">Enter your details above to track an order.</p>
+          <p className="text-center text-sm text-ink-secondary">Enter your details above to track an order.</p>
         )}
 
         <p className="text-center mt-8">
-          <Link to="/account" className="text-sm text-[#1B4332] hover:underline">
+          <Link to="/account" className="text-sm text-accent hover:underline">
             View all your orders in My Account →
           </Link>
         </p>

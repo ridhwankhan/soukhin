@@ -41,11 +41,11 @@ export default function HomePage() {
       <HeroSection />
 
       {/* Categories */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24 bg-elevated">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-serif font-semibold text-[#2D2D2D] mb-3">Shop by Category</h2>
-            <p className="text-[#666666]">Explore our lifestyle collection</p>
+            <h2 className="text-3xl md:text-4xl font-serif font-semibold text-ink mb-3">Shop by Category</h2>
+            <p className="text-ink-secondary">Explore our lifestyle collection</p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -61,17 +61,17 @@ export default function HomePage() {
                   to={`/category/${category.slug}`}
                   className="group block"
                 >
-                  <div className="aspect-square rounded-lg overflow-hidden mb-3 bg-[#F5F0E8]">
+                  <div className="aspect-square rounded-lg overflow-hidden mb-3 bg-surface">
                     <img
                       src={category.image}
                       alt={category.name}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                   </div>
-                  <h3 className="font-medium text-[#2D2D2D] group-hover:text-[#1B4332] transition-colors">
+                  <h3 className="font-medium text-ink group-hover:text-accent transition-colors">
                     {category.name}
                   </h3>
-                  <p className="text-xs text-[#666666]">{category.nameBn}</p>
+                  <p className="text-xs text-ink-secondary">{category.nameBn}</p>
                 </Link>
               </motion.div>
             ))}
@@ -81,16 +81,16 @@ export default function HomePage() {
 
       {/* Featured Products */}
       {featuredProducts.length > 0 && (
-      <section className="py-16 md:py-24 bg-[#F8F6F3]">
+      <section className="py-16 md:py-24 bg-canvas">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl md:text-4xl font-serif font-semibold text-[#2D2D2D] mb-2">Featured Products</h2>
-              <p className="text-[#666666]">Handpicked by our team</p>
+              <h2 className="text-3xl md:text-4xl font-serif font-semibold text-ink mb-2">Featured Products</h2>
+              <p className="text-ink-secondary">Handpicked by our team</p>
             </div>
             <Link
               to="/category/new-arrivals"
-              className="flex items-center gap-2 text-[#1B4332] font-medium hover:underline"
+              className="flex items-center gap-2 text-accent font-medium hover:underline"
             >
               View All <ArrowRight className="w-4 h-4" />
             </Link>
@@ -126,7 +126,7 @@ export default function HomePage() {
                 <p className="text-xl md:text-2xl mb-8">{banner.subtitle}</p>
                 <Link
                   to={banner.link}
-                  className="px-8 py-3 bg-white text-[#1B4332] rounded-sm font-medium hover:bg-[#F5F0E8] transition-colors"
+                  className="px-8 py-3 bg-elevated text-accent rounded-sm font-medium hover:bg-surface transition-colors"
                 >
                   Shop Now
                 </Link>
@@ -137,13 +137,13 @@ export default function HomePage() {
 
         <button
           onClick={prevBanner}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 bg-elevated/20 hover:bg-elevated/30 rounded-full transition-colors"
         >
           <ChevronLeft className="w-6 h-6 text-white" />
         </button>
         <button
           onClick={nextBanner}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2 bg-elevated/20 hover:bg-elevated/30 rounded-full transition-colors"
         >
           <ChevronRight className="w-6 h-6 text-white" />
         </button>
@@ -154,7 +154,7 @@ export default function HomePage() {
               key={idx}
               onClick={() => setCurrentBanner(idx)}
               className={`w-2 h-2 rounded-full transition-colors ${
-                currentBanner === idx ? 'bg-white' : 'bg-white/50'
+                currentBanner === idx ? 'bg-elevated' : 'bg-elevated/50'
               }`}
             />
           ))}
@@ -163,16 +163,16 @@ export default function HomePage() {
 
       {/* New Arrivals */}
       {newArrivals.length > 0 && (
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24 bg-elevated">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl md:text-4xl font-serif font-semibold text-[#2D2D2D] mb-2">New Arrivals</h2>
-              <p className="text-[#666666]">Fresh additions to our collection</p>
+              <h2 className="text-3xl md:text-4xl font-serif font-semibold text-ink mb-2">New Arrivals</h2>
+              <p className="text-ink-secondary">Fresh additions to our collection</p>
             </div>
             <Link
               to="/category/new-arrivals"
-              className="flex items-center gap-2 text-[#1B4332] font-medium hover:underline"
+              className="flex items-center gap-2 text-accent font-medium hover:underline"
             >
               View All <ArrowRight className="w-4 h-4" />
             </Link>
@@ -188,7 +188,7 @@ export default function HomePage() {
       )}
 
       {/* Trust Badges */}
-      <section className="py-16 bg-[#1B4332]">
+      <section className="py-16 bg-accent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
@@ -208,19 +208,19 @@ export default function HomePage() {
       </section>
 
       {/* Newsletter */}
-      <section className="py-16 md:py-24 bg-[#F8F6F3]">
+      <section className="py-16 md:py-24 bg-canvas">
         <div className="max-w-2xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-serif font-semibold text-[#2D2D2D] mb-3">Stay Connected</h2>
-          <p className="text-[#666666] mb-6">Subscribe to our newsletter for updates on new collections and special offers.</p>
+          <h2 className="text-3xl font-serif font-semibold text-ink mb-3">Stay Connected</h2>
+          <p className="text-ink-secondary mb-6">Subscribe to our newsletter for updates on new collections and special offers.</p>
           <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 px-4 py-3 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+              className="flex-1 px-4 py-3 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
             />
             <button
               type="submit"
-              className="px-6 py-3 bg-[#1B4332] text-white rounded-sm font-medium hover:bg-[#163828] transition-colors"
+              className="px-6 py-3 bg-accent text-white rounded-sm font-medium hover:bg-accent-hover transition-colors"
             >
               Subscribe
             </button>

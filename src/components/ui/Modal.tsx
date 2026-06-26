@@ -44,13 +44,13 @@ export default function Modal({ isOpen, onClose, children, size = 'md' }: ModalP
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className={`relative w-full ${sizeClasses[size]} bg-white rounded-lg shadow-xl max-h-[90vh] overflow-hidden`}
+            className={`relative w-full ${sizeClasses[size]} bg-elevated rounded-lg shadow-xl max-h-[90vh] overflow-hidden`}
           >
             <button
               onClick={onClose}
               className="absolute top-4 right-4 z-10 p-2 rounded-full hover:bg-gray-100 transition-colors"
             >
-              <X className="w-5 h-5 text-[#666666]" />
+              <X className="w-5 h-5 text-ink-secondary" />
             </button>
             <div className="overflow-y-auto max-h-[90vh]">{children}</div>
           </motion.div>

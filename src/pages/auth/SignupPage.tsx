@@ -45,27 +45,27 @@ export default function SignupPage() {
 
   const Field = ({ id, label, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { id: keyof typeof form; label: string }) => (
     <div>
-      <label className="block text-xs font-semibold uppercase tracking-wide text-[#4A4A4A] mb-2">{label}</label>
+      <label className="block text-xs font-semibold uppercase tracking-wide text-ink-secondary mb-2">{label}</label>
       <input
         {...props}
         value={form[id]}
         onChange={e => setForm(f => ({ ...f, [id]: e.target.value }))}
-        className="w-full px-4 py-3 border border-[#E2D9CF] text-sm text-[#1A1A1A] bg-white focus:outline-none focus:border-[#1B4332] transition-colors"
+        className="w-full px-4 py-3 border border-line text-sm text-ink bg-elevated focus:outline-none focus:border-accent transition-colors"
       />
       {errors[id] && <p className="mt-1.5 text-xs text-red-600">{errors[id]}</p>}
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#F9F7F4] flex flex-col">
-      <div className="flex items-center justify-between px-6 py-5 border-b border-[#E2D9CF] bg-white">
+    <div className="min-h-screen bg-canvas flex flex-col">
+      <div className="flex items-center justify-between px-6 py-5 border-b border-line bg-elevated">
         <Link to="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-[#1B4332] flex items-center justify-center">
+          <div className="w-8 h-8 bg-accent flex items-center justify-center">
             <span className="text-white font-serif font-bold leading-none">শ</span>
           </div>
-          <span className="font-serif text-base font-semibold text-[#1A1A1A]">{BRAND_CONFIG.name}</span>
+          <span className="font-serif text-base font-semibold text-ink">{BRAND_CONFIG.name}</span>
         </Link>
-        <Link to="/" className="flex items-center gap-1.5 text-sm text-[#7A7A7A] hover:text-[#1A1A1A] transition-colors">
+        <Link to="/" className="flex items-center gap-1.5 text-sm text-ink-muted hover:text-ink transition-colors">
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to store
         </Link>
@@ -78,10 +78,10 @@ export default function SignupPage() {
           transition={{ duration: 0.45 }}
           className="w-full max-w-md"
         >
-          <div className="bg-white border border-[#E2D9CF] p-8 md:p-10">
+          <div className="bg-elevated border border-line p-8 md:p-10">
             <div className="mb-8">
-              <h1 className="font-serif text-2xl font-medium text-[#1A1A1A] mb-1.5">Create account</h1>
-              <p className="text-sm text-[#7A7A7A]">Join {BRAND_CONFIG.name} for exclusive benefits</p>
+              <h1 className="font-serif text-2xl font-medium text-ink mb-1.5">Create account</h1>
+              <p className="text-sm text-ink-muted">Join {BRAND_CONFIG.name} for exclusive benefits</p>
             </div>
 
             {errors.global && (
@@ -96,18 +96,18 @@ export default function SignupPage() {
               <Field id="phone" label="Phone (optional)" type="tel" autoComplete="tel" placeholder="01XXXXXXXXX" />
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wide text-[#4A4A4A] mb-2">Password</label>
+                <label className="block text-xs font-semibold uppercase tracking-wide text-ink-secondary mb-2">Password</label>
                 <div className="relative">
                   <input
                     type={showPw ? 'text' : 'password'}
                     value={form.password}
                     autoComplete="new-password"
                     onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                    className="w-full px-4 py-3 pr-11 border border-[#E2D9CF] text-sm text-[#1A1A1A] bg-white focus:outline-none focus:border-[#1B4332] transition-colors"
+                    className="w-full px-4 py-3 pr-11 border border-line text-sm text-ink bg-elevated focus:outline-none focus:border-accent transition-colors"
                     placeholder="Min. 6 characters"
                   />
                   <button type="button" onClick={() => setShowPw(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#9A9A9A] hover:text-[#4A4A4A]">
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-ink-muted hover:text-ink-secondary">
                     {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
@@ -115,13 +115,13 @@ export default function SignupPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wide text-[#4A4A4A] mb-2">Confirm password</label>
+                <label className="block text-xs font-semibold uppercase tracking-wide text-ink-secondary mb-2">Confirm password</label>
                 <input
                   type={showPw ? 'text' : 'password'}
                   value={form.confirm}
                   autoComplete="new-password"
                   onChange={e => setForm(f => ({ ...f, confirm: e.target.value }))}
-                  className="w-full px-4 py-3 border border-[#E2D9CF] text-sm text-[#1A1A1A] bg-white focus:outline-none focus:border-[#1B4332] transition-colors"
+                  className="w-full px-4 py-3 border border-line text-sm text-ink bg-elevated focus:outline-none focus:border-accent transition-colors"
                   placeholder="••••••••"
                 />
                 {errors.confirm && <p className="mt-1.5 text-xs text-red-600">{errors.confirm}</p>}
@@ -133,16 +133,16 @@ export default function SignupPage() {
                     type="button"
                     onClick={() => setAgreed(v => !v)}
                     className={`flex-shrink-0 w-5 h-5 border-2 flex items-center justify-center transition-colors mt-0.5 ${
-                      agreed ? 'bg-[#1B4332] border-[#1B4332]' : 'border-[#E2D9CF]'
+                      agreed ? 'bg-accent border-accent' : 'border-line'
                     }`}
                   >
                     {agreed && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
                   </button>
-                  <span className="text-sm text-[#7A7A7A]">
+                  <span className="text-sm text-ink-muted">
                     I agree to the{' '}
-                    <Link to="/terms" className="text-[#1B4332] hover:underline">Terms of Service</Link>
+                    <Link to="/terms" className="text-accent hover:underline">Terms of Service</Link>
                     {' '}and{' '}
-                    <Link to="/privacy" className="text-[#1B4332] hover:underline">Privacy Policy</Link>
+                    <Link to="/privacy" className="text-accent hover:underline">Privacy Policy</Link>
                   </span>
                 </label>
                 {errors.agree && <p className="mt-1.5 text-xs text-red-600">{errors.agree}</p>}
@@ -151,16 +151,16 @@ export default function SignupPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 bg-[#1B4332] text-white text-sm font-semibold tracking-wide hover:bg-[#163828] disabled:opacity-60 transition-colors mt-2"
+                className="w-full py-3.5 bg-accent text-white text-sm font-semibold tracking-wide hover:bg-accent-hover disabled:opacity-60 transition-colors mt-2"
               >
                 {loading ? 'Creating account…' : 'Create Account'}
               </button>
             </form>
 
             <div className="mt-6 pt-6 border-t border-[#F0EBE3] text-center">
-              <p className="text-sm text-[#7A7A7A]">
+              <p className="text-sm text-ink-muted">
                 Already have an account?{' '}
-                <Link to="/login" className="text-[#1B4332] font-semibold hover:underline">
+                <Link to="/login" className="text-accent font-semibold hover:underline">
                   Sign in
                 </Link>
               </p>

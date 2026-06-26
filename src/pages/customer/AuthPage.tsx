@@ -137,25 +137,25 @@ export default function AuthPage() {
 
   if (loading || adminLoading) {
     return (
-      <div className="min-h-screen bg-[#F8F6F3] flex items-center justify-center">
-        <div className="w-10 h-10 border-2 border-[#1B4332] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-canvas flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F6F3] py-12 px-4">
+    <div className="min-h-screen bg-canvas py-12 px-4">
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 bg-[#1B4332] rounded-sm flex items-center justify-center">
+            <div className="w-10 h-10 bg-accent rounded-sm flex items-center justify-center">
               <span className="text-white font-serif text-xl font-bold">শ</span>
             </div>
           </Link>
-          <h1 className="text-2xl font-serif font-semibold text-[#2D2D2D]">
+          <h1 className="text-2xl font-serif font-semibold text-ink">
             {activeMode === 'register' ? 'Create Your Account' : activeMode === 'verify' ? 'Verify Your Email' : 'Welcome Back'}
           </h1>
-          <p className="text-sm text-[#666666] mt-2">
+          <p className="text-sm text-ink-secondary mt-2">
             {activeMode === 'register'
               ? 'Sign up to shop, track orders, and manage your details.'
               : activeMode === 'verify'
@@ -167,15 +167,15 @@ export default function AuthPage() {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-lg shadow-sm p-6"
+          className="bg-elevated rounded-lg shadow-sm p-6"
         >
           {activeMode !== 'verify' && (
-            <div className="flex border border-[#D4C4B5] rounded-sm mb-6 overflow-hidden">
+            <div className="flex border border-line rounded-sm mb-6 overflow-hidden">
               <button
                 type="button"
                 onClick={() => { setActiveMode('login'); setError(''); }}
                 className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-                  activeMode === 'login' ? 'bg-[#1B4332] text-white' : 'bg-white text-[#666666]'
+                  activeMode === 'login' ? 'bg-accent text-white' : 'bg-elevated text-ink-secondary'
                 }`}
               >
                 Sign In
@@ -184,7 +184,7 @@ export default function AuthPage() {
                 type="button"
                 onClick={() => { setActiveMode('register'); setError(''); }}
                 className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-                  activeMode === 'register' ? 'bg-[#1B4332] text-white' : 'bg-white text-[#666666]'
+                  activeMode === 'register' ? 'bg-accent text-white' : 'bg-elevated text-ink-secondary'
                 }`}
               >
                 Register
@@ -255,13 +255,13 @@ export default function AuthPage() {
                 required
               />
               <div>
-                <label className="block text-sm font-medium text-[#2D2D2D] mb-1.5">Address (Optional)</label>
+                <label className="block text-sm font-medium text-ink mb-1.5">Address (Optional)</label>
                 <textarea
                   value={registerForm.address}
                   onChange={(e) => setRegisterForm({ ...registerForm, address: e.target.value })}
                   placeholder="House, road, area..."
                   rows={2}
-                  className="w-full px-4 py-2.5 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332] resize-none"
+                  className="w-full px-4 py-2.5 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent resize-none"
                 />
               </div>
               <Input
@@ -290,14 +290,14 @@ export default function AuthPage() {
 
           {activeMode === 'verify' && (
             <div className="space-y-4 text-center">
-              <div className="w-14 h-14 bg-[#1B4332]/10 rounded-full flex items-center justify-center mx-auto">
-                <Mail className="w-7 h-7 text-[#1B4332]" />
+              <div className="w-14 h-14 bg-accent/10 rounded-full flex items-center justify-center mx-auto">
+                <Mail className="w-7 h-7 text-accent" />
               </div>
-              <p className="text-sm text-[#666666]">
+              <p className="text-sm text-ink-secondary">
                 We sent a verification link to your email. Click the link to activate your account, then sign in to continue.
               </p>
-              <p className="text-xs text-[#666666]">
-                Store contact: <a href={`mailto:${CONTACT_EMAIL}`} className="text-[#1B4332] underline">{CONTACT_EMAIL}</a>
+              <p className="text-xs text-ink-secondary">
+                Store contact: <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent underline">{CONTACT_EMAIL}</a>
               </p>
               {user && (
                 <Button onClick={handleResend} variant="outline" className="w-full" loading={submitting}>
@@ -311,9 +311,9 @@ export default function AuthPage() {
           )}
 
           {activeMode !== 'verify' && (
-            <p className="mt-6 text-xs text-center text-[#666666]">
+            <p className="mt-6 text-xs text-center text-ink-secondary">
               Need help? Email us at{' '}
-              <a href={`mailto:${CONTACT_EMAIL}`} className="text-[#1B4332] underline">
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent underline">
                 {CONTACT_EMAIL}
               </a>
             </p>
@@ -321,7 +321,7 @@ export default function AuthPage() {
         </motion.div>
 
         <p className="text-center mt-6">
-          <Link to="/" className="text-sm text-[#1B4332] hover:underline">
+          <Link to="/" className="text-sm text-accent hover:underline">
             ← Back to shopping
           </Link>
         </p>

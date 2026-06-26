@@ -25,7 +25,7 @@ const TIME_FRAMES: { id: TimeFrame; label: string }[] = [
   { id: 'all', label: 'All Time' },
 ];
 
-const CHART_COLORS = ['#1B4332', '#B8860B', '#C2704A', '#2D6A4F', '#40916C', '#52B788', '#74C69D'];
+const CHART_COLORS = ['#C9B59C', '#00ADB5', '#D9CFC7', '#393E46', '#EFE9E3', '#B8A38A', '#EEEEEE'];
 
 export default function CategoryRevenueChart() {
   const [timeFrame, setTimeFrame] = useState<TimeFrame>('30d');
@@ -86,11 +86,11 @@ export default function CategoryRevenueChart() {
   );
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm">
+    <div className="bg-elevated rounded-lg p-6 shadow-sm">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-lg font-semibold text-[#2D2D2D]">Revenue by Category</h2>
-          <p className="text-sm text-[#666666]">
+          <h2 className="text-lg font-semibold text-ink">Revenue by Category</h2>
+          <p className="text-sm text-ink-secondary">
             Total: ৳{totalRevenue.toLocaleString()} in selected period
           </p>
         </div>
@@ -102,8 +102,8 @@ export default function CategoryRevenueChart() {
               onClick={() => setTimeFrame(tf.id)}
               className={`px-3 py-1.5 text-xs font-medium rounded-sm transition-colors ${
                 timeFrame === tf.id
-                  ? 'bg-[#1B4332] text-white'
-                  : 'bg-[#F8F6F3] text-[#666666] hover:bg-[#F5F0E8]'
+                  ? 'bg-accent text-white'
+                  : 'bg-canvas text-ink-secondary hover:bg-surface'
               }`}
             >
               {tf.label}
@@ -118,25 +118,25 @@ export default function CategoryRevenueChart() {
             type="date"
             value={customStart}
             onChange={(e) => { setCustomStart(e.target.value); setTimeFrame('custom'); }}
-            className="px-2 py-1 text-xs border border-[#D4C4B5] rounded-sm"
+            className="px-2 py-1 text-xs border border-line rounded-sm"
           />
-          <span className="text-xs text-[#666666]">to</span>
+          <span className="text-xs text-ink-secondary">to</span>
           <input
             type="date"
             value={customEnd}
             onChange={(e) => { setCustomEnd(e.target.value); setTimeFrame('custom'); }}
-            className="px-2 py-1 text-xs border border-[#D4C4B5] rounded-sm"
+            className="px-2 py-1 text-xs border border-line rounded-sm"
           />
         </div>
         <button
           onClick={() => setSelectedSlugs(categories.map((c) => c.slug))}
-          className="text-xs text-[#1B4332] hover:underline"
+          className="text-xs text-accent hover:underline"
         >
           Select all
         </button>
         <button
           onClick={() => setSelectedSlugs([])}
-          className="text-xs text-[#666666] hover:underline"
+          className="text-xs text-ink-secondary hover:underline"
         >
           Clear all
         </button>
@@ -149,8 +149,8 @@ export default function CategoryRevenueChart() {
             onClick={() => toggleCategory(cat.slug)}
             className={`px-3 py-1 text-xs rounded-full border transition-colors ${
               selectedSlugs.includes(cat.slug)
-                ? 'bg-[#1B4332] text-white border-[#1B4332]'
-                : 'bg-white text-[#666666] border-[#D4C4B5] hover:border-[#1B4332]'
+                ? 'bg-accent text-white border-accent'
+                : 'bg-elevated text-ink-secondary border-line hover:border-accent'
             }`}
           >
             {cat.name}
@@ -159,9 +159,9 @@ export default function CategoryRevenueChart() {
       </div>
 
       {loading ? (
-        <div className="h-72 flex items-center justify-center text-sm text-[#666666]">Loading chart...</div>
+        <div className="h-72 flex items-center justify-center text-sm text-ink-secondary">Loading chart...</div>
       ) : chartData.length === 0 ? (
-        <div className="h-72 flex items-center justify-center text-sm text-[#666666]">
+        <div className="h-72 flex items-center justify-center text-sm text-ink-secondary">
           No revenue data for this period. Orders will appear here once sales are recorded.
         </div>
       ) : (
@@ -177,7 +177,7 @@ export default function CategoryRevenueChart() {
               ]}
             />
             <Legend />
-            <Bar dataKey="revenue" name="Revenue (৳)" fill="#1B4332" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="revenue" name="Revenue (৳)" fill="var(--color-accent)" radius={[4, 4, 0, 0]} />
             <Bar dataKey="orders" name="Orders" fill="#B8860B" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>

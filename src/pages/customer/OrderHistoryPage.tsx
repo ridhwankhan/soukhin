@@ -31,8 +31,8 @@ export default function OrderHistoryPage() {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-[#F8F6F3]">
-      <div className="bg-[#1B4332] text-white py-8">
+    <div className="min-h-screen bg-canvas">
+      <div className="bg-accent text-white py-8">
         <div className="max-w-3xl mx-auto px-4">
           <h1 className="text-2xl md:text-3xl font-serif font-semibold">My Orders</h1>
         </div>
@@ -40,11 +40,11 @@ export default function OrderHistoryPage() {
 
       <div className="max-w-3xl mx-auto px-4 py-8">
         {loading ? (
-          <div className="text-center py-12 text-[#666666]">Loading orders...</div>
+          <div className="text-center py-12 text-ink-secondary">Loading orders...</div>
         ) : orders.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+          <div className="text-center py-12 bg-elevated rounded-lg shadow-sm">
             <Package className="w-12 h-12 text-[#D4C4B5] mx-auto mb-4" />
-            <p className="text-[#666666] mb-4">You haven't placed any orders yet.</p>
+            <p className="text-ink-secondary mb-4">You haven't placed any orders yet.</p>
             <Link to="/"><Button>Start Shopping</Button></Link>
           </div>
         ) : (
@@ -54,26 +54,26 @@ export default function OrderHistoryPage() {
                 key={order.id}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-lg shadow-sm p-4"
+                className="bg-elevated rounded-lg shadow-sm p-4"
               >
                 <Link
                   to={`/track-order?order=${encodeURIComponent(order.orderNumber)}`}
                   className="flex items-center justify-between group"
                 >
                   <div>
-                    <p className="font-semibold text-[#1B4332]">#{order.orderNumber}</p>
-                    <p className="text-xs text-[#666666] mt-1">
+                    <p className="font-semibold text-accent">#{order.orderNumber}</p>
+                    <p className="text-xs text-ink-secondary mt-1">
                       {new Date(order.createdAt).toLocaleDateString('en-GB')} · {order.shipping.area}
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="text-right">
-                      <p className="font-medium text-[#2D2D2D]">৳{order.total.toLocaleString()}</p>
+                      <p className="font-medium text-ink">৳{order.total.toLocaleString()}</p>
                       <span className={`inline-block mt-1 px-2 py-0.5 text-xs rounded capitalize ${STATUS_COLORS[order.status]}`}>
                         {order.status.replace(/-/g, ' ')}
                       </span>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-[#999999] group-hover:text-[#1B4332]" />
+                    <ChevronRight className="w-5 h-5 text-[#999999] group-hover:text-accent" />
                   </div>
                 </Link>
               </motion.div>
@@ -82,7 +82,7 @@ export default function OrderHistoryPage() {
         )}
 
         <p className="text-center mt-6">
-          <Link to="/account" className="text-sm text-[#1B4332] hover:underline">← Back to account</Link>
+          <Link to="/account" className="text-sm text-accent hover:underline">← Back to account</Link>
         </p>
       </div>
     </div>

@@ -7,7 +7,7 @@ import { ProductBadge, PRODUCT_BADGE_LABELS } from '../../types';
 const ALL_BADGES: ProductBadge[] = ['new', 'eid-collection', 'best-seller', 'pre-order', 'featured', 'sale', 'limited-edition'];
 
 const BADGE_COLORS: Record<ProductBadge, string> = {
-  'new': 'bg-[#1B4332] text-white',
+  'new': 'bg-accent text-white',
   'eid-collection': 'bg-[#9A7535] text-white',
   'best-seller': 'bg-[#B5603E] text-white',
   'pre-order': 'bg-[#5A4A6A] text-white',
@@ -40,26 +40,26 @@ export default function ProductLabelsPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-xl font-semibold text-[#1A1A1A]">Product Labels</h1>
-        <p className="text-sm text-[#7A7A7A] mt-0.5">Add or remove labels/badges on products — visible to customers on product cards</p>
+        <h1 className="text-xl font-semibold text-ink">Product Labels</h1>
+        <p className="text-sm text-ink-muted mt-0.5">Add or remove labels/badges on products — visible to customers on product cards</p>
       </div>
 
       {/* Filter bar */}
       <div className="flex flex-wrap items-center gap-3 mb-5">
         <div className="relative flex-1 min-w-48 max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#9A9A9A]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-muted" />
           <input
             type="text"
             placeholder="Search by name or SKU…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 border border-[#E2D9CF] text-sm focus:outline-none focus:border-[#1B4332] transition-colors"
+            className="w-full pl-9 pr-4 py-2.5 border border-line text-sm focus:outline-none focus:border-accent transition-colors"
           />
         </div>
         <div className="flex items-center gap-1.5 flex-wrap">
           <button
             onClick={() => setFilter('all')}
-            className={`px-3 py-1.5 text-xs font-medium border transition-colors ${filter === 'all' ? 'bg-[#1B4332] text-white border-[#1B4332]' : 'border-[#E2D9CF] text-[#4A4A4A] hover:bg-[#F9F7F4]'}`}
+            className={`px-3 py-1.5 text-xs font-medium border transition-colors ${filter === 'all' ? 'bg-accent text-white border-accent' : 'border-line text-ink-secondary hover:bg-canvas'}`}
           >
             All
           </button>
@@ -67,7 +67,7 @@ export default function ProductLabelsPage() {
             <button
               key={badge}
               onClick={() => setFilter(badge)}
-              className={`px-3 py-1.5 text-xs font-medium border transition-colors ${filter === badge ? BADGE_COLORS[badge] + ' border-transparent' : 'border-[#E2D9CF] text-[#4A4A4A] hover:bg-[#F9F7F4]'}`}
+              className={`px-3 py-1.5 text-xs font-medium border transition-colors ${filter === badge ? BADGE_COLORS[badge] + ' border-transparent' : 'border-line text-ink-secondary hover:bg-canvas'}`}
             >
               {PRODUCT_BADGE_LABELS[badge]}
             </button>
@@ -75,7 +75,7 @@ export default function ProductLabelsPage() {
         </div>
       </div>
 
-      <p className="text-xs text-[#9A9A9A] mb-3">{filtered.length} product{filtered.length !== 1 ? 's' : ''} shown</p>
+      <p className="text-xs text-ink-muted mb-3">{filtered.length} product{filtered.length !== 1 ? 's' : ''} shown</p>
 
       {/* Product list */}
       <div className="space-y-2">
@@ -83,11 +83,11 @@ export default function ProductLabelsPage() {
           <motion.div
             key={product.id}
             layout
-            className={`bg-white border transition-colors ${saved === product.id ? 'border-[#1B4332]' : 'border-[#E2D9CF]'} p-4`}
+            className={`bg-elevated border transition-colors ${saved === product.id ? 'border-accent' : 'border-line'} p-4`}
           >
             <div className="flex items-start gap-4">
               {/* Thumbnail */}
-              <div className="w-12 h-14 flex-shrink-0 overflow-hidden bg-[#F5F0E8]">
+              <div className="w-12 h-14 flex-shrink-0 overflow-hidden bg-surface">
                 <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
               </div>
 
@@ -95,11 +95,11 @@ export default function ProductLabelsPage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-medium text-[#1A1A1A] line-clamp-1">{product.name}</p>
-                    <p className="text-xs text-[#9A9A9A] mt-0.5">SKU: {product.sku} · Stock: {product.stock}</p>
+                    <p className="text-sm font-medium text-ink line-clamp-1">{product.name}</p>
+                    <p className="text-xs text-ink-muted mt-0.5">SKU: {product.sku} · Stock: {product.stock}</p>
                   </div>
                   {saved === product.id && (
-                    <span className="text-xs font-medium text-[#1B4332] flex-shrink-0">Saved ✓</span>
+                    <span className="text-xs font-medium text-accent flex-shrink-0">Saved ✓</span>
                   )}
                 </div>
 
@@ -114,7 +114,7 @@ export default function ProductLabelsPage() {
                         className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium border transition-all ${
                           active
                             ? BADGE_COLORS[badge] + ' border-transparent'
-                            : 'bg-white border-[#E2D9CF] text-[#7A7A7A] hover:border-[#4A4A4A]'
+                            : 'bg-elevated border-line text-ink-muted hover:border-[#4A4A4A]'
                         }`}
                       >
                         {active && <Tag className="w-2.5 h-2.5" />}
@@ -130,7 +130,7 @@ export default function ProductLabelsPage() {
               <button
                 onClick={() => resetProduct(product.id)}
                 title="Reset to original labels"
-                className="flex-shrink-0 p-1.5 text-[#C0B8B0] hover:text-[#9A9A9A] transition-colors"
+                className="flex-shrink-0 p-1.5 text-[#C0B8B0] hover:text-ink-muted transition-colors"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
               </button>
@@ -139,9 +139,9 @@ export default function ProductLabelsPage() {
         ))}
 
         {filtered.length === 0 && (
-          <div className="bg-white border border-[#E2D9CF] py-12 text-center">
+          <div className="bg-elevated border border-line py-12 text-center">
             <Tag className="w-7 h-7 text-[#D4C4B5] mx-auto mb-3" />
-            <p className="text-sm text-[#7A7A7A]">No products match your search.</p>
+            <p className="text-sm text-ink-muted">No products match your search.</p>
           </div>
         )}
       </div>

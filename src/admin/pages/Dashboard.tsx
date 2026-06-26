@@ -89,12 +89,12 @@ export default function AdminDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-[#2D2D2D]">Dashboard</h1>
-          <p className="text-sm text-[#666666]">
+          <h1 className="text-2xl font-semibold text-ink">Dashboard</h1>
+          <p className="text-sm text-ink-secondary">
             {loading ? 'Loading live data...' : 'Live store overview'}
           </p>
         </div>
-        <div className="text-sm text-[#666666]">
+        <div className="text-sm text-ink-secondary">
           Last updated: {new Date().toLocaleString('en-GB')}
         </div>
       </div>
@@ -106,12 +106,12 @@ export default function AdminDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1 }}
-            className="bg-white rounded-lg p-6 shadow-sm"
+            className="bg-elevated rounded-lg p-6 shadow-sm"
           >
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-[#666666]">{stat.label}</p>
-                <p className="text-2xl font-semibold text-[#2D2D2D] mt-1">{stat.value}</p>
+                <p className="text-sm text-ink-secondary">{stat.label}</p>
+                <p className="text-2xl font-semibold text-ink mt-1">{stat.value}</p>
               </div>
               <div className={`p-3 rounded-lg ${stat.color}`}>
                 <stat.icon className="w-5 h-5" />
@@ -126,18 +126,18 @@ export default function AdminDashboard() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-lg p-6 shadow-sm"
+        className="bg-elevated rounded-lg p-6 shadow-sm"
       >
-        <h2 className="text-lg font-semibold text-[#2D2D2D] mb-4">Order Status Overview</h2>
+        <h2 className="text-lg font-semibold text-ink mb-4">Order Status Overview</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {orderStatusCards.map((item) => (
-            <div key={item.label} className="flex items-center gap-3 p-3 bg-[#F8F6F3] rounded-lg">
+            <div key={item.label} className="flex items-center gap-3 p-3 bg-canvas rounded-lg">
               <div className={`p-2 rounded-lg ${item.color}`}>
                 <item.icon className="w-4 h-4 text-white" />
               </div>
               <div>
-                <p className="text-lg font-semibold text-[#2D2D2D]">{item.value}</p>
-                <p className="text-xs text-[#666666]">{item.label}</p>
+                <p className="text-lg font-semibold text-ink">{item.value}</p>
+                <p className="text-xs text-ink-secondary">{item.label}</p>
               </div>
             </div>
           ))}
@@ -148,34 +148,34 @@ export default function AdminDashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-lg shadow-sm"
+          className="bg-elevated rounded-lg shadow-sm"
         >
-          <div className="p-4 border-b border-[#F5F0E8] flex items-center justify-between">
-            <h2 className="font-semibold text-[#2D2D2D]">Recent Orders</h2>
-            <Link to="/admin/orders" className="text-sm text-[#1B4332] hover:underline">
+          <div className="p-4 border-b border-line flex items-center justify-between">
+            <h2 className="font-semibold text-ink">Recent Orders</h2>
+            <Link to="/admin/orders" className="text-sm text-accent hover:underline">
               View All
             </Link>
           </div>
           <div className="divide-y divide-[#F5F0E8]">
             {recentOrders.length === 0 ? (
-              <p className="p-6 text-sm text-[#666666] text-center">No orders yet</p>
+              <p className="p-6 text-sm text-ink-secondary text-center">No orders yet</p>
             ) : (
               recentOrders.map((order) => (
                 <Link
                   key={order.id}
                   to="/admin/orders"
-                  className="flex items-center gap-4 p-4 hover:bg-[#F8F6F3] transition-colors"
+                  className="flex items-center gap-4 p-4 hover:bg-canvas transition-colors"
                 >
-                  <div className="w-10 h-10 bg-[#1B4332]/10 rounded-full flex items-center justify-center">
-                    <ShoppingBag className="w-5 h-5 text-[#1B4332]" />
+                  <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center">
+                    <ShoppingBag className="w-5 h-5 text-accent" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm text-[#2D2D2D]">{order.orderNumber}</p>
-                    <p className="text-xs text-[#666666]">{order.shipping.name}</p>
+                    <p className="font-medium text-sm text-ink">{order.orderNumber}</p>
+                    <p className="text-xs text-ink-secondary">{order.shipping.name}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-sm text-[#1B4332]">৳{order.total.toLocaleString()}</p>
-                    <p className="text-xs text-[#666666]">{order.status}</p>
+                    <p className="font-medium text-sm text-accent">৳{order.total.toLocaleString()}</p>
+                    <p className="text-xs text-ink-secondary">{order.status}</p>
                   </div>
                 </Link>
               ))
@@ -186,14 +186,14 @@ export default function AdminDashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-lg shadow-sm"
+          className="bg-elevated rounded-lg shadow-sm"
         >
-          <div className="p-4 border-b border-[#F5F0E8] flex items-center justify-between">
-            <h2 className="font-semibold text-[#2D2D2D] flex items-center gap-2">
+          <div className="p-4 border-b border-line flex items-center justify-between">
+            <h2 className="font-semibold text-ink flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-amber-500" />
               Low Stock Alert
             </h2>
-            <Link to="/admin/inventory" className="text-sm text-[#1B4332] hover:underline">
+            <Link to="/admin/inventory" className="text-sm text-accent hover:underline">
               View All
             </Link>
           </div>
@@ -202,8 +202,8 @@ export default function AdminDashboard() {
               <div key={product.id} className="flex items-center gap-4 p-4">
                 <img src={product.images[0]} alt={product.name} className="w-12 h-12 object-cover rounded" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-[#2D2D2D] truncate">{product.name}</p>
-                  <p className="text-xs text-[#666666]">{product.sku}</p>
+                  <p className="font-medium text-sm text-ink truncate">{product.name}</p>
+                  <p className="text-xs text-ink-secondary">{product.sku}</p>
                 </div>
                 <div className={`px-2 py-1 rounded text-xs font-medium ${
                   product.stock <= 5 ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'
@@ -219,17 +219,17 @@ export default function AdminDashboard() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-lg p-6 shadow-sm"
+        className="bg-elevated rounded-lg p-6 shadow-sm"
       >
-        <h2 className="text-lg font-semibold text-[#2D2D2D] mb-4">Payment Method Breakdown</h2>
+        <h2 className="text-lg font-semibold text-ink mb-4">Payment Method Breakdown</h2>
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
           {paymentBreakdown.length === 0 ? (
-            <p className="text-sm text-[#666666] col-span-full">No payment data yet</p>
+            <p className="text-sm text-ink-secondary col-span-full">No payment data yet</p>
           ) : (
             paymentBreakdown.map((item) => (
-              <div key={item.method} className="text-center p-4 bg-[#F8F6F3] rounded-lg">
-                <p className="text-2xl font-semibold text-[#2D2D2D]">{item.count}</p>
-                <p className="text-xs text-[#666666] mt-1">{item.method.toUpperCase()}</p>
+              <div key={item.method} className="text-center p-4 bg-canvas rounded-lg">
+                <p className="text-2xl font-semibold text-ink">{item.count}</p>
+                <p className="text-xs text-ink-secondary mt-1">{item.method.toUpperCase()}</p>
               </div>
             ))
           )}

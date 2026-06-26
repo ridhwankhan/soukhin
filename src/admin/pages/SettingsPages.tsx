@@ -18,8 +18,8 @@ export function PaymentSettingsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-[#2D2D2D]">Payment Settings</h1>
-          <p className="text-sm text-[#666666]">Configure payment gateways</p>
+          <h1 className="text-2xl font-semibold text-ink">Payment Settings</h1>
+          <p className="text-sm text-ink-secondary">Configure payment gateways</p>
         </div>
         <Button onClick={handleSave}>
           <Save className="w-4 h-4 mr-2" /> Save Changes
@@ -36,7 +36,7 @@ export function PaymentSettingsPage() {
         </motion.div>
       )}
 
-      <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
+      <div className="bg-elevated rounded-lg shadow-sm p-6 space-y-6">
         <div className="p-4 bg-amber-50 border border-amber-200 rounded flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
           <div>
@@ -48,9 +48,9 @@ export function PaymentSettingsPage() {
         </div>
 
         {/* bKash */}
-        <div className="border-b border-[#F5F0E8] pb-6">
+        <div className="border-b border-line pb-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-[#2D2D2D]">bKash</h3>
+            <h3 className="font-semibold text-ink">bKash</h3>
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -63,32 +63,32 @@ export function PaymentSettingsPage() {
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Merchant ID</label>
+              <label className="block text-sm font-medium text-ink mb-1">Merchant ID</label>
               <input
                 type="text"
                 value={config.bkash.merchantId}
                 onChange={(e) => setConfig(prev => ({ ...prev, bkash: { ...prev.bkash, merchantId: e.target.value } }))}
                 placeholder="Enter merchant ID"
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">API Key</label>
+              <label className="block text-sm font-medium text-ink mb-1">API Key</label>
               <input
                 type="password"
                 value={config.bkash.apiKey}
                 onChange={(e) => setConfig(prev => ({ ...prev, bkash: { ...prev.bkash, apiKey: e.target.value } }))}
                 placeholder="Enter API key"
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
           </div>
         </div>
 
         {/* Nagad */}
-        <div className="border-b border-[#F5F0E8] pb-6">
+        <div className="border-b border-line pb-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-[#2D2D2D]">Nagad</h3>
+            <h3 className="font-semibold text-ink">Nagad</h3>
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -101,32 +101,32 @@ export function PaymentSettingsPage() {
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Merchant ID</label>
+              <label className="block text-sm font-medium text-ink mb-1">Merchant ID</label>
               <input
                 type="text"
                 value={config.nagad.merchantId}
                 onChange={(e) => setConfig(prev => ({ ...prev, nagad: { ...prev.nagad, merchantId: e.target.value } }))}
                 placeholder="Enter merchant ID"
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">API Key</label>
+              <label className="block text-sm font-medium text-ink mb-1">API Key</label>
               <input
                 type="password"
                 value={config.nagad.apiKey}
                 onChange={(e) => setConfig(prev => ({ ...prev, nagad: { ...prev.nagad, apiKey: e.target.value } }))}
                 placeholder="Enter API key"
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
           </div>
         </div>
 
         {/* Rocket */}
-        <div className="border-b border-[#F5F0E8] pb-6">
+        <div className="border-b border-line pb-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-[#2D2D2D]">Rocket</h3>
+            <h3 className="font-semibold text-ink">Rocket</h3>
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -139,23 +139,23 @@ export function PaymentSettingsPage() {
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Merchant ID</label>
+              <label className="block text-sm font-medium text-ink mb-1">Merchant ID</label>
               <input
                 type="text"
                 value={config.rocket.merchantId}
                 onChange={(e) => setConfig(prev => ({ ...prev, rocket: { ...prev.rocket, merchantId: e.target.value } }))}
                 placeholder="Enter merchant ID"
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">API Key</label>
+              <label className="block text-sm font-medium text-ink mb-1">API Key</label>
               <input
                 type="password"
                 value={config.rocket.apiKey}
                 onChange={(e) => setConfig(prev => ({ ...prev, rocket: { ...prev.rocket, apiKey: e.target.value } }))}
                 placeholder="Enter API key"
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
           </div>
@@ -165,7 +165,7 @@ export function PaymentSettingsPage() {
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-[#2D2D2D]">Cash on Delivery</h3>
+              <h3 className="font-semibold text-ink">Cash on Delivery</h3>
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -180,7 +180,7 @@ export function PaymentSettingsPage() {
 
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-[#2D2D2D]">Bank Transfer</h3>
+              <h3 className="font-semibold text-ink">Bank Transfer</h3>
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -192,12 +192,12 @@ export function PaymentSettingsPage() {
               </label>
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Account Details</label>
+              <label className="block text-sm font-medium text-ink mb-1">Account Details</label>
               <textarea
                 value={config.bankTransfer.accountDetails}
                 onChange={(e) => setConfig(prev => ({ ...prev, bankTransfer: { ...prev.bankTransfer, accountDetails: e.target.value } }))}
                 rows={3}
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332] resize-none"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent resize-none"
               />
             </div>
           </div>
@@ -213,17 +213,17 @@ export function DeliverySettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-[#2D2D2D]">Delivery Settings</h1>
-        <p className="text-sm text-[#666666]">Configure delivery fees and options</p>
+        <h1 className="text-2xl font-semibold text-ink">Delivery Settings</h1>
+        <p className="text-sm text-ink-secondary">Configure delivery fees and options</p>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
+      <div className="bg-elevated rounded-lg shadow-sm p-6 space-y-6">
         {/* Inside Dhaka */}
-        <div className="border-b border-[#F5F0E8] pb-6">
-          <h3 className="font-semibold text-[#2D2D2D] mb-4">Inside Dhaka</h3>
+        <div className="border-b border-line pb-6">
+          <h3 className="font-semibold text-ink mb-4">Inside Dhaka</h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Delivery Fee (BDT)</label>
+              <label className="block text-sm font-medium text-ink mb-1">Delivery Fee (BDT)</label>
               <input
                 type="number"
                 value={config.insideDhaka.fee}
@@ -231,11 +231,11 @@ export function DeliverySettingsPage() {
                   ...prev,
                   insideDhaka: { ...prev.insideDhaka, fee: parseInt(e.target.value) }
                 }))}
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Estimated Days</label>
+              <label className="block text-sm font-medium text-ink mb-1">Estimated Days</label>
               <input
                 type="text"
                 value={config.insideDhaka.estimatedDays}
@@ -244,18 +244,18 @@ export function DeliverySettingsPage() {
                   insideDhaka: { ...prev.insideDhaka, estimatedDays: e.target.value }
                 }))}
                 placeholder="1-2"
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
           </div>
         </div>
 
         {/* Outside Dhaka */}
-        <div className="border-b border-[#F5F0E8] pb-6">
-          <h3 className="font-semibold text-[#2D2D2D] mb-4">Outside Dhaka</h3>
+        <div className="border-b border-line pb-6">
+          <h3 className="font-semibold text-ink mb-4">Outside Dhaka</h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Delivery Fee (BDT)</label>
+              <label className="block text-sm font-medium text-ink mb-1">Delivery Fee (BDT)</label>
               <input
                 type="number"
                 value={config.outsideDhaka.fee}
@@ -263,11 +263,11 @@ export function DeliverySettingsPage() {
                   ...prev,
                   outsideDhaka: { ...prev.outsideDhaka, fee: parseInt(e.target.value) }
                 }))}
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Estimated Days</label>
+              <label className="block text-sm font-medium text-ink mb-1">Estimated Days</label>
               <input
                 type="text"
                 value={config.outsideDhaka.estimatedDays}
@@ -276,7 +276,7 @@ export function DeliverySettingsPage() {
                   outsideDhaka: { ...prev.outsideDhaka, estimatedDays: e.target.value }
                 }))}
                 placeholder="3-5"
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
           </div>
@@ -285,7 +285,7 @@ export function DeliverySettingsPage() {
         {/* Pickup */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-[#2D2D2D]">Store Pickup</h3>
+            <h3 className="font-semibold text-ink">Store Pickup</h3>
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -300,7 +300,7 @@ export function DeliverySettingsPage() {
             </label>
           </div>
           <div>
-            <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Pickup Address</label>
+            <label className="block text-sm font-medium text-ink mb-1">Pickup Address</label>
             <textarea
               value={config.pickup.address}
               onChange={(e) => setConfig(prev => ({
@@ -308,7 +308,7 @@ export function DeliverySettingsPage() {
                 pickup: { ...prev.pickup, address: e.target.value }
               }))}
               rows={2}
-              className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332] resize-none"
+              className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent resize-none"
             />
           </div>
         </div>
@@ -323,17 +323,17 @@ export function StoreSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-[#2D2D2D]">Store Settings</h1>
-        <p className="text-sm text-[#666666]">General store configuration</p>
+        <h1 className="text-2xl font-semibold text-ink">Store Settings</h1>
+        <p className="text-sm text-ink-secondary">General store configuration</p>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
+      <div className="bg-elevated rounded-lg shadow-sm p-6 space-y-6">
         {/* Hero Section */}
-        <div className="border-b border-[#F5F0E8] pb-6">
-          <h3 className="font-semibold text-[#2D2D2D] mb-4">Hero Section</h3>
+        <div className="border-b border-line pb-6">
+          <h3 className="font-semibold text-ink mb-4">Hero Section</h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Title (English)</label>
+              <label className="block text-sm font-medium text-ink mb-1">Title (English)</label>
               <input
                 type="text"
                 value={settings.hero.title}
@@ -341,11 +341,11 @@ export function StoreSettingsPage() {
                   ...prev,
                   hero: { ...prev.hero, title: e.target.value }
                 }))}
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Title (Bengali)</label>
+              <label className="block text-sm font-medium text-ink mb-1">Title (Bengali)</label>
               <input
                 type="text"
                 value={settings.hero.titleBn}
@@ -353,11 +353,11 @@ export function StoreSettingsPage() {
                   ...prev,
                   hero: { ...prev.hero, titleBn: e.target.value }
                 }))}
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Subtitle (English)</label>
+              <label className="block text-sm font-medium text-ink mb-1">Subtitle (English)</label>
               <input
                 type="text"
                 value={settings.hero.subtitle}
@@ -365,11 +365,11 @@ export function StoreSettingsPage() {
                   ...prev,
                   hero: { ...prev.hero, subtitle: e.target.value }
                 }))}
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Subtitle (Bengali)</label>
+              <label className="block text-sm font-medium text-ink mb-1">Subtitle (Bengali)</label>
               <input
                 type="text"
                 value={settings.hero.subtitleBn}
@@ -377,32 +377,32 @@ export function StoreSettingsPage() {
                   ...prev,
                   hero: { ...prev.hero, subtitleBn: e.target.value }
                 }))}
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
           </div>
         </div>
 
         {/* Announcement Bar */}
-        <div className="border-b border-[#F5F0E8] pb-6">
-          <h3 className="font-semibold text-[#2D2D2D] mb-4">Announcement Bar</h3>
+        <div className="border-b border-line pb-6">
+          <h3 className="font-semibold text-ink mb-4">Announcement Bar</h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Text (English)</label>
+              <label className="block text-sm font-medium text-ink mb-1">Text (English)</label>
               <input
                 type="text"
                 value={settings.announcementBar}
                 onChange={(e) => setSettings(prev => ({ ...prev, announcementBar: e.target.value }))}
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Text (Bengali)</label>
+              <label className="block text-sm font-medium text-ink mb-1">Text (Bengali)</label>
               <input
                 type="text"
                 value={settings.announcementBarBn}
                 onChange={(e) => setSettings(prev => ({ ...prev, announcementBarBn: e.target.value }))}
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
           </div>
@@ -410,34 +410,34 @@ export function StoreSettingsPage() {
 
         {/* Contact Info */}
         <div>
-          <h3 className="font-semibold text-[#2D2D2D] mb-4">Contact & Social</h3>
+          <h3 className="font-semibold text-ink mb-4">Contact & Social</h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">WhatsApp Number</label>
+              <label className="block text-sm font-medium text-ink mb-1">WhatsApp Number</label>
               <input
                 type="text"
                 value={settings.whatsappNumber}
                 onChange={(e) => setSettings(prev => ({ ...prev, whatsappNumber: e.target.value }))}
                 placeholder="880XXXXXXXXXX"
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Facebook Page URL</label>
+              <label className="block text-sm font-medium text-ink mb-1">Facebook Page URL</label>
               <input
                 type="url"
                 value={settings.facebookLink}
                 onChange={(e) => setSettings(prev => ({ ...prev, facebookLink: e.target.value }))}
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#2D2D2D] mb-1">Instagram URL</label>
+              <label className="block text-sm font-medium text-ink mb-1">Instagram URL</label>
               <input
                 type="url"
                 value={settings.instagramLink}
                 onChange={(e) => setSettings(prev => ({ ...prev, instagramLink: e.target.value }))}
-                className="w-full px-4 py-2 border border-[#D4C4B5] rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full px-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
           </div>

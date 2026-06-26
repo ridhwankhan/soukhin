@@ -27,8 +27,8 @@ export default function SessionTimeoutWarning({
   return (
     <Modal isOpen={open} onClose={onExtend} size="sm">
       <div className="p-6 text-center">
-        <h2 className="text-lg font-semibold text-[#2D2D2D] mb-2">Session expiring soon</h2>
-        <p className="text-sm text-[#666666] mb-6">
+        <h2 className="text-lg font-semibold text-ink mb-2">Session expiring soon</h2>
+        <p className="text-sm text-ink-secondary mb-6">
           Your {label} will end in about {formatRemaining(remainingMs)} due to inactivity.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">

@@ -60,9 +60,9 @@ export default function SearchBar({ isOpen, onClose }: SearchBarProps) {
             exit={{ opacity: 0, y: -20 }}
             className="fixed top-24 left-1/2 -translate-x-1/2 w-full max-w-2xl z-50 px-4"
           >
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+            <div className="bg-elevated rounded-lg shadow-xl overflow-hidden">
               <form onSubmit={handleSubmit} className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-secondary" />
                 <input
                   ref={inputRef}
                   type="text"
@@ -74,22 +74,22 @@ export default function SearchBar({ isOpen, onClose }: SearchBarProps) {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-[#F5F0E8] rounded-full"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-surface rounded-full"
                 >
-                  <X className="w-5 h-5 text-[#666666]" />
+                  <X className="w-5 h-5 text-ink-secondary" />
                 </button>
               </form>
 
               {results.length > 0 && (
-                <div className="border-t border-[#F5F0E8] p-4">
-                  <p className="text-xs text-[#666666] mb-3">Suggestions</p>
+                <div className="border-t border-line p-4">
+                  <p className="text-xs text-ink-secondary mb-3">Suggestions</p>
                   <div className="space-y-2">
                     {results.map((product) => (
                       <Link
                         key={product.id}
                         to={`/product/${product.id}`}
                         onClick={() => { onClose(); setQuery(''); }}
-                        className="flex items-center gap-3 p-2 hover:bg-[#F5F0E8] rounded-sm transition-colors"
+                        className="flex items-center gap-3 p-2 hover:bg-surface rounded-sm transition-colors"
                       >
                         <img
                           src={product.images[0]}
@@ -97,10 +97,10 @@ export default function SearchBar({ isOpen, onClose }: SearchBarProps) {
                           className="w-12 h-12 object-cover rounded-sm"
                         />
                         <div>
-                          <p className="font-medium text-[#2D2D2D] text-sm">{product.name}</p>
-                          <p className="text-xs text-[#666666]">{product.category.replace('-', ' ')}</p>
+                          <p className="font-medium text-ink text-sm">{product.name}</p>
+                          <p className="text-xs text-ink-secondary">{product.category.replace('-', ' ')}</p>
                         </div>
-                        <span className="ml-auto text-[#1B4332] font-medium">
+                        <span className="ml-auto text-accent font-medium">
                           ৳{(product.salePrice ?? product.price).toLocaleString()}
                         </span>
                       </Link>
@@ -110,7 +110,7 @@ export default function SearchBar({ isOpen, onClose }: SearchBarProps) {
               )}
 
               {debouncedQuery.length >= 3 && results.length === 0 && (
-                <div className="border-t border-[#F5F0E8] p-4 text-center text-[#666666]">
+                <div className="border-t border-line p-4 text-center text-ink-secondary">
                   No products found for "{debouncedQuery}"
                 </div>
               )}

@@ -56,10 +56,10 @@ export default function AdminLoginPage() {
           <p className="text-sm text-white/50">Restricted access — authorised staff only</p>
         </div>
 
-        <div className="bg-white p-8">
+        <div className="bg-elevated p-8">
           <div className="flex items-center gap-2 mb-6">
-            <Shield className="w-4 h-4 text-[#1B4332]" />
-            <h2 className="text-sm font-semibold text-[#1A1A1A] uppercase tracking-wide">Admin Sign In</h2>
+            <Shield className="w-4 h-4 text-accent" />
+            <h2 className="text-sm font-semibold text-ink uppercase tracking-wide">Admin Sign In</h2>
           </div>
 
           {error && (
@@ -70,7 +70,7 @@ export default function AdminLoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wide text-[#4A4A4A] mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-wide text-ink-secondary mb-2">
                 Email address
               </label>
               <input
@@ -79,12 +79,12 @@ export default function AdminLoginPage() {
                 autoComplete="email"
                 value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                className="w-full px-4 py-3 border border-[#E2D9CF] text-sm text-[#1A1A1A] focus:outline-none focus:border-[#1B4332] transition-colors"
+                className="w-full px-4 py-3 border border-line text-sm text-ink focus:outline-none focus:border-accent transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wide text-[#4A4A4A] mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-wide text-ink-secondary mb-2">
                 Password
               </label>
               <div className="relative">
@@ -94,10 +94,10 @@ export default function AdminLoginPage() {
                   autoComplete="current-password"
                   value={form.password}
                   onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                  className="w-full px-4 py-3 pr-11 border border-[#E2D9CF] text-sm text-[#1A1A1A] focus:outline-none focus:border-[#1B4332] transition-colors"
+                  className="w-full px-4 py-3 pr-11 border border-line text-sm text-ink focus:outline-none focus:border-accent transition-colors"
                 />
                 <button type="button" onClick={() => setShowPw(v => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#9A9A9A] hover:text-[#4A4A4A]">
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-ink-muted hover:text-ink-secondary">
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
@@ -106,7 +106,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-[#1B4332] text-white text-sm font-semibold tracking-wide hover:bg-[#163828] disabled:opacity-60 transition-colors"
+              className="w-full py-3.5 bg-accent text-white text-sm font-semibold tracking-wide hover:bg-accent-hover disabled:opacity-60 transition-colors"
             >
               {loading ? 'Signing in…' : 'Sign In to Admin'}
             </button>
@@ -114,17 +114,17 @@ export default function AdminLoginPage() {
 
           {/* Demo credentials */}
           <div className="mt-6 pt-5 border-t border-[#F0EBE3]">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#9A9A9A] mb-3">Demo accounts</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted mb-3">Demo accounts</p>
             <div className="space-y-1.5">
               {DEMO_ACCOUNTS.map(acc => (
                 <button
                   key={acc.email}
                   type="button"
                   onClick={() => fillDemo(acc.email, acc.password)}
-                  className="w-full text-left px-3 py-2.5 bg-[#F9F7F4] hover:bg-[#F0EBE3] transition-colors text-xs"
+                  className="w-full text-left px-3 py-2.5 bg-canvas hover:bg-[#F0EBE3] transition-colors text-xs"
                 >
-                  <span className="font-semibold text-[#1B4332]">{acc.role}</span>
-                  <span className="text-[#7A7A7A] ml-2">{acc.email}</span>
+                  <span className="font-semibold text-accent">{acc.role}</span>
+                  <span className="text-ink-muted ml-2">{acc.email}</span>
                   <span className="text-[#C0B8B0] ml-1">/ {acc.password}</span>
                 </button>
               ))}

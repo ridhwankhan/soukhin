@@ -63,10 +63,10 @@ export default function NotificationPanel() {
           setOpen(!open);
           if (!open) loadNotifications();
         }}
-        className="relative p-2 hover:bg-[#F5F0E8] rounded-full"
+        className="relative p-2 hover:bg-surface rounded-full"
         aria-label="Notifications"
       >
-        <Bell className="w-5 h-5 text-[#666666]" />
+        <Bell className="w-5 h-5 text-ink-secondary" />
         {unreadCount > 0 && (
           <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-[#C2704A] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -80,27 +80,27 @@ export default function NotificationPanel() {
             initial={{ opacity: 0, y: 8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
-            className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-xl border border-[#F5F0E8] z-50 overflow-hidden"
+            className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-elevated rounded-lg shadow-xl border border-line z-50 overflow-hidden"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#F5F0E8]">
-              <h3 className="font-semibold text-[#2D2D2D]">Notifications</h3>
-              <button onClick={() => setOpen(false)} className="p-1 hover:bg-[#F5F0E8] rounded">
-                <X className="w-4 h-4 text-[#666666]" />
+            <div className="flex items-center justify-between px-4 py-3 border-b border-line">
+              <h3 className="font-semibold text-ink">Notifications</h3>
+              <button onClick={() => setOpen(false)} className="p-1 hover:bg-surface rounded">
+                <X className="w-4 h-4 text-ink-secondary" />
               </button>
             </div>
 
             <div className="max-h-80 overflow-y-auto">
               {loading ? (
-                <div className="p-6 text-center text-sm text-[#666666]">Loading...</div>
+                <div className="p-6 text-center text-sm text-ink-secondary">Loading...</div>
               ) : notifications.length === 0 ? (
-                <div className="p-6 text-center text-sm text-[#666666]">No notifications</div>
+                <div className="p-6 text-center text-sm text-ink-secondary">No notifications</div>
               ) : (
                 notifications.map((notification) => (
                   <button
                     key={`${notification.type}-${notification.id}`}
                     onClick={() => handleNotificationClick(notification)}
-                    className={`w-full text-left px-4 py-3 border-b border-[#F5F0E8] hover:bg-[#F8F6F3] transition-colors ${
-                      notification.isUnread ? 'bg-[#1B4332]/5' : ''
+                    className={`w-full text-left px-4 py-3 border-b border-line hover:bg-canvas transition-colors ${
+                      notification.isUnread ? 'bg-accent/5' : ''
                     }`}
                   >
                     <div className="flex gap-3">
@@ -114,8 +114,8 @@ export default function NotificationPanel() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#2D2D2D] truncate">{notification.title}</p>
-                        <p className="text-xs text-[#666666] line-clamp-2">{notification.body}</p>
+                        <p className="text-sm font-medium text-ink truncate">{notification.title}</p>
+                        <p className="text-xs text-ink-secondary line-clamp-2">{notification.body}</p>
                         <p className="text-[10px] text-[#999999] mt-1">
                           {new Date(notification.createdAt).toLocaleString('en-GB')}
                         </p>
@@ -129,11 +129,11 @@ export default function NotificationPanel() {
               )}
             </div>
 
-            <div className="px-4 py-2 border-t border-[#F5F0E8] bg-[#F8F6F3]">
+            <div className="px-4 py-2 border-t border-line bg-canvas">
               <Link
                 to="/admin/messages"
                 onClick={() => setOpen(false)}
-                className="text-xs text-[#1B4332] hover:underline"
+                className="text-xs text-accent hover:underline"
               >
                 View all messages →
               </Link>

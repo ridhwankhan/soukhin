@@ -9,17 +9,17 @@ export default function SupportFab() {
   return (
     <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
       {open && (
-        <div className="w-56 rounded-lg border border-[#E2D9CF] dark:border-white/15 bg-white dark:bg-[#1A2420] shadow-xl overflow-hidden animate-fade-in">
-          <div className="px-4 py-3 border-b border-[#E2D9CF] dark:border-white/10">
-            <p className="text-sm font-medium text-[#2D2D2D] dark:text-white">Need help?</p>
-            <p className="text-xs text-[#666666] dark:text-white/60 mt-0.5">We usually reply within a few hours.</p>
+        <div className="w-56 rounded-lg border border-line bg-elevated shadow-xl overflow-hidden animate-fade-in">
+          <div className="px-4 py-3 border-b border-line">
+            <p className="text-sm font-medium text-ink">Need help?</p>
+            <p className="text-xs text-ink-secondary mt-0.5">We usually reply within a few hours.</p>
           </div>
           <div className="p-2 space-y-1">
             <a
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-[#2D2D2D] dark:text-white hover:bg-[#F5F0E8] dark:hover:bg-white/5 transition-colors"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-ink hover:bg-surface transition-colors"
             >
               <span className="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center flex-shrink-0">
                 <MessageCircle className="w-4 h-4 fill-white" />
@@ -28,18 +28,18 @@ export default function SupportFab() {
             </a>
             <a
               href={CONTACT_PHONE_URL}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-[#2D2D2D] dark:text-white hover:bg-[#F5F0E8] dark:hover:bg-white/5 transition-colors"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-ink hover:bg-surface transition-colors"
             >
-              <span className="w-8 h-8 rounded-full bg-[#1B4332] text-white flex items-center justify-center flex-shrink-0 text-xs font-semibold">
+              <span className="w-8 h-8 rounded-full bg-accent text-accent-fg flex items-center justify-center flex-shrink-0 text-xs font-semibold">
                 📞
               </span>
               Call {CONTACT_PHONE}
             </a>
             <a
               href={`mailto:${CONTACT_EMAIL}`}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-[#2D2D2D] dark:text-white hover:bg-[#F5F0E8] dark:hover:bg-white/5 transition-colors"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-ink hover:bg-surface transition-colors"
             >
-              <span className="w-8 h-8 rounded-full bg-[#1B4332] text-white flex items-center justify-center flex-shrink-0">
+              <span className="w-8 h-8 rounded-full bg-accent text-accent-fg flex items-center justify-center flex-shrink-0">
                 <Mail className="w-4 h-4" />
               </span>
               Email us
@@ -47,9 +47,9 @@ export default function SupportFab() {
             <Link
               to="/contact"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-[#2D2D2D] dark:text-white hover:bg-[#F5F0E8] dark:hover:bg-white/5 transition-colors"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-ink hover:bg-surface transition-colors"
             >
-              <span className="w-8 h-8 rounded-full bg-[#C2704A] text-white flex items-center justify-center flex-shrink-0">
+              <span className="w-8 h-8 rounded-full bg-muted text-ink flex items-center justify-center flex-shrink-0">
                 <MessageCircle className="w-4 h-4" />
               </span>
               Contact form
@@ -62,7 +62,7 @@ export default function SupportFab() {
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         aria-label={open ? 'Close support menu' : 'Open support menu'}
-        className="flex items-center justify-center w-12 h-12 bg-[#1B4332] text-white shadow-lg hover:shadow-xl hover:scale-[1.04] active:scale-[0.98] transition-all duration-200 rounded-full"
+        className="flex items-center justify-center w-12 h-12 bg-accent text-accent-fg shadow-lg hover:bg-accent-hover hover:shadow-xl hover:scale-[1.04] active:scale-[0.98] transition-all duration-200 rounded-full"
       >
         {open ? <X className="w-5 h-5" /> : <MessageCircle className="w-5 h-5" />}
       </button>
