@@ -19,7 +19,7 @@ export default function AuthPage() {
   const justVerified = searchParams.get('verified') === '1';
 
   const { user, profile, loading, isEmailVerified, signIn, signUp, resendVerificationEmail } = useAuth();
-  const { admin, loading: adminLoading } = useAdminAuth();
+  const { admin, loading: adminLoading, refreshAdmin } = useAdminAuth();
 
   const [activeMode, setActiveMode] = useState<AuthMode>(mode);
   const [error, setError] = useState('');
@@ -43,19 +43,29 @@ export default function AuthPage() {
   useEffect(() => {
     if (loading || adminLoading) return;
 
-    if (user && isEmailVerified && admin) {
-      navigate(getStaffPostLoginPath(admin.role, returnTo.startsWith('/') ? returnTo : '/'), { replace: true });
+    if (!user) return;
+
+    if (!isEmailVerified) {
+      setActiveMode('verify');
       return;
     }
 
-    if (!loading && user && isEmailVerified && profile) {
-      navigate(returnTo.startsWith('/') ? returnTo : '/', { replace: true });
+    const safeReturn = returnTo.startsWith('/') ? returnTo : '/';
+
+    // Staff — wait until admin profile is resolved before routing
+    if (admin) {
+      navigate(getStaffPostLoginPath(admin.role, safeReturn), { replace: true });
+      return;
     }
-    if (!loading && user && isEmailVerified && !profile && activeMode !== 'register') {
-      navigate(returnTo.startsWith('/') ? returnTo : '/account', { replace: true });
+
+    // Customer (not staff)
+    if (profile) {
+      navigate(safeReturn, { replace: true });
+      return;
     }
-    if (!loading && user && !isEmailVerified) {
-      setActiveMode('verify');
+
+    if (activeMode !== 'register') {
+      navigate(safeReturn === '/' ? '/account' : safeReturn, { replace: true });
     }
   }, [loading, adminLoading, user, isEmailVerified, profile, admin, navigate, returnTo, activeMode]);
 
@@ -81,7 +91,9 @@ export default function AuthPage() {
     }
 
     if (result.isStaff && result.staffRole) {
-      navigate(getStaffPostLoginPath(result.staffRole, returnTo.startsWith('/') ? returnTo : '/'), { replace: true });
+      await refreshAdmin();
+      const safeReturn = returnTo.startsWith('/') ? returnTo : '/';
+      navigate(getStaffPostLoginPath(result.staffRole, safeReturn), { replace: true });
       return;
     }
 

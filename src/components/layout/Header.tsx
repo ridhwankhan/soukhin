@@ -8,7 +8,7 @@ import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
 import { useAdminAuth } from '../../context/AdminAuthContext';
-import { canStaffUseStorefront } from '../../lib/staffAuth';
+import { canStaffUseStorefront, hasStaffDashboardAccess } from '../../lib/staffAuth';
 
 interface HeaderProps {
   onCartClick: () => void;
@@ -25,8 +25,9 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
   const { getItemCount } = useCart();
   const { items: wishlistItems } = useWishlist();
   const { user, profile, isEmailVerified } = useAuth();
-  const { admin } = useAdminAuth();
+  const { admin, loading: adminLoading } = useAdminAuth();
   const canShopAsStaff = admin ? canStaffUseStorefront(admin.role) : false;
+  const showStaffDashboard = hasStaffDashboardAccess(admin);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const isHome = location.pathname === '/';
@@ -76,6 +77,18 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
     <header className={`fixed top-0 left-0 right-0 z-40 transition-colors duration-300 text-ink ${headerSurface}`}>
       {/* Announcement bar */}
       <div className="bg-announcement text-announcement-fg text-center py-2 text-sm">
+        {user && isEmailVerified && showStaffDashboard && !location.pathname.startsWith('/admin') && (
+          <>
+            <Link
+              to="/admin"
+              className="inline-flex items-center gap-1.5 font-semibold underline underline-offset-2 hover:text-white/90 transition-colors mr-3"
+            >
+              <Shield className="w-3.5 h-3.5" />
+              Admin Dashboard
+            </Link>
+            <span className="opacity-60 mr-3" aria-hidden>|</span>
+          </>
+        )}
         <span>Free delivery on orders over ৳2000 | Use code: SOUKHIN10</span>
       </div>
 
@@ -209,10 +222,10 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
               )}
             </button>
 
-            {user && isEmailVerified && admin ? (
+            {user && isEmailVerified && showStaffDashboard ? (
               <Link
                 to="/admin"
-                className="hidden md:flex items-center gap-2 px-3 py-2 hover:bg-surface rounded-full transition-colors text-sm font-semibold text-accent"
+                className="hidden md:inline-flex items-center gap-2 px-3 py-2 rounded-full border border-accent/25 bg-accent/5 hover:bg-surface transition-colors text-sm font-semibold text-accent"
                 title="Staff dashboard"
               >
                 <Shield className="w-4 h-4" />
@@ -326,14 +339,19 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
                   </div>
                 );
               })}
-              {user && isEmailVerified && admin ? (
+              {user && isEmailVerified && showStaffDashboard ? (
                 <Link
                   to="/admin"
-                  className="block px-4 py-3 rounded-sm text-sm font-semibold hover:bg-surface mt-2 border-t border-line pt-4 flex items-center gap-2 text-accent"
+                  className="block px-4 py-3 rounded-sm text-sm font-semibold bg-accent/5 border border-accent/20 hover:bg-surface mt-2 flex items-center gap-2 text-accent"
                 >
                   <Shield className="w-4 h-4" />
-                  Staff Dashboard
+                  Admin Dashboard
                 </Link>
+              ) : null}
+              {user && isEmailVerified && adminLoading && !admin ? (
+                <p className="px-4 py-3 text-xs text-ink-muted mt-2 border-t border-line pt-4">
+                  Checking staff access…
+                </p>
               ) : null}
               {user && isEmailVerified && (!admin || canShopAsStaff) ? (
                 <Link

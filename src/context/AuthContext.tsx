@@ -124,9 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      if (adminProfile) {
-        navigate('/admin', { replace: true });
-      }
+      // Storefront-capable staff stay on the current page; AuthPage handles their redirect.
     },
     [handlePendingAction, loadProfile, navigate]
   );
