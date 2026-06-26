@@ -1,4 +1,4 @@
-import { AdminRole } from '../types';
+import { AdminRole, AdminUser } from '../types';
 
 /** Owner & admin manage the store; other staff may also shop as customers. */
 export function canStaffUseStorefront(role: AdminRole): boolean {
@@ -30,7 +30,7 @@ export function getStaffPostLoginPath(role: AdminRole, returnTo: string): string
 }
 
 /** Any authenticated staff member (all roles) may open the admin dashboard. */
-export function hasStaffDashboardAccess(admin: { isActive?: boolean } | null | undefined): boolean {
+export function hasStaffDashboardAccess(admin: AdminUser | null | undefined): boolean {
   return Boolean(admin);
 }
 

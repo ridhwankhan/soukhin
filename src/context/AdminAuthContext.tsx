@@ -7,13 +7,14 @@ import {
   useState,
   ReactNode,
 } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { fetchMyAdminProfile, signInAdmin, signOutAdmin } from '../lib/adminService';
 import { hasPermission } from '../config/roles';
 import { AdminUser, Permission } from '../types';
-import { clearSessionMarkers } from '../lib/sessionManager';
+import { clearSessionMarkers, touchSession } from '../lib/sessionManager';
+import { withTimeout } from '../lib/asyncUtils';
 import { useSessionManager } from '../hooks/useSessionManager';
 import SessionTimeoutWarning from '../components/auth/SessionTimeoutWarning';
 
@@ -32,13 +33,15 @@ const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefin
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isOnAdminRoute = location.pathname.startsWith('/admin');
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [admin, setAdmin] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadAdmin = useCallback(async () => {
-    const profile = await fetchMyAdminProfile();
+    const profile = await withTimeout(fetchMyAdminProfile(), 12_000, null);
     setAdmin(profile);
     return profile;
   }, []);
@@ -46,30 +49,72 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (!mounted) return;
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      if (data.session?.user) {
-        await loadAdmin();
-      }
-      setLoading(false);
-    });
+    const bootstrap = async () => {
+      try {
+        const { data } = await withTimeout(supabase.auth.getSession(), 10_000, {
+          data: { session: null },
+          error: null,
+        });
 
-    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+        if (!mounted) return;
+
+        setSession(data.session);
+        setUser(data.session?.user ?? null);
+
+        if (data.session?.user) {
+          await loadAdmin();
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    void bootstrap();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (!mounted) return;
+
       setSession(nextSession);
       setUser(nextSession?.user ?? null);
+
+      if (event === 'INITIAL_SESSION') return;
+
       if (nextSession?.user) {
-        await loadAdmin();
+        window.setTimeout(() => {
+          void loadAdmin();
+        }, 0);
       } else {
         setAdmin(null);
       }
+
       setLoading(false);
     });
+
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible' || !mounted) return;
+      if (window.location.pathname.startsWith('/admin')) touchSession('admin');
+      void withTimeout(supabase.auth.getSession(), 8_000, { data: { session: null }, error: null }).then(
+        ({ data }) => {
+          if (!mounted) return;
+          if (!data.session?.user) {
+            setSession(null);
+            setUser(null);
+            setAdmin(null);
+            return;
+          }
+          setSession(data.session);
+          setUser(data.session.user);
+          void loadAdmin();
+        }
+      );
+    };
+
+    document.addEventListener('visibilitychange', onVisible);
 
     return () => {
       mounted = false;
       listener.subscription.unsubscribe();
+      document.removeEventListener('visibilitychange', onVisible);
     };
   }, [loadAdmin]);
 
@@ -82,15 +127,21 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     clearSessionMarkers('admin');
-    await signOutAdmin();
+    await withTimeout(signOutAdmin(), 5_000, undefined);
+    setSession(null);
+    setUser(null);
     setAdmin(null);
+    setLoading(false);
     navigate('/');
   }, [navigate]);
 
   const { showWarning, idleRemainingMs, extendSession } = useSessionManager({
     scope: 'admin',
-    isAuthenticated: Boolean(admin),
-    onExpire: signOut,
+    // Only track admin idle timeout while on dashboard — not while staff is shopping
+    isAuthenticated: Boolean(admin) && isOnAdminRoute,
+    onExpire: () => {
+      void signOut();
+    },
   });
 
   const can = useCallback(

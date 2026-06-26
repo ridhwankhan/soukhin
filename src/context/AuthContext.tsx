@@ -22,7 +22,8 @@ import { checkStaffEmail, fetchMyAdminProfile } from '../lib/adminService';
 import { canStaffUseStorefront } from '../lib/staffAuth';
 import { isValidEmail, isValidPhone, normalizePhone } from '../lib/validators';
 import { checkClientRateLimit, formatRetryAfter } from '../lib/rateLimit';
-import { clearSessionMarkers } from '../lib/sessionManager';
+import { clearSessionMarkers, touchSession } from '../lib/sessionManager';
+import { withTimeout } from '../lib/asyncUtils';
 import { useSessionManager } from '../hooks/useSessionManager';
 import SessionTimeoutWarning from '../components/auth/SessionTimeoutWarning';
 import { AdminRole } from '../types';
@@ -40,6 +41,7 @@ interface AuthContextType {
   session: Session | null;
   profile: CustomerProfile | null;
   loading: boolean;
+  profileLoading: boolean;
   isEmailVerified: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string; isStaff?: boolean; staffRole?: AdminRole }>;
   signUp: (input: SignUpInput) => Promise<{ error?: string; needsEmailVerification?: boolean }>;
@@ -58,12 +60,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(false);
 
   const isEmailVerified = Boolean(user?.email_confirmed_at);
 
   const loadProfile = useCallback(async (authUser: User) => {
+    setProfileLoading(true);
     try {
-      const existing = await fetchCustomerProfile(authUser.id);
+      const existing = await withTimeout(fetchCustomerProfile(authUser.id), 12_000, null);
       if (existing) {
         setProfile(existing);
         return;
@@ -71,19 +75,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const meta = authUser.user_metadata ?? {};
       if (meta.name && meta.phone) {
-        const created = await createCustomerProfile({
-          userId: authUser.id,
-          name: meta.name,
-          email: authUser.email ?? '',
-          phone: meta.phone,
-          address: meta.address,
-        });
-        setProfile(created);
+        const created = await withTimeout(
+          createCustomerProfile({
+            userId: authUser.id,
+            name: meta.name,
+            email: authUser.email ?? '',
+            phone: meta.phone,
+            address: meta.address,
+          }),
+          12_000,
+          null
+        );
+        if (created) setProfile(created);
+        else setProfile(null);
       } else {
         setProfile(null);
       }
     } catch {
       setProfile(null);
+    } finally {
+      setProfileLoading(false);
     }
   }, []);
 
@@ -132,26 +143,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (!mounted) return;
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      if (data.session?.user) {
-        loadProfile(data.session.user).finally(() => mounted && setLoading(false));
-      } else {
-        setLoading(false);
-      }
-    });
+    const bootstrap = async () => {
+      try {
+        const { data } = await withTimeout(supabase.auth.getSession(), 10_000, {
+          data: { session: null },
+          error: null,
+        });
 
-    const { data: listener } = supabase.auth.onAuthStateChange(async (event, nextSession) => {
+        if (!mounted) return;
+
+        setSession(data.session);
+        setUser(data.session?.user ?? null);
+
+        if (data.session?.user) {
+          await loadProfile(data.session.user);
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    void bootstrap();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (!mounted) return;
+
       setSession(nextSession);
       setUser(nextSession?.user ?? null);
-
-      if (event === 'SIGNED_IN' && nextSession?.user) {
-        await completeAuthFlow(nextSession.user);
-        setLoading(false);
-        return;
-      }
 
       if (event === 'SIGNED_OUT') {
         setProfile(null);
@@ -159,17 +177,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
+      // INITIAL_SESSION is handled by bootstrap — avoid duplicate work
+      if (event === 'INITIAL_SESSION') return;
+
+      if (event === 'SIGNED_IN' && nextSession?.user) {
+        window.setTimeout(() => {
+          void completeAuthFlow(nextSession.user!).finally(() => {
+            if (mounted) setLoading(false);
+          });
+        }, 0);
+        return;
+      }
+
       if (nextSession?.user) {
-        await loadProfile(nextSession.user);
+        window.setTimeout(() => {
+          void loadProfile(nextSession.user!);
+        }, 0);
       } else {
         setProfile(null);
       }
+
       setLoading(false);
     });
+
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible' || !mounted) return;
+      touchSession('customer');
+      void withTimeout(supabase.auth.getSession(), 8_000, { data: { session: null }, error: null }).then(
+        ({ data }) => {
+          if (!mounted) return;
+          if (!data.session?.user) {
+            setSession(null);
+            setUser(null);
+            setProfile(null);
+            return;
+          }
+          setSession(data.session);
+          setUser(data.session.user);
+          void loadProfile(data.session.user);
+        }
+      );
+    };
+
+    document.addEventListener('visibilitychange', onVisible);
 
     return () => {
       mounted = false;
       listener.subscription.unsubscribe();
+      document.removeEventListener('visibilitychange', onVisible);
     };
   }, [completeAuthFlow, loadProfile]);
 
@@ -270,15 +325,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     clearSessionMarkers('customer');
-    await supabase.auth.signOut();
+    await withTimeout(supabase.auth.signOut(), 5_000, undefined);
+    setSession(null);
+    setUser(null);
     setProfile(null);
+    setLoading(false);
     navigate('/');
   }, [navigate]);
 
   const { showWarning, idleRemainingMs, extendSession } = useSessionManager({
     scope: 'customer',
     isAuthenticated: Boolean(user && isEmailVerified),
-    onExpire: signOut,
+    onExpire: () => {
+      void signOut();
+    },
   });
 
   const refreshProfile = useCallback(async () => {
@@ -351,6 +411,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       session,
       profile,
       loading,
+      profileLoading,
       isEmailVerified,
       signIn,
       signUp,
@@ -365,6 +426,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       session,
       profile,
       loading,
+      profileLoading,
       isEmailVerified,
       signIn,
       signUp,

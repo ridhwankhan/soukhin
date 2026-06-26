@@ -7,7 +7,7 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 
 export default function AccountPage() {
-  const { user, profile, loading, updateProfile, signOut, refreshProfile } = useAuth();
+  const { user, profile, loading, profileLoading, updateProfile, signOut, refreshProfile } = useAuth();
   const [form, setForm] = useState({ name: '', phone: '', address: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -46,7 +46,10 @@ export default function AccountPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-canvas flex items-center justify-center">
-        <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+        <div className="text-center">
+          <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-ink-secondary">Loading your account…</p>
+        </div>
       </div>
     );
   }
@@ -75,6 +78,9 @@ export default function AccountPage() {
                 <Mail className="w-3.5 h-3.5" />
                 {user?.email}
               </p>
+              {profileLoading && (
+                <p className="text-xs text-ink-muted mt-1">Refreshing profile…</p>
+              )}
             </div>
           </div>
 
