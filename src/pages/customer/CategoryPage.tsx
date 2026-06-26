@@ -1,3 +1,4 @@
+import { useState, useEffect, useMemo } from 'react';
 import Breadcrumbs from '../../components/layout/Breadcrumbs';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -9,6 +10,7 @@ import EmptyCategoryModal from '../../components/category/EmptyCategoryModal';
 import { Category, Product, SortOption } from '../../types';
 import { fetchProductsByCategory } from '../../lib/productService';
 import { findCategoryBySlug, getSubcategoriesForParent, getTopLevelCategories } from '../../lib/categoryService';
+import { withTimeout } from '../../lib/asyncUtils';
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'newest', label: 'Newest First' },
@@ -37,15 +39,21 @@ export default function CategoryPage() {
   useEffect(() => {
     if (!slug) return;
 
+    setEmptyModalOpen(false);
+    setLoading(true);
+
     const load = async () => {
-      setLoading(true);
       try {
-        const [cat, subs, products, topLevel] = await Promise.all([
-          findCategoryBySlug(slug),
-          getSubcategoriesForParent(slug),
-          fetchProductsByCategory(slug),
-          getTopLevelCategories(),
-        ]);
+        const [cat, subs, products, topLevel] = await withTimeout(
+          Promise.all([
+            findCategoryBySlug(slug),
+            getSubcategoriesForParent(slug),
+            fetchProductsByCategory(slug),
+            getTopLevelCategories(),
+          ]),
+          12_000,
+          [null, [], [], []] as [Category | null, Category[], Product[], Category[]]
+        );
 
         const isTopLevel = topLevel.some((c) => c.slug === slug);
         setCategory(cat ?? (isTopLevel ? topLevel.find((c) => c.slug === slug) ?? null : null));
@@ -56,6 +64,8 @@ export default function CategoryPage() {
           setEmptyModalOpen(true);
         }
       } catch {
+        setCategory(null);
+        setSubcats([]);
         setRawProducts([]);
         setEmptyModalOpen(true);
       } finally {
@@ -63,7 +73,7 @@ export default function CategoryPage() {
       }
     };
 
-    load();
+    void load();
   }, [slug]);
 
   const allSizes = useMemo(() => {
@@ -195,6 +205,18 @@ export default function CategoryPage() {
               </div>
             )}
           </>
+        )}
+
+        {isCategoryEmpty && !loading && (
+          <div className="text-center py-16 px-4">
+            <p className="text-lg font-semibold text-ink mb-2">{displayCategory?.name} — Coming Soon</p>
+            <p className="text-sm text-ink-secondary mb-6 max-w-md mx-auto">
+              We are curating beautiful products for this category. Check back soon.
+            </p>
+            <Link to="/" className="inline-flex px-6 py-2.5 bg-accent text-white text-sm font-semibold rounded-sm hover:bg-accent-hover transition-colors">
+              Browse Other Categories
+            </Link>
+          </div>
         )}
 
         {loading && (

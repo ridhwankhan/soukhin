@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Mail, LogOut } from 'lucide-react';
+import { User, Mail, LogOut, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useStaffAccess } from '../../hooks/useStaffAccess';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 
 export default function AccountPage() {
   const { user, profile, loading, profileLoading, updateProfile, signOut, refreshProfile } = useAuth();
+  const { admin, adminLoading, showDashboard, staffCheckDone, refreshAdmin } = useStaffAccess();
   const [form, setForm] = useState({ name: '', phone: '', address: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -62,7 +64,39 @@ export default function AccountPage() {
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+        {showDashboard && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-elevated rounded-lg shadow-sm p-5 border border-accent/20"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-5 h-5 text-accent" />
+                </div>
+                <div>
+                  <p className="font-semibold text-ink">Store Dashboard</p>
+                  <p className="text-sm text-ink-secondary mt-0.5">
+                    {admin
+                      ? `Signed in as ${admin.role.replace('-', ' ')} — manage products, orders, and settings.`
+                      : adminLoading || !staffCheckDone
+                      ? 'Verifying your staff access…'
+                      : 'Your email is authorized for staff access. Open the dashboard to manage the store.'}
+                  </p>
+                </div>
+              </div>
+              <Link to="/admin" onClick={() => void refreshAdmin()}>
+                <Button className="w-full sm:w-auto whitespace-nowrap">
+                  <Shield className="w-4 h-4 mr-2" />
+                  Open Admin Dashboard
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        )}
+
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

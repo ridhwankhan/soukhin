@@ -7,8 +7,8 @@ import { NAV_LINKS, NAV_DROPDOWNS, BRAND_CONFIG } from '../../config';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
-import { useAdminAuth } from '../../context/AdminAuthContext';
-import { canStaffUseStorefront, hasStaffDashboardAccess } from '../../lib/staffAuth';
+import { canStaffUseStorefront } from '../../lib/staffAuth';
+import { useStaffAccess } from '../../hooks/useStaffAccess';
 
 interface HeaderProps {
   onCartClick: () => void;
@@ -25,9 +25,8 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
   const { getItemCount } = useCart();
   const { items: wishlistItems } = useWishlist();
   const { user, profile, isEmailVerified } = useAuth();
-  const { admin, loading: adminLoading } = useAdminAuth();
+  const { admin, adminLoading, showDashboard } = useStaffAccess();
   const canShopAsStaff = admin ? canStaffUseStorefront(admin.role) : false;
-  const showStaffDashboard = hasStaffDashboardAccess(admin);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const isHome = location.pathname === '/';
@@ -67,17 +66,14 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
     return NAV_DROPDOWNS[key as keyof typeof NAV_DROPDOWNS];
   };
 
-  const headerSurface = scrolled
-    ? 'bg-elevated/95 supports-[backdrop-filter]:bg-elevated/80 supports-[backdrop-filter]:backdrop-blur-md shadow-md border-b border-line'
-    : isHome
-    ? 'bg-canvas/90 supports-[backdrop-filter]:bg-canvas/75 supports-[backdrop-filter]:backdrop-blur-md border-b border-line shadow-sm'
-    : 'bg-elevated/95 supports-[backdrop-filter]:bg-elevated/85 supports-[backdrop-filter]:backdrop-blur-md shadow-sm';
+  const headerSurface =
+    'bg-white dark:bg-elevated border-b border-line shadow-sm text-ink';
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-40 transition-colors duration-300 text-ink ${headerSurface}`}>
+    <header className={`fixed top-0 left-0 right-0 z-40 transition-colors duration-200 ${headerSurface}`}>
       {/* Announcement bar */}
       <div className="bg-announcement text-announcement-fg text-center py-2 text-sm">
-        {user && isEmailVerified && showStaffDashboard && !location.pathname.startsWith('/admin') && (
+        {user && isEmailVerified && showDashboard && !location.pathname.startsWith('/admin') && (
           <>
             <Link
               to="/admin"
@@ -222,7 +218,7 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
               )}
             </button>
 
-            {user && isEmailVerified && showStaffDashboard ? (
+            {user && isEmailVerified && showDashboard ? (
               <Link
                 to="/admin"
                 className="hidden md:inline-flex items-center gap-2 px-3 py-2 rounded-full border border-accent/25 bg-accent/5 hover:bg-surface transition-colors text-sm font-semibold text-accent"
@@ -339,7 +335,7 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
                   </div>
                 );
               })}
-              {user && isEmailVerified && showStaffDashboard ? (
+              {user && isEmailVerified && showDashboard ? (
                 <Link
                   to="/admin"
                   className="block px-4 py-3 rounded-sm text-sm font-semibold bg-accent/5 border border-accent/20 hover:bg-surface mt-2 flex items-center gap-2 text-accent"
