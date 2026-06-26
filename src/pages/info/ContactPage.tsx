@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MapPin, MessageCircle, Clock, Phone } from 'lucide-react';
-import { CONTACT_EMAIL, CONTACT_MAILTO, CONTACT_PHONE, CONTACT_PHONE_URL, WHATSAPP_URL } from '../../config';
+import { Mail, MapPin, MessageCircle, Clock } from 'lucide-react';
+import { CONTACT_EMAIL, CONTACT_MAILTO, WHATSAPP_URL } from '../../config';
 import { submitContactMessage } from '../../lib/contactService';
 import { isValidEmail } from '../../lib/validators';
 import Button from '../../components/ui/Button';
@@ -163,18 +163,6 @@ export default function ContactPage() {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Phone className="w-5 h-5 text-accent" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-ink">Phone</h3>
-                      <a href={CONTACT_PHONE_URL} className="text-sm text-accent hover:underline">
-                        {CONTACT_PHONE}
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
                     <div className="w-10 h-10 bg-[#25D366]/10 rounded-full flex items-center justify-center flex-shrink-0">
                       <MessageCircle className="w-5 h-5 text-[#25D366]" />
                     </div>
@@ -186,7 +174,7 @@ export default function ContactPage() {
                         rel="noopener noreferrer"
                         className="text-sm text-accent hover:underline"
                       >
-                        {CONTACT_PHONE} — message us anytime
+                        Message us anytime
                       </a>
                     </div>
                   </div>

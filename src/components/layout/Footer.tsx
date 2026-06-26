@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Heart, Mail, MapPin, Phone, MessageCircle } from 'lucide-react';
-import { BRAND_CONFIG, CONTACT_EMAIL, CONTACT_PHONE, CONTACT_PHONE_URL, DEVELOPER_EMAIL, DEVELOPER_NAME, FOOTER_LINKS, SITE_SETTINGS, WHATSAPP_URL } from '../../config';
+import { Facebook, Instagram, Heart, Mail, MapPin, MessageCircle } from 'lucide-react';
+import { BRAND_CONFIG, CONTACT_EMAIL, DEVELOPER_EMAIL, DEVELOPER_NAME, FOOTER_LINKS, SITE_SETTINGS, WHATSAPP_URL } from '../../config';
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -108,15 +108,6 @@ export default function Footer() {
                 >
                   <Mail className="w-3.5 h-3.5 flex-shrink-0 text-white/30 group-hover:text-white/70" />
                   <span className="underline-offset-2 group-hover:underline break-all">{CONTACT_EMAIL}</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href={CONTACT_PHONE_URL}
-                  className="flex items-center gap-2.5 text-sm text-white/60 hover:text-white transition-colors group"
-                >
-                  <Phone className="w-3.5 h-3.5 flex-shrink-0 text-white/30 group-hover:text-white/70" />
-                  <span className="group-hover:underline">{CONTACT_PHONE}</span>
                 </a>
               </li>
               <li>

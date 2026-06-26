@@ -1,11 +1,10 @@
 import { SiteSettings } from '../types';
 
-// Store contact
+// Store contact — email public; WhatsApp uses dial code only (number not shown on site)
 export const CONTACT_EMAIL = 'shoukhin.lifestyle.bd@gmail.com';
 export const CONTACT_MAILTO = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Shoukhin — Customer enquiry')}`;
-export const CONTACT_PHONE = '01577577168';
-/** International format for tel: / wa.me (no + or spaces) */
-export const CONTACT_PHONE_DIAL = '8801577577168';
+/** International format for wa.me (not displayed publicly) */
+export const WHATSAPP_DIAL = '8801577577168';
 
 // Site developer credit (footer)
 export const DEVELOPER_NAME = 'Ridhwan';
@@ -13,10 +12,9 @@ export const DEVELOPER_EMAIL = 'ridhwankhan03@gmail.com';
 
 // WhatsApp — defaults to store number; override with VITE_WHATSAPP_NUMBER on Vercel
 export const WHATSAPP_NUMBER =
-  (import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined)?.trim() || CONTACT_PHONE_DIAL;
+  (import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined)?.trim() || WHATSAPP_DIAL;
 
 export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
-export const CONTACT_PHONE_URL = `tel:+${CONTACT_PHONE_DIAL}`;
 
 export const SITE_SETTINGS: SiteSettings = {
   hero: {
@@ -28,8 +26,8 @@ export const SITE_SETTINGS: SiteSettings = {
   announcementBar: 'Free delivery on orders over ৳2000 | Use code: SOUKHIN10',
   announcementBarBn: '২০০০ টাকার বেশি অর্ডারে ফ্রি ডেলিভারি | কোড: SOUKHIN10',
   whatsappNumber: WHATSAPP_NUMBER,
-  facebookLink: 'https://facebook.com/soukhin',
-  instagramLink: 'https://instagram.com/soukhin.bd',
+  facebookLink: 'https://www.facebook.com/shoukhinl/',
+  instagramLink: 'https://www.instagram.com/shoukhin_lifestyle?igsh=MXFvODE1eWFuMmpiag==',
   logo: '/images/logo.png',
   footerText: 'Shoukhin - Premium Bangladeshi Lifestyle Brand',
 };

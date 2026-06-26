@@ -37,8 +37,8 @@ export const BRAND_CONFIG = {
   },
 
   social: {
-    facebook: '',
-    instagram: '',
+    facebook: 'https://www.facebook.com/shoukhinl/',
+    instagram: 'https://www.instagram.com/shoukhin_lifestyle?igsh=MXFvODE1eWFuMmpiag==',
     whatsapp: '8801577577168',
   },
 

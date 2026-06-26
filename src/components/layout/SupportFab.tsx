@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MessageCircle, X, Mail } from 'lucide-react';
-import { CONTACT_EMAIL, CONTACT_MAILTO, CONTACT_PHONE, CONTACT_PHONE_URL, WHATSAPP_URL } from '../../config';
+import { CONTACT_EMAIL, CONTACT_MAILTO, WHATSAPP_URL } from '../../config';
 
 export default function SupportFab() {
   const [open, setOpen] = useState(false);
@@ -24,16 +24,7 @@ export default function SupportFab() {
               <span className="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center flex-shrink-0">
                 <MessageCircle className="w-4 h-4 fill-white" />
               </span>
-              WhatsApp ({CONTACT_PHONE})
-            </a>
-            <a
-              href={CONTACT_PHONE_URL}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-ink hover:bg-surface transition-colors"
-            >
-              <span className="w-8 h-8 rounded-full bg-accent text-accent-fg flex items-center justify-center flex-shrink-0 text-xs font-semibold">
-                📞
-              </span>
-              Call {CONTACT_PHONE}
+              WhatsApp
             </a>
             <a
               href={CONTACT_MAILTO}
