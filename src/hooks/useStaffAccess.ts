@@ -40,12 +40,15 @@ export function useStaffAccess() {
   const isOwnerEmail =
     Boolean(user?.email) && user.email!.toLowerCase() === CONTACT_EMAIL.toLowerCase();
 
-  const showDashboard = Boolean(admin) || isStaffEmail || isOwnerEmail;
+  const needsStaffSetup = staffCheckDone && isOwnerEmail && !isStaffEmail && !admin;
+  const showDashboard = Boolean(admin) || isStaffEmail || needsStaffSetup;
 
   return {
     admin,
     adminLoading,
     isStaffEmail,
+    isOwnerEmail,
+    needsStaffSetup,
     staffCheckDone,
     showDashboard,
     refreshAdmin,

@@ -10,7 +10,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { fetchMyAdminProfile, signInAdmin, signOutAdmin } from '../lib/adminService';
+import { fetchMyAdminProfile, fetchMyAdminProfileWithRetry, signInAdmin, signOutAdmin } from '../lib/adminService';
 import { hasPermission } from '../config/roles';
 import { AdminUser, Permission } from '../types';
 import { clearSessionMarkers, touchSession } from '../lib/sessionManager';
@@ -42,7 +42,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const loadAdmin = useCallback(async () => {
-    const profile = await withTimeout(fetchMyAdminProfile(), 12_000, null);
+    const profile = await withTimeout(fetchMyAdminProfileWithRetry(3), 15_000, null);
     setAdmin(profile);
     return profile;
   }, []);
@@ -176,7 +176,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       signIn,
       signOut,
       can,
-      refreshAdmin: async () => { await loadAdmin(); },
+      refreshAdmin: loadAdmin,
       setAdminProfile,
     }),
     [user, session, admin, loading, signIn, signOut, can, loadAdmin, setAdminProfile]

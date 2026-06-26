@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, Mail, LogOut, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -8,12 +8,15 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 
 export default function AccountPage() {
+  const navigate = useNavigate();
   const { user, profile, loading, profileLoading, updateProfile, signOut, refreshProfile } = useAuth();
-  const { admin, adminLoading, showDashboard, staffCheckDone, refreshAdmin } = useStaffAccess();
+  const { admin, adminLoading, showDashboard, staffCheckDone, needsStaffSetup, refreshAdmin } = useStaffAccess();
   const [form, setForm] = useState({ name: '', phone: '', address: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [saving, setSaving] = useState(false);
+  const [openingDashboard, setOpeningDashboard] = useState(false);
+  const [dashboardError, setDashboardError] = useState('');
 
   useEffect(() => {
     refreshProfile();
@@ -28,6 +31,14 @@ export default function AccountPage() {
       });
     }
   }, [profile]);
+
+  const handleOpenDashboard = async () => {
+    setDashboardError('');
+    setOpeningDashboard(true);
+    await refreshAdmin();
+    setOpeningDashboard(false);
+    navigate('/admin');
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,18 +92,26 @@ export default function AccountPage() {
                   <p className="text-sm text-ink-secondary mt-0.5">
                     {admin
                       ? `Signed in as ${admin.role.replace('-', ' ')} — manage products, orders, and settings.`
+                      : needsStaffSetup
+                      ? 'Your owner email needs a one-time link in Supabase. Open the dashboard for setup steps.'
                       : adminLoading || !staffCheckDone
                       ? 'Verifying your staff access…'
                       : 'Your email is authorized for staff access. Open the dashboard to manage the store.'}
                   </p>
+                  {dashboardError && (
+                    <p className="text-xs text-red-600 mt-2">{dashboardError}</p>
+                  )}
                 </div>
               </div>
-              <Link to="/admin" onClick={() => void refreshAdmin()}>
-                <Button className="w-full sm:w-auto whitespace-nowrap">
-                  <Shield className="w-4 h-4 mr-2" />
-                  Open Admin Dashboard
-                </Button>
-              </Link>
+              <Button
+                type="button"
+                onClick={handleOpenDashboard}
+                loading={openingDashboard}
+                className="w-full sm:w-auto whitespace-nowrap"
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Open Admin Dashboard
+              </Button>
             </div>
           </motion.div>
         )}

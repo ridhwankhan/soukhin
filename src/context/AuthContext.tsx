@@ -18,7 +18,7 @@ import {
   updateCustomerProfile,
 } from '../lib/customerService';
 import { consumePendingAction, consumeReturnPath, PendingAction, savePendingAction } from '../lib/pendingAction';
-import { checkStaffEmail, fetchMyAdminProfile } from '../lib/adminService';
+import { checkStaffEmail, fetchMyAdminProfileWithRetry } from '../lib/adminService';
 import { isValidEmail, isValidPhone, normalizePhone } from '../lib/validators';
 import { checkClientRateLimit, formatRetryAfter } from '../lib/rateLimit';
 import { clearSessionMarkers, touchSession } from '../lib/sessionManager';
@@ -245,7 +245,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (isStaff) {
-      const admin = await fetchMyAdminProfile();
+      const admin = await fetchMyAdminProfileWithRetry(3);
       if (!admin) {
         await supabase.auth.signOut();
         return { error: 'Your staff account is not active. Contact the store owner.' };

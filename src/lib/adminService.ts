@@ -26,13 +26,25 @@ function mapAdminProfile(row: AdminProfileRow): AdminUser {
 }
 
 export async function fetchMyAdminProfile(): Promise<AdminUser | null> {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return null;
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) return null;
 
   const { data, error } = await supabase.rpc('get_my_admin_profile');
   if (error || !data) return null;
 
   return mapAdminProfile(data as AdminProfileRow);
+}
+
+/** Retry profile fetch — helps right after sign-in before JWT is fully ready. */
+export async function fetchMyAdminProfileWithRetry(attempts = 3): Promise<AdminUser | null> {
+  for (let i = 0; i < attempts; i++) {
+    const profile = await fetchMyAdminProfile();
+    if (profile) return profile;
+    if (i < attempts - 1) {
+      await new Promise((r) => window.setTimeout(r, 400));
+    }
+  }
+  return null;
 }
 
 export async function signInAdmin(email: string, password: string): Promise<{ admin?: AdminUser; error?: string }> {
