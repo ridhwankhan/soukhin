@@ -1,5 +1,6 @@
 import { Category, CategorySlug } from '../types';
 import { supabase } from './supabase';
+import { resolveCategoryImage } from './categoryImages';
 
 interface DbCategoryRow {
   id: string;
@@ -30,7 +31,7 @@ function mapCategory(row: DbCategoryRow, productCount = 0): Category {
     name: row.name,
     nameBn: row.name_bn ?? '',
     description: row.description ?? '',
-    image: row.image ?? '',
+    image: resolveCategoryImage(row.slug, row.image),
     productCount,
     parentId: row.parent_id ?? undefined,
   };

@@ -7,9 +7,10 @@ export const CONTACT_EMAIL = 'shoukhin.lifestyle.bd@gmail.com';
 export const DEVELOPER_NAME = 'Ridhwan';
 export const DEVELOPER_EMAIL = 'ridhwankhan03@gmail.com';
 
-// WhatsApp number - Add your number here (format: country code + number, no spaces or symbols)
-// Example: "8801712345678" for Bangladesh
-export const WHATSAPP_NUMBER = '';
+// WhatsApp number (format: country code + number, no spaces or symbols)
+// Example: "8801712345678" for Bangladesh — set in Vercel as VITE_WHATSAPP_NUMBER
+export const WHATSAPP_NUMBER =
+  (import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined)?.trim() || '';
 
 export const SITE_SETTINGS: SiteSettings = {
   hero: {
@@ -103,5 +104,8 @@ export const FOOTER_LINKS = {
     { href: '/return-exchange', label: 'Return & Exchange' },
     { href: '/privacy', label: 'Privacy Policy' },
     { href: '/terms', label: 'Terms & Conditions' },
+  ],
+  staff: [
+    { href: '/admin/login', label: 'Staff Login' },
   ],
 };

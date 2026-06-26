@@ -78,7 +78,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Policies */}
+          {/* Policies + Staff */}
           <div className="lg:col-span-2">
             <h3 className="text-xs font-semibold uppercase tracking-[0.1em] text-white/40 mb-4">Policies</h3>
             <ul className="space-y-2.5">
@@ -89,6 +89,11 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
+              <li className="pt-2 border-t border-white/10 mt-2">
+                <Link to="/admin/login" className="text-sm text-white/50 hover:text-white transition-colors">
+                  Staff Login
+                </Link>
+              </li>
             </ul>
           </div>
 

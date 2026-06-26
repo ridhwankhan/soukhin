@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import Breadcrumbs from '../../components/layout/Breadcrumbs';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { SlidersHorizontal, X, ChevronDown } from 'lucide-react';
@@ -135,11 +135,14 @@ export default function CategoryPage() {
   return (
     <div className="min-h-screen bg-[#F8F6F3]">
       <div className="bg-[#1B4332] text-white py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Breadcrumbs items={[{ label: displayCategory?.name || 'Products' }]} className="mb-5 text-white/50 [&_a]:text-white/70 [&_a:hover]:text-white [&_span]:text-white/90" />
+          <div className="text-center">
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-3xl md:text-4xl font-serif font-semibold mb-2">
             {displayCategory?.name || 'Products'}
           </motion.h1>
           {displayCategory?.nameBn && <p className="text-white/70">{displayCategory.nameBn}</p>}
+          </div>
         </div>
       </div>
 

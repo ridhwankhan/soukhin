@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ShoppingBag, Heart, Search, User, ChevronDown, LogIn } from 'lucide-react';
+import { Menu, X, ShoppingBag, Heart, Search, User, ChevronDown, LogIn, Home, Shield } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 import { NAV_LINKS, NAV_DROPDOWNS, BRAND_CONFIG } from '../../config';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
@@ -62,10 +63,10 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
   };
 
   const headerSurface = scrolled
-    ? 'bg-white/95 backdrop-blur-md shadow-md border-b border-[#1B4332]/5'
+    ? 'bg-white/95 dark:bg-[#111A14]/95 backdrop-blur-md shadow-md border-b border-[#1B4332]/5 dark:border-white/10'
     : isHome
-    ? 'bg-[#F9F7F4]/80 backdrop-blur-xl border-b border-white/50 shadow-sm'
-    : 'bg-white/90 backdrop-blur-md shadow-sm';
+    ? 'bg-[#F9F7F4]/80 dark:bg-[#111A14]/80 backdrop-blur-xl border-b border-white/50 dark:border-white/10 shadow-sm'
+    : 'bg-white/90 dark:bg-[#111A14]/90 backdrop-blur-md shadow-sm';
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 supports-[backdrop-filter]:backdrop-blur-xl ${headerSurface}`}>
@@ -160,6 +161,19 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
 
           {/* Actions */}
           <div className="flex items-center gap-2 md:gap-4">
+            {!isHome && (
+              <Link
+                to="/"
+                className="p-2 hover:bg-[#F5F0E8] dark:hover:bg-white/10 rounded-full transition-colors"
+                title="Back to Home"
+                aria-label="Back to Home"
+              >
+                <Home className="w-5 h-5 text-[#2D2D2D] dark:text-white/90" />
+              </Link>
+            )}
+
+            <ThemeToggle />
+
             <button
               onClick={onSearchToggle}
               className="p-2 hover:bg-[#F5F0E8] rounded-full transition-colors"
@@ -313,10 +327,11 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
                 </Link>
               )}
               <Link
-                to="/admin"
-                className="block px-4 py-3 rounded-sm text-sm font-medium hover:bg-[#F5F0E8] text-[#666666]"
+                to="/admin/login"
+                className="block px-4 py-3 rounded-sm text-sm font-medium hover:bg-[#F5F0E8] dark:hover:bg-white/5 text-[#666666] dark:text-white/70 flex items-center gap-2"
               >
-                Admin Dashboard
+                <Shield className="w-4 h-4" />
+                Staff / Admin Login
               </Link>
             </div>
           </motion.div>

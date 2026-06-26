@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useState } from 'react';
+import { ThemeProvider } from './context/ThemeContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { AuthProvider } from './context/AuthContext';
@@ -13,7 +14,7 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import CartDrawer from './components/cart/CartDrawer';
 import SearchBar from './components/layout/SearchBar';
-import WhatsAppButton from './components/layout/WhatsAppButton';
+import SupportFab from './components/layout/SupportFab';
 
 // Customer Pages
 import HomePage from './pages/customer/HomePage';
@@ -59,7 +60,7 @@ function CustomerLayout({ children }: { children: React.ReactNode }) {
   const isHome = location.pathname === '/';
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#0F1411] transition-colors duration-200">
       <Header
         onCartClick={() => setCartOpen(true)}
         searchOpen={searchOpen}
@@ -72,13 +73,14 @@ function CustomerLayout({ children }: { children: React.ReactNode }) {
       <Footer />
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
       <SearchBar isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
-      <WhatsAppButton />
+      <SupportFab />
     </div>
   );
 }
 
 function App() {
   return (
+    <ThemeProvider>
     <CartProvider>
       <WishlistProvider>
         <Router>
@@ -191,6 +193,7 @@ function App() {
         </Router>
       </WishlistProvider>
     </CartProvider>
+    </ThemeProvider>
   );
 }
 

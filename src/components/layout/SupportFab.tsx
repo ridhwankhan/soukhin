@@ -1,0 +1,64 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { MessageCircle, X, Mail } from 'lucide-react';
+import { CONTACT_EMAIL, WHATSAPP_NUMBER } from '../../config';
+
+export default function SupportFab() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
+      {open && (
+        <div className="w-56 rounded-lg border border-[#E2D9CF] dark:border-white/15 bg-white dark:bg-[#1A2420] shadow-xl overflow-hidden animate-fade-in">
+          <div className="px-4 py-3 border-b border-[#E2D9CF] dark:border-white/10">
+            <p className="text-sm font-medium text-[#2D2D2D] dark:text-white">Need help?</p>
+            <p className="text-xs text-[#666666] dark:text-white/60 mt-0.5">We usually reply within a few hours.</p>
+          </div>
+          <div className="p-2 space-y-1">
+            {WHATSAPP_NUMBER ? (
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-[#2D2D2D] dark:text-white hover:bg-[#F5F0E8] dark:hover:bg-white/5 transition-colors"
+              >
+                <span className="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center flex-shrink-0">
+                  <MessageCircle className="w-4 h-4 fill-white" />
+                </span>
+                WhatsApp
+              </a>
+            ) : null}
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-[#2D2D2D] dark:text-white hover:bg-[#F5F0E8] dark:hover:bg-white/5 transition-colors"
+            >
+              <span className="w-8 h-8 rounded-full bg-[#1B4332] text-white flex items-center justify-center flex-shrink-0">
+                <Mail className="w-4 h-4" />
+              </span>
+              Email us
+            </a>
+            <Link
+              to="/contact"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-[#2D2D2D] dark:text-white hover:bg-[#F5F0E8] dark:hover:bg-white/5 transition-colors"
+            >
+              <span className="w-8 h-8 rounded-full bg-[#C2704A] text-white flex items-center justify-center flex-shrink-0">
+                <MessageCircle className="w-4 h-4" />
+              </span>
+              Contact form
+            </Link>
+          </div>
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        aria-label={open ? 'Close support menu' : 'Open support menu'}
+        className="flex items-center justify-center w-12 h-12 bg-[#1B4332] text-white shadow-lg hover:shadow-xl hover:scale-[1.04] active:scale-[0.98] transition-all duration-200 rounded-full"
+      >
+        {open ? <X className="w-5 h-5" /> : <MessageCircle className="w-5 h-5" />}
+      </button>
+    </div>
+  );
+}

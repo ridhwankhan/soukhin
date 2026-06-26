@@ -66,10 +66,6 @@ export default function HomePage() {
                       src={category.image}
                       alt={category.name}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                      }}
                     />
                   </div>
                   <h3 className="font-medium text-[#2D2D2D] group-hover:text-[#1B4332] transition-colors">

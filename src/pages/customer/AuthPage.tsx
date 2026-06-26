@@ -310,6 +310,11 @@ export default function AuthPage() {
             ← Back to shopping
           </Link>
         </p>
+        <p className="text-center mt-3">
+          <Link to="/admin/login" className="text-xs text-[#666666] hover:text-[#1B4332] hover:underline">
+            Staff / admin login →
+          </Link>
+        </p>
       </div>
     </div>
   );
