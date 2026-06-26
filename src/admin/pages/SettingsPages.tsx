@@ -56,7 +56,7 @@ export function PaymentSettingsPage() {
                 type="checkbox"
                 checked={config.bkash.enabled}
                 onChange={(e) => setConfig(prev => ({ ...prev, bkash: { ...prev.bkash, enabled: e.target.checked } }))}
-                className="w-4 h-4 accent-[#1B4332]"
+                className="w-4 h-4 accent-[#850E35]"
               />
               <span className="text-sm">Enabled</span>
             </label>
@@ -94,7 +94,7 @@ export function PaymentSettingsPage() {
                 type="checkbox"
                 checked={config.nagad.enabled}
                 onChange={(e) => setConfig(prev => ({ ...prev, nagad: { ...prev.nagad, enabled: e.target.checked } }))}
-                className="w-4 h-4 accent-[#1B4332]"
+                className="w-4 h-4 accent-[#850E35]"
               />
               <span className="text-sm">Enabled</span>
             </label>
@@ -132,7 +132,7 @@ export function PaymentSettingsPage() {
                 type="checkbox"
                 checked={config.rocket.enabled}
                 onChange={(e) => setConfig(prev => ({ ...prev, rocket: { ...prev.rocket, enabled: e.target.checked } }))}
-                className="w-4 h-4 accent-[#1B4332]"
+                className="w-4 h-4 accent-[#850E35]"
               />
               <span className="text-sm">Enabled</span>
             </label>
@@ -171,7 +171,7 @@ export function PaymentSettingsPage() {
                   type="checkbox"
                   checked={config.cod.enabled}
                   onChange={(e) => setConfig(prev => ({ ...prev, cod: { enabled: e.target.checked } }))}
-                  className="w-4 h-4 accent-[#1B4332]"
+                  className="w-4 h-4 accent-[#850E35]"
                 />
                 <span className="text-sm">Enabled</span>
               </label>
@@ -186,7 +186,7 @@ export function PaymentSettingsPage() {
                   type="checkbox"
                   checked={config.bankTransfer.enabled}
                   onChange={(e) => setConfig(prev => ({ ...prev, bankTransfer: { ...prev.bankTransfer, enabled: e.target.checked } }))}
-                  className="w-4 h-4 accent-[#1B4332]"
+                  className="w-4 h-4 accent-[#850E35]"
                 />
                 <span className="text-sm">Enabled</span>
               </label>
@@ -294,7 +294,7 @@ export function DeliverySettingsPage() {
                   ...prev,
                   pickup: { ...prev.pickup, enabled: e.target.checked }
                 }))}
-                className="w-4 h-4 accent-[#1B4332]"
+                className="w-4 h-4 accent-[#850E35]"
               />
               <span className="text-sm">Enabled</span>
             </label>

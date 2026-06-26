@@ -124,7 +124,7 @@ export default function TrackOrderPage() {
                   <div key={idx} className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                       step.current ? 'bg-accent text-white' :
-                      step.done ? 'bg-green-100 text-green-600' : 'bg-surface text-[#999999]'
+                      step.done ? 'bg-green-100 text-green-600' : 'bg-surface text-ink-muted'
                     }`}>
                       {step.done && !step.current ? (
                         <CheckCircle className="w-4 h-4" />

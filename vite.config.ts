@@ -14,7 +14,7 @@ export default defineConfig({
           vendor: ['react', 'react-dom', 'react-router-dom'],
           supabase: ['@supabase/supabase-js'],
           charts: ['recharts'],
-          three: ['three', '@react-three/fiber', '@react-three/drei'],
+          motion: ['framer-motion'],
         },
       },
     },

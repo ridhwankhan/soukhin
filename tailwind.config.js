@@ -13,7 +13,9 @@ export default {
           DEFAULT: 'var(--color-accent)',
           hover: 'var(--color-accent-hover)',
           fg: 'var(--color-accent-fg)',
+          soft: 'var(--color-accent-soft)',
         },
+        heading: 'var(--color-heading)',
         ink: {
           DEFAULT: 'var(--color-ink)',
           secondary: 'var(--color-ink-secondary)',

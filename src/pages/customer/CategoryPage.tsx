@@ -169,7 +169,7 @@ export default function CategoryPage() {
                   <span>Filters</span>
                 </button>
                 {hasActiveFilters && (
-                  <button onClick={clearFilters} className="text-sm text-[#C2704A] hover:underline">Clear all</button>
+                  <button onClick={clearFilters} className="text-sm text-accent font-medium hover:underline">Clear all</button>
                 )}
               </div>
               <div className="flex items-center gap-2">

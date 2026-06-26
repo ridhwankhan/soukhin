@@ -237,12 +237,12 @@ ${shipping.notes ? `\n*Notes:* ${shipping.notes}` : ''}
                     ? 'bg-accent text-white'
                     : idx < ['shipping', 'payment', 'confirm'].indexOf(step)
                     ? 'bg-green-500 text-white'
-                    : 'bg-[#D4C4B5] text-ink-secondary'
+                    : 'bg-muted text-ink-secondary'
                 }`}
               >
                 {idx + 1}
               </div>
-              {idx < 2 && <div className="w-16 h-1 bg-[#D4C4B5]" />}
+              {idx < 2 && <div className="w-16 h-1 bg-muted" />}
             </div>
           ))}
         </div>

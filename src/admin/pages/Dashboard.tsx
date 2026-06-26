@@ -156,7 +156,7 @@ export default function AdminDashboard() {
               View All
             </Link>
           </div>
-          <div className="divide-y divide-[#F5F0E8]">
+          <div className="divide-y divide-line">
             {recentOrders.length === 0 ? (
               <p className="p-6 text-sm text-ink-secondary text-center">No orders yet</p>
             ) : (
@@ -197,7 +197,7 @@ export default function AdminDashboard() {
               View All
             </Link>
           </div>
-          <div className="divide-y divide-[#F5F0E8]">
+          <div className="divide-y divide-line">
             {lowStockProducts.slice(0, 5).map((product) => (
               <div key={product.id} className="flex items-center gap-4 p-4">
                 <img src={product.images[0]} alt={product.name} className="w-12 h-12 object-cover rounded" />

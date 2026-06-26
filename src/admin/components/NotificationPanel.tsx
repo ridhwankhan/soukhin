@@ -68,7 +68,7 @@ export default function NotificationPanel() {
       >
         <Bell className="w-5 h-5 text-ink-secondary" />
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-[#C2704A] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-accent-soft text-white text-[10px] font-bold rounded-full flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -116,12 +116,12 @@ export default function NotificationPanel() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-ink truncate">{notification.title}</p>
                         <p className="text-xs text-ink-secondary line-clamp-2">{notification.body}</p>
-                        <p className="text-[10px] text-[#999999] mt-1">
+                        <p className="text-[10px] text-ink-muted mt-1">
                           {new Date(notification.createdAt).toLocaleString('en-GB')}
                         </p>
                       </div>
                       {notification.isUnread && (
-                        <span className="w-2 h-2 bg-[#C2704A] rounded-full mt-2 flex-shrink-0" />
+                        <span className="w-2 h-2 bg-accent-soft rounded-full mt-2 flex-shrink-0" />
                       )}
                     </div>
                   </button>

@@ -65,7 +65,7 @@ export function InventoryPage() {
                 <th className="text-right p-4 font-medium">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F5F0E8]">
+            <tbody className="divide-y divide-line">
               {lowStock.map((product) => (
                 <tr key={product.id} className="hover:bg-canvas">
                   <td className="p-4">
@@ -164,7 +164,7 @@ export function CustomersPage() {
                 <th className="text-left p-4 font-medium">Joined</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F5F0E8]">
+            <tbody className="divide-y divide-line">
               {customers.map((customer) => (
                 <tr key={customer.id} className="hover:bg-canvas">
                   <td className="p-4">
@@ -216,7 +216,7 @@ export function ReviewsPage() {
                 <th className="text-right p-4 font-medium">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F5F0E8]">
+            <tbody className="divide-y divide-line">
               {reviews.map((review) => (
                 <tr key={review.id} className="hover:bg-canvas">
                   <td className="p-4">
@@ -226,7 +226,7 @@ export function ReviewsPage() {
                   <td className="p-4">
                     <div className="flex gap-0.5">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'text-[#B8860B] fill-current' : 'text-gray-300'}`} />
+                        <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'text-accent-soft fill-current' : 'text-gray-300'}`} />
                       ))}
                     </div>
                   </td>
@@ -287,7 +287,7 @@ export function CouponsPage() {
                 <th className="text-left p-4 font-medium">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F5F0E8]">
+            <tbody className="divide-y divide-line">
               {coupons.map((coupon) => (
                 <tr key={coupon.id} className="hover:bg-canvas">
                   <td className="p-4 font-mono font-medium text-accent">{coupon.code}</td>
@@ -362,7 +362,7 @@ export function MessagesPage() {
                 <th className="text-right p-4 font-medium">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F5F0E8]">
+            <tbody className="divide-y divide-line">
               {messagesList.length === 0 && !loading && (
                 <tr><td colSpan={5} className="p-8 text-center text-sm text-ink-secondary">No messages yet</td></tr>
               )}
@@ -436,7 +436,7 @@ export function AuditLogPage() {
                 <th className="text-left p-4 font-medium">Details</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F5F0E8]">
+            <tbody className="divide-y divide-line">
               {auditLogs.map((log) => (
                 <tr key={log.id} className="hover:bg-canvas">
                   <td className="p-4 text-sm text-ink-secondary">

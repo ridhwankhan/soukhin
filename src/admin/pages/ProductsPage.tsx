@@ -135,7 +135,7 @@ export default function ProductsPage() {
                   <th className="text-right p-4 font-medium">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F5F0E8]">
+              <tbody className="divide-y divide-line">
                 {filteredProducts.map((product) => (
                   <motion.tr key={product.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-canvas">
                     <td className="p-4">

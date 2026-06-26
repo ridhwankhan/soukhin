@@ -178,7 +178,7 @@ export default function UsersPage() {
                 {canManage && <th className="text-right p-4 font-medium">Actions</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F5F0E8]">
+            <tbody className="divide-y divide-line">
               {staff.map((member) => (
                 <motion.tr key={member.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   <td className="p-4">

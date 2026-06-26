@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -31,14 +31,14 @@ import ContactPage from './pages/info/ContactPage';
 import FAQPage from './pages/info/FAQPage';
 import { ReturnExchangePage, PrivacyPage, TermsPage } from './pages/info/PolicyPages';
 
-// Admin
-import AdminLoginPage from './admin/pages/AdminLoginPage';
-import AdminLayout from './admin/AdminLayout';
-import AdminDashboard from './admin/pages/Dashboard';
-import OrdersPage from './admin/pages/OrdersPage';
-import ProductsPage from './admin/pages/ProductsPage';
-import UsersPage from './admin/pages/UsersPage';
-import {
+// Admin — lazy-loaded so storefront visitors don't download charts/admin bundles
+const AdminLoginPage = lazy(() => import('./admin/pages/AdminLoginPage'));
+const AdminLayout = lazy(() => import('./admin/AdminLayout'));
+const AdminDashboard = lazy(() => import('./admin/pages/Dashboard'));
+const OrdersPage = lazy(() => import('./admin/pages/OrdersPage'));
+const ProductsPage = lazy(() => import('./admin/pages/ProductsPage'));
+const UsersPage = lazy(() => import('./admin/pages/UsersPage'));
+const {
   InventoryPage,
   CategoriesPage,
   CustomersPage,
@@ -46,12 +46,32 @@ import {
   CouponsPage,
   MessagesPage,
   AuditLogPage,
-} from './admin/pages/OtherPages';
-import {
+} = {
+  InventoryPage: lazy(() => import('./admin/pages/OtherPages').then((m) => ({ default: m.InventoryPage }))),
+  CategoriesPage: lazy(() => import('./admin/pages/OtherPages').then((m) => ({ default: m.CategoriesPage }))),
+  CustomersPage: lazy(() => import('./admin/pages/OtherPages').then((m) => ({ default: m.CustomersPage }))),
+  ReviewsPage: lazy(() => import('./admin/pages/OtherPages').then((m) => ({ default: m.ReviewsPage }))),
+  CouponsPage: lazy(() => import('./admin/pages/OtherPages').then((m) => ({ default: m.CouponsPage }))),
+  MessagesPage: lazy(() => import('./admin/pages/OtherPages').then((m) => ({ default: m.MessagesPage }))),
+  AuditLogPage: lazy(() => import('./admin/pages/OtherPages').then((m) => ({ default: m.AuditLogPage }))),
+};
+const {
   PaymentSettingsPage,
   DeliverySettingsPage,
   StoreSettingsPage,
-} from './admin/pages/SettingsPages';
+} = {
+  PaymentSettingsPage: lazy(() => import('./admin/pages/SettingsPages').then((m) => ({ default: m.PaymentSettingsPage }))),
+  DeliverySettingsPage: lazy(() => import('./admin/pages/SettingsPages').then((m) => ({ default: m.DeliverySettingsPage }))),
+  StoreSettingsPage: lazy(() => import('./admin/pages/SettingsPages').then((m) => ({ default: m.StoreSettingsPage }))),
+};
+
+function RouteFallback() {
+  return (
+    <div className="min-h-[40vh] flex items-center justify-center bg-canvas">
+      <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
 
 function CustomerLayout({ children }: { children: React.ReactNode }) {
   const [cartOpen, setCartOpen] = useState(false);
@@ -86,6 +106,7 @@ function App() {
         <Router>
           <AuthProvider>
           <AdminAuthProvider>
+          <Suspense fallback={<RouteFallback />}>
           <Routes>
             {/* Customer Routes */}
             <Route path="/" element={
@@ -188,6 +209,7 @@ function App() {
               <Route path="audit-log" element={<AuditLogPage />} />
             </Route>
           </Routes>
+          </Suspense>
           </AdminAuthProvider>
           </AuthProvider>
         </Router>

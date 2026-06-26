@@ -49,7 +49,7 @@ export default function AdminLoginPage() {
       >
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-[#9A7535] flex items-center justify-center mx-auto mb-4">
+          <div className="w-12 h-12 bg-accent flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-serif text-xl font-bold leading-none">শ</span>
           </div>
           <h1 className="font-serif text-xl font-medium text-white mb-1">{BRAND_CONFIG.name} Admin</h1>

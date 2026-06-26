@@ -45,7 +45,7 @@ export default function ProfilePage() {
             </div>
             <button
               onClick={() => { logoutCustomer(); navigate('/'); }}
-              className="hidden md:flex items-center gap-1.5 text-sm text-[#B5603E] hover:underline font-medium"
+              className="hidden md:flex items-center gap-1.5 text-sm text-accent hover:underline font-medium"
             >
               <LogOut className="w-3.5 h-3.5" />
               Sign out
@@ -267,7 +267,7 @@ function SettingsTab({ customer, updateCustomer, onLogout }: {
         <h2 className="text-sm font-semibold text-ink mb-4">Session</h2>
         <button
           onClick={onLogout}
-          className="flex items-center gap-2 px-4 py-2.5 border border-[#B5603E] text-sm font-medium text-[#B5603E] hover:bg-[#B5603E] hover:text-white transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 border border-accent text-sm font-medium text-accent hover:bg-accent-soft hover:text-white transition-colors"
         >
           <LogOut className="w-3.5 h-3.5" />
           Sign out of your account

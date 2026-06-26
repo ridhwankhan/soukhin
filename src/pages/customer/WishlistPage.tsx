@@ -27,7 +27,7 @@ export default function WishlistPage() {
             {items.length > 0 && (
               <button
                 onClick={clearWishlist}
-                className="flex items-center gap-1.5 text-sm text-[#B5603E] hover:underline font-medium"
+                className="flex items-center gap-1.5 text-sm text-accent hover:underline font-medium"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 Clear all

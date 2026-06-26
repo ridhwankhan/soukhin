@@ -4,28 +4,30 @@
 
 @layer base {
   :root {
-    /* Light — Color Hunt warm cream palette */
-    --color-canvas: #F9F8F6;
-    --color-surface: #EFE9E3;
+    /* Light — rose & cream palette */
+    --color-canvas: #FCF5EE;
+    --color-surface: #FFC4C4;
     --color-elevated: #FFFFFF;
-    --color-muted: #D9CFC7;
-    --color-accent: #C9B59C;
-    --color-accent-hover: #B8A38A;
-    --color-accent-fg: #222831;
-    --color-ink: #2A2622;
-    --color-ink-secondary: #5C534C;
-    --color-ink-muted: #8A7F76;
-    --color-border: #D9CFC7;
-    --color-footer: #393E46;
-    --color-footer-fg: #EEEEEE;
-    --color-announcement: #C9B59C;
-    --color-announcement-fg: #222831;
-    --color-scrollbar: #D9CFC7;
-    --color-scrollbar-hover: #C9B59C;
+    --color-muted: #FFD9D9;
+    --color-accent: #850E35;
+    --color-accent-hover: #6F0B2C;
+    --color-accent-fg: #FFFFFF;
+    --color-accent-soft: #EE6983;
+    --color-heading: #850E35;
+    --color-ink: #3A2E31;
+    --color-ink-secondary: #6E5A5F;
+    --color-ink-muted: #6E5A5F;
+    --color-border: rgba(133, 14, 53, 0.12);
+    --color-footer: #850E35;
+    --color-footer-fg: #FFF0F3;
+    --color-announcement: #850E35;
+    --color-announcement-fg: #FFFFFF;
+    --color-scrollbar: #EAD3CC;
+    --color-scrollbar-hover: #EE6983;
   }
 
   html.dark {
-    /* Dark — teal accent palette */
+    /* Dark — teal accent palette (unchanged) */
     --color-canvas: #222831;
     --color-surface: #393E46;
     --color-elevated: #393E46;
@@ -33,9 +35,11 @@
     --color-accent: #00ADB5;
     --color-accent-hover: #00C4CD;
     --color-accent-fg: #EEEEEE;
+    --color-accent-soft: #00C4CD;
+    --color-heading: #EEEEEE;
     --color-ink: #EEEEEE;
     --color-ink-secondary: #CCCCCC;
-    --color-ink-muted: #999999;
+    --color-ink-muted: #B0B0B0;
     --color-border: #4A5058;
     --color-footer: #222831;
     --color-footer-fg: #EEEEEE;
@@ -86,15 +90,15 @@
 
   h1, h2, h3, h4, h5, h6 {
     line-height: 1.2;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: -0.01em;
-    color: var(--color-ink);
+    /* color inherited so headings stay readable on both light sections and dark banners */
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium tracking-wide transition-all duration-200 active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold tracking-wide transition-all duration-200 active:scale-[0.98];
     background-color: var(--color-accent);
     color: var(--color-accent-fg);
   }
@@ -104,7 +108,7 @@
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 border text-sm font-medium tracking-wide transition-all duration-200 active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 border text-sm font-semibold tracking-wide transition-all duration-200 active:scale-[0.98];
     border-color: var(--color-accent);
     color: var(--color-accent);
   }
@@ -115,12 +119,13 @@
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-colors duration-150;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold transition-colors duration-150;
     color: var(--color-accent);
   }
 
   .btn-ghost:hover {
     background-color: var(--color-surface);
+    color: var(--color-accent);
   }
 
   .section-heading {

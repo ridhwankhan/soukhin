@@ -167,7 +167,7 @@ export default function CategoryRevenueChart() {
       ) : (
         <ResponsiveContainer width="100%" height={320}>
           <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#F5F0E8" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
             <XAxis dataKey="name" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `৳${(v / 1000).toFixed(0)}k`} />
             <Tooltip
@@ -178,7 +178,7 @@ export default function CategoryRevenueChart() {
             />
             <Legend />
             <Bar dataKey="revenue" name="Revenue (৳)" fill="var(--color-accent)" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="orders" name="Orders" fill="#B8860B" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="orders" name="Orders" fill="var(--color-accent-soft)" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       )}

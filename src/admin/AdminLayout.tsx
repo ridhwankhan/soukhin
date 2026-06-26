@@ -156,7 +156,7 @@ export default function AdminLayout() {
         <div className="flex items-center justify-between p-4 border-b border-white/10">
           {sidebarOpen && (
             <Link to="/admin" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-[#B8860B] rounded-sm flex items-center justify-center">
+              <div className="w-8 h-8 bg-accent rounded-sm flex items-center justify-center">
                 <span className="text-white font-serif font-bold">শ</span>
               </div>
               <span className="font-semibold">Soukhin Admin</span>
@@ -185,7 +185,7 @@ export default function AdminLayout() {
                 <div key={item.label}>
                   <button
                     onClick={() => toggleExpand(item.label)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-muted transition-colors ${
+                    className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors ${
                       sidebarOpen ? '' : 'justify-center'
                     }`}
                   >
@@ -207,8 +207,8 @@ export default function AdminLayout() {
                         <Link
                           key={child.href}
                           to={child.href}
-                          className={`block py-2 text-sm hover:text-[#B8860B] transition-colors ${
-                            location.pathname === child.href ? 'text-[#B8860B]' : 'text-white/70'
+                          className={`block py-2 text-sm hover:text-accent-soft transition-colors ${
+                            location.pathname === child.href ? 'text-accent-soft' : 'text-white/70'
                           }`}
                         >
                           {child.label}
@@ -224,8 +224,8 @@ export default function AdminLayout() {
               <Link
                 key={item.href}
                 to={item.href!}
-                className={`flex items-center gap-3 px-4 py-3 hover:bg-muted transition-colors ${
-                  isActive ? 'bg-elevated/10 border-r-2 border-[#B8860B]' : ''
+                className={`flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors ${
+                  isActive ? 'bg-white/10 border-r-2 border-accent-soft' : ''
                 } ${sidebarOpen ? '' : 'justify-center'}`}
                 title={!sidebarOpen ? item.label : undefined}
               >
@@ -289,7 +289,7 @@ export default function AdminLayout() {
                       </Link>
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-sm text-[#C2704A] hover:bg-surface"
+                        className="w-full text-left px-4 py-2 text-sm text-accent font-medium hover:bg-surface"
                       >
                         Sign Out
                       </button>

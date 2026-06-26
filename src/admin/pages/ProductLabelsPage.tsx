@@ -8,8 +8,8 @@ const ALL_BADGES: ProductBadge[] = ['new', 'eid-collection', 'best-seller', 'pre
 
 const BADGE_COLORS: Record<ProductBadge, string> = {
   'new': 'bg-accent text-white',
-  'eid-collection': 'bg-[#9A7535] text-white',
-  'best-seller': 'bg-[#B5603E] text-white',
+  'eid-collection': 'bg-accent text-white',
+  'best-seller': 'bg-accent-soft text-white',
   'pre-order': 'bg-[#5A4A6A] text-white',
   'featured': 'bg-[#1A5276] text-white',
   'sale': 'bg-red-600 text-white',
@@ -140,7 +140,7 @@ export default function ProductLabelsPage() {
 
         {filtered.length === 0 && (
           <div className="bg-elevated border border-line py-12 text-center">
-            <Tag className="w-7 h-7 text-[#D4C4B5] mx-auto mb-3" />
+            <Tag className="w-7 h-7 text-ink-muted mx-auto mb-3" />
             <p className="text-sm text-ink-muted">No products match your search.</p>
           </div>
         )}

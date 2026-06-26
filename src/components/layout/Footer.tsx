@@ -158,7 +158,7 @@ export default function Footer() {
         <div className="border-t border-white/5">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-center gap-1.5 text-xs text-white/40">
             <span>Made with</span>
-            <Heart className="w-3.5 h-3.5 text-[#C2704A] fill-[#C2704A]/30" aria-hidden />
+            <Heart className="w-3.5 h-3.5 text-accent-soft fill-accent-soft/30" aria-hidden />
             <span>by</span>
             <a
               href={developerMailto}

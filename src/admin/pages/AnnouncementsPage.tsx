@@ -6,15 +6,15 @@ import { Announcement } from '../../types';
 
 const BG_OPTIONS: { value: Announcement['bgColor']; label: string; preview: string }[] = [
   { value: 'green', label: 'Forest Green', preview: 'bg-accent' },
-  { value: 'gold', label: 'Gold', preview: 'bg-[#9A7535]' },
-  { value: 'terracotta', label: 'Terracotta', preview: 'bg-[#B5603E]' },
+  { value: 'gold', label: 'Gold', preview: 'bg-accent' },
+  { value: 'terracotta', label: 'Terracotta', preview: 'bg-accent-soft' },
   { value: 'dark', label: 'Ink', preview: 'bg-[#1A1A1A]' },
 ];
 
 const bgClass = (color: Announcement['bgColor']) => ({
   green: 'bg-accent',
-  gold: 'bg-[#9A7535]',
-  terracotta: 'bg-[#B5603E]',
+  gold: 'bg-accent',
+  terracotta: 'bg-accent-soft',
   dark: 'bg-[#1A1A1A]',
 }[color]);
 
@@ -98,7 +98,7 @@ export default function AnnouncementsPage() {
       <div className="bg-elevated border border-line overflow-hidden">
         {announcements.length === 0 ? (
           <div className="py-16 text-center">
-            <Megaphone className="w-8 h-8 text-[#D4C4B5] mx-auto mb-3" />
+            <Megaphone className="w-8 h-8 text-ink-muted mx-auto mb-3" />
             <p className="text-sm text-ink-muted">No announcements yet. Add one to get started.</p>
           </div>
         ) : (
@@ -145,7 +145,7 @@ export default function AnnouncementsPage() {
                       <button onClick={() => openEdit(a)} className="p-1.5 text-ink-muted hover:text-accent transition-colors">
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => setConfirmDelete(a.id)} className="p-1.5 text-ink-muted hover:text-[#B5603E] transition-colors">
+                      <button onClick={() => setConfirmDelete(a.id)} className="p-1.5 text-ink-muted hover:text-accent transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -251,7 +251,7 @@ export default function AnnouncementsPage() {
                     <button
                       type="button"
                       onClick={() => setField('isActive', !drawer.data.isActive)}
-                      className={`relative w-10 h-5 rounded-full transition-colors ${drawer.data.isActive ? 'bg-accent' : 'bg-[#D4C4B5]'}`}
+                      className={`relative w-10 h-5 rounded-full transition-colors ${drawer.data.isActive ? 'bg-accent' : 'bg-muted'}`}
                     >
                       <div className={`absolute top-0.5 left-0.5 w-4 h-4 bg-elevated rounded-full shadow transition-transform ${drawer.data.isActive ? 'translate-x-5' : ''}`} />
                     </button>
@@ -307,7 +307,7 @@ export default function AnnouncementsPage() {
                 </button>
                 <button
                   onClick={() => { deleteAnnouncement(confirmDelete); setConfirmDelete(null); }}
-                  className="flex-1 py-2.5 bg-[#B5603E] text-white text-sm font-medium hover:bg-[#9A4F33] transition-colors"
+                  className="flex-1 py-2.5 bg-accent-soft text-white text-sm font-medium hover:bg-accent-hover transition-colors"
                 >
                   Delete
                 </button>

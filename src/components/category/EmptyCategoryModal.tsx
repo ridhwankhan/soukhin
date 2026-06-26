@@ -26,12 +26,12 @@ export default function EmptyCategoryModal({
           {categoryName} — Coming Soon
         </h2>
         {categoryNameBn && (
-          <p className="text-sm text-[#B8860B] mb-3">{categoryNameBn}</p>
+          <p className="text-sm text-accent mb-3 font-medium">{categoryNameBn}</p>
         )}
         <p className="text-ink-secondary text-sm leading-relaxed mb-6">
           We are curating beautiful products for this category. Check back soon — new items will be added regularly.
         </p>
-        <div className="flex items-center justify-center gap-2 text-xs text-[#999999] mb-6">
+        <div className="flex items-center justify-center gap-2 text-xs text-ink-muted mb-6">
           <Sparkles className="w-4 h-4" />
           <span>Fresh collections on the way</span>
         </div>

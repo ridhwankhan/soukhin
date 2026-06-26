@@ -69,7 +69,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             <div className="flex-1 overflow-y-auto p-4">
               {items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
-                  <ShoppingBag className="w-16 h-16 text-[#D4C4B5] mb-4" />
+                  <ShoppingBag className="w-16 h-16 text-ink-muted mb-4" />
                   <p className="text-ink-secondary mb-4">Your cart is empty</p>
                   <Button onClick={onClose}>Continue Shopping</Button>
                 </div>
@@ -116,7 +116,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       </div>
                       <button
                         onClick={() => removeItem(item.product.id)}
-                        className="p-2 text-ink-secondary hover:text-[#C2704A] transition-colors"
+                        className="p-2 text-ink-secondary hover:text-accent-soft transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

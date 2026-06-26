@@ -67,7 +67,7 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
 
       <div className="space-y-6">
         <div>
-          <p className="text-sm text-[#B8860B] uppercase tracking-wide mb-2">
+          <p className="text-sm text-accent uppercase tracking-wide mb-2 font-semibold">
             {product.category.replace('-', ' ')}
           </p>
           <h2 className="text-2xl md:text-3xl font-semibold text-ink font-serif">{product.name}</h2>
@@ -79,7 +79,7 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
           {hasDiscount && (
             <>
               <span className="text-xl text-ink-secondary line-through">{BRAND_CONFIG.currency.symbol}{product.price.toLocaleString()}</span>
-              <span className="px-2 py-1 bg-[#C2704A] text-white text-sm rounded-sm">
+              <span className="px-2 py-1 bg-accent-soft text-white text-sm rounded-sm">
                 {Math.round((1 - product.salePrice! / product.price) * 100)}% off
               </span>
             </>
@@ -161,8 +161,8 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
             onClick={() => toggleItem(product)}
             className={`p-3 rounded-sm border transition-colors ${
               isWishlisted
-                ? 'border-[#C2704A] bg-[#C2704A] text-white'
-                : 'border-line hover:border-[#C2704A]'
+                ? 'border-accent-soft bg-accent-soft text-white'
+                : 'border-line hover:border-accent-soft'
             }`}
           >
             <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
@@ -179,8 +179,8 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
             <span>{product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}</span>
           </div>
           {product.foodNote && (
-            <div className="flex items-center gap-3 text-sm text-[#C2704A]">
-              <Leaf className="w-4 h-4" />
+            <div className="flex items-center gap-3 text-sm text-ink-secondary">
+              <Leaf className="w-4 h-4 text-accent" />
               <span>{product.foodNote}</span>
             </div>
           )}

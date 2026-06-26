@@ -38,7 +38,7 @@ const ProductCard = memo(function ProductCard({ product, onClick }: ProductCardP
           loading="lazy"
         />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-[#D4C4B5] text-sm">No image</div>
+          <div className="w-full h-full flex items-center justify-center text-ink-muted text-sm">No image</div>
         )}
 
         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
@@ -50,7 +50,7 @@ const ProductCard = memo(function ProductCard({ product, onClick }: ProductCardP
         <button
           onClick={(e) => { e.stopPropagation(); toggleItem(product); }}
           className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-200 ${
-            isWishlisted ? 'bg-[#C2704A] text-white' : 'bg-elevated/90 text-ink-secondary hover:bg-[#C2704A] hover:text-white'
+            isWishlisted ? 'bg-accent-soft text-white' : 'bg-elevated/90 text-ink-secondary hover:bg-accent-soft hover:text-white'
           }`}
         >
           <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
@@ -82,10 +82,10 @@ const ProductCard = memo(function ProductCard({ product, onClick }: ProductCardP
       </div>
 
       <div className="p-4">
-        <p className="text-xs text-[#B8860B] uppercase tracking-wide mb-1">
+        <p className="text-xs text-accent uppercase tracking-wide mb-1 font-semibold">
           {product.category.replace('-', ' ')}
         </p>
-        <h3 className="font-medium text-ink mb-1 line-clamp-1 group-hover:text-accent transition-colors">
+        <h3 className="font-semibold text-ink mb-1 line-clamp-1 group-hover:text-accent transition-colors">
           {product.name}
         </h3>
         <p className="text-xs text-ink-secondary mb-2">{product.nameBn}</p>

@@ -43,7 +43,7 @@ export default function OrderHistoryPage() {
           <div className="text-center py-12 text-ink-secondary">Loading orders...</div>
         ) : orders.length === 0 ? (
           <div className="text-center py-12 bg-elevated rounded-lg shadow-sm">
-            <Package className="w-12 h-12 text-[#D4C4B5] mx-auto mb-4" />
+            <Package className="w-12 h-12 text-ink-muted mx-auto mb-4" />
             <p className="text-ink-secondary mb-4">You haven't placed any orders yet.</p>
             <Link to="/"><Button>Start Shopping</Button></Link>
           </div>
@@ -73,7 +73,7 @@ export default function OrderHistoryPage() {
                         {order.status.replace(/-/g, ' ')}
                       </span>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-[#999999] group-hover:text-accent" />
+                    <ChevronRight className="w-5 h-5 text-ink-muted group-hover:text-accent" />
                   </div>
                 </Link>
               </motion.div>

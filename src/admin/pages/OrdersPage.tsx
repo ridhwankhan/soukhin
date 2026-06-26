@@ -136,7 +136,7 @@ export default function OrdersPage() {
                 <th className="text-right p-4 font-medium">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F5F0E8]">
+            <tbody className="divide-y divide-line">
               {filteredOrders.map((order) => (
                 <motion.tr
                   key={order.id}
