@@ -24,11 +24,14 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
   const { user, profile, isEmailVerified } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const isHome = location.pathname === '/';
+
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 12);
     };
-    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -58,10 +61,14 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
     return NAV_DROPDOWNS[key as keyof typeof NAV_DROPDOWNS];
   };
 
+  const headerSurface = scrolled
+    ? 'bg-white/95 backdrop-blur-md shadow-md border-b border-[#1B4332]/5'
+    : isHome
+    ? 'bg-[#F9F7F4]/80 backdrop-blur-xl border-b border-white/50 shadow-sm'
+    : 'bg-white/90 backdrop-blur-md shadow-sm';
+
   return (
-    <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-      scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'
-    }`}>
+    <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 supports-[backdrop-filter]:backdrop-blur-xl ${headerSurface}`}>
       {/* Announcement bar */}
       <div className="bg-[#1B4332] text-white text-center py-2 text-sm">
         <span>Free delivery on orders over ৳2000 | Use code: SOUKHIN10</span>

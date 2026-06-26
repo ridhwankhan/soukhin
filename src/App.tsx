@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -55,6 +55,8 @@ import {
 function CustomerLayout({ children }: { children: React.ReactNode }) {
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const location = useLocation();
+  const isHome = location.pathname === '/';
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -63,7 +65,7 @@ function CustomerLayout({ children }: { children: React.ReactNode }) {
         searchOpen={searchOpen}
         onSearchToggle={() => setSearchOpen(!searchOpen)}
       />
-      <main className="flex-1 pt-[88px] md:pt-[108px]">
+      <main className={`flex-1 ${isHome ? 'pt-[72px] md:pt-[88px]' : 'pt-[88px] md:pt-[108px]'}`}>
         <CartResumeHandler onOpenCart={() => setCartOpen(true)} />
         {children}
       </main>

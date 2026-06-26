@@ -6,52 +6,56 @@ const HERO_IMAGE = '/images/hero.png';
 
 export default function HeroSection() {
   return (
-    <section className="relative w-full overflow-hidden bg-[#F9F7F4]">
-      {/* Full-width brand hero image */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        className="relative w-full"
-      >
-        <img
-          src={HERO_IMAGE}
-          alt="Soukhin — premium Bangladeshi lifestyle collection"
-          className="w-full h-auto max-h-[85vh] object-cover object-center"
-          loading="eager"
-          fetchPriority="high"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1B4332]/50 via-transparent to-transparent pointer-events-none" />
-      </motion.div>
-
-      {/* CTA overlay */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 px-4 sm:px-8 pb-8 sm:pb-12">
+    <section className="relative w-full bg-[#F9F7F4]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        {/* Padded frame — image keeps full aspect ratio, never stretched/cropped */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6"
+          transition={{ duration: 0.7 }}
+          className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-[#EDE8E0] shadow-[0_8px_40px_rgba(27,67,50,0.08)] ring-1 ring-[#1B4332]/5"
         >
-          <div className="text-white drop-shadow-md max-w-lg">
-            <p className="text-xs font-semibold tracking-[0.18em] uppercase text-[#E8D5A3] mb-2">
+          <img
+            src={HERO_IMAGE}
+            alt="Soukhin — premium Bangladeshi lifestyle collection"
+            className="block w-full h-auto max-h-[min(72vh,820px)] object-contain object-center mx-auto"
+            loading="eager"
+            fetchPriority="high"
+            width={1920}
+            height={1080}
+          />
+        </motion.div>
+
+        {/* CTAs below the image — branding stays visible in the photo */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mt-6 sm:mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5"
+        >
+          <div className="max-w-xl">
+            <p className="text-xs font-semibold tracking-[0.18em] uppercase text-[#9A7535] mb-2">
               Bangladeshi Craftsmanship
             </p>
-            <h1 className="font-serif text-3xl sm:text-4xl font-medium leading-tight">
-              Tasteful Living, <span className="italic">Delivered.</span>
+            <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-medium text-[#1A1A1A] leading-tight">
+              Tasteful Living, <span className="italic text-[#1B4332]">Delivered.</span>
             </h1>
+            <p className="mt-2 text-sm sm:text-base text-[#666666]">
+              Wearables, pitha, jewelry & gifts — curated with care.
+            </p>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 shrink-0">
             <Link
               to="/category/wearables"
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-white text-[#1B4332] text-sm font-medium tracking-wide hover:bg-[#F5F0E8] transition-colors group shadow-lg"
+              className="inline-flex items-center gap-2 px-7 py-3.5 bg-[#1B4332] text-white text-sm font-medium tracking-wide hover:bg-[#163828] transition-colors group shadow-md"
             >
               Shop Collection
               <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <Link
               to="/category/new-arrivals"
-              className="inline-flex items-center gap-2 px-7 py-3.5 border-2 border-white/90 text-white text-sm font-medium tracking-wide hover:bg-white/10 transition-colors"
+              className="inline-flex items-center gap-2 px-7 py-3.5 border border-[#1B4332]/30 text-[#1B4332] text-sm font-medium tracking-wide hover:bg-[#1B4332]/5 transition-colors"
             >
               New Arrivals
             </Link>
