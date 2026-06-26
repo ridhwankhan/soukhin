@@ -2,9 +2,29 @@
 
 [![Repository](https://img.shields.io/badge/GitHub-ridhwankhan%2Fsoukhin-1B4332?style=flat-square&logo=github)](https://github.com/ridhwankhan/soukhin)
 
-Production-ready storefront and admin dashboard for a Bangladeshi lifestyle brand. Built with **React**, **TypeScript**, **Tailwind CSS**, **Supabase**, and **Three.js**.
+> **New to deploying?** Read **[DEPLOY_FROM_ZERO.md](./DEPLOY_FROM_ZERO.md)** — click-by-click guide (Supabase + Vercel, free).
 
-**Live stack (100% free tier to start):** Vercel (hosting) + Supabase (database, auth, storage, edge functions)
+Production-ready storefront and admin dashboard. **React + Vite + Supabase + Vercel.**
+
+**Your Supabase project:** `https://yxctdtihkmslpidscfph.supabase.co`
+
+---
+
+## Deploy in 3 steps (summary)
+
+1. **Supabase** — SQL Editor → paste all of [`supabase/ONE_CLICK_DATABASE_SETUP.sql`](./supabase/ONE_CLICK_DATABASE_SETUP.sql) → **RUN** → create user in Authentication  
+2. **Vercel** — import [github.com/ridhwankhan/soukhin](https://github.com/ridhwankhan/soukhin) → add env vars → Deploy  
+3. **Test** — open `https://your-app.vercel.app/admin/login`
+
+Full details: **[DEPLOY_FROM_ZERO.md](./DEPLOY_FROM_ZERO.md)**
+
+### Vercel environment variables (use `VITE_` not `NEXT_PUBLIC_`)
+
+| Variable | Example |
+|----------|---------|
+| `VITE_SUPABASE_URL` | `https://yxctdtihkmslpidscfph.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | `sb_publishable_...` from Supabase → Settings → API |
+| `VITE_SITE_URL` | `https://your-app.vercel.app` |
 
 ---
 

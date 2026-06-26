@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "load-test": "node scripts/load-test.mjs"
+    "load-test": "node scripts/load-test.mjs",
+    "build-sql": "node scripts/build-one-click-sql.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",
