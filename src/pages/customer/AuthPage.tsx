@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, CheckCircle } from 'lucide-react';
@@ -19,12 +19,13 @@ export default function AuthPage() {
   const justVerified = searchParams.get('verified') === '1';
 
   const { user, profile, loading, isEmailVerified, signIn, signUp, resendVerificationEmail } = useAuth();
-  const { admin, loading: adminLoading, refreshAdmin } = useAdminAuth();
+  const { admin, loading: adminLoading, setAdminProfile } = useAdminAuth();
 
   const [activeMode, setActiveMode] = useState<AuthMode>(mode);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const loginHandledRef = useRef(false);
 
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [registerForm, setRegisterForm] = useState({
@@ -40,25 +41,26 @@ export default function AuthPage() {
     setActiveMode(mode);
   }, [mode]);
 
+  // Redirect already-signed-in visitors (not during an active login submit)
   useEffect(() => {
-    if (loading || adminLoading) return;
-
-    if (!user) return;
-
-    if (!isEmailVerified) {
-      setActiveMode('verify');
+    if (loading || adminLoading || submitting || loginHandledRef.current) return;
+    if (!user || !isEmailVerified) {
+      if (user && !isEmailVerified) setActiveMode('verify');
       return;
     }
 
     const safeReturn = returnTo.startsWith('/') ? returnTo : '/';
 
-    // Staff — wait until admin profile is resolved before routing
     if (admin) {
       navigate(getStaffPostLoginPath(admin.role, safeReturn), { replace: true });
       return;
     }
 
-    // Customer (not staff)
+    // Signed in but staff profile not ready — never bounce to /admin (prevents redirect loop)
+    if (safeReturn.startsWith('/admin')) {
+      return;
+    }
+
     if (profile) {
       navigate(safeReturn, { replace: true });
       return;
@@ -67,7 +69,7 @@ export default function AuthPage() {
     if (activeMode !== 'register') {
       navigate(safeReturn === '/' ? '/account' : safeReturn, { replace: true });
     }
-  }, [loading, adminLoading, user, isEmailVerified, profile, admin, navigate, returnTo, activeMode]);
+  }, [loading, adminLoading, submitting, user, isEmailVerified, profile, admin, navigate, returnTo, activeMode]);
 
   useEffect(() => {
     if (justVerified) {
@@ -81,23 +83,29 @@ export default function AuthPage() {
     setError('');
     setSuccess('');
     setSubmitting(true);
+    loginHandledRef.current = true;
 
     const result = await signIn(loginForm.email, loginForm.password);
     setSubmitting(false);
 
     if (result.error) {
+      loginHandledRef.current = false;
       setError(result.error);
       return;
     }
 
+    const safeReturn = returnTo.startsWith('/') ? returnTo : '/';
+
     if (result.isStaff && result.staffRole) {
-      await refreshAdmin();
-      const safeReturn = returnTo.startsWith('/') ? returnTo : '/';
-      navigate(getStaffPostLoginPath(result.staffRole, safeReturn), { replace: true });
+      if (result.adminProfile) {
+        setAdminProfile(result.adminProfile);
+      }
+      const dest = getStaffPostLoginPath(result.staffRole, safeReturn);
+      navigate(dest, { replace: true });
       return;
     }
 
-    navigate(returnTo.startsWith('/') ? returnTo : '/', { replace: true });
+    navigate(safeReturn, { replace: true });
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -147,7 +155,7 @@ export default function AuthPage() {
     setSuccess('Verification email sent. Please check your inbox.');
   };
 
-  if (loading || adminLoading) {
+  if (loading && !user) {
     return (
       <div className="min-h-screen bg-canvas flex items-center justify-center">
         <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin" />

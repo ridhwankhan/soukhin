@@ -27,6 +27,7 @@ interface AdminAuthContextType {
   signOut: () => Promise<void>;
   can: (permission: Permission) => boolean;
   refreshAdmin: () => Promise<void>;
+  setAdminProfile: (profile: AdminUser | null) => void;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
@@ -44,6 +45,10 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     const profile = await withTimeout(fetchMyAdminProfile(), 12_000, null);
     setAdmin(profile);
     return profile;
+  }, []);
+
+  const setAdminProfile = useCallback((profile: AdminUser | null) => {
+    setAdmin(profile);
   }, []);
 
   useEffect(() => {
@@ -78,6 +83,16 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       setUser(nextSession?.user ?? null);
 
       if (event === 'INITIAL_SESSION') return;
+
+      if (event === 'SIGNED_IN' && nextSession?.user) {
+        setLoading(true);
+        window.setTimeout(() => {
+          void loadAdmin().finally(() => {
+            if (mounted) setLoading(false);
+          });
+        }, 0);
+        return;
+      }
 
       if (nextSession?.user) {
         window.setTimeout(() => {
@@ -162,8 +177,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       signOut,
       can,
       refreshAdmin: async () => { await loadAdmin(); },
+      setAdminProfile,
     }),
-    [user, session, admin, loading, signIn, signOut, can, loadAdmin]
+    [user, session, admin, loading, signIn, signOut, can, loadAdmin, setAdminProfile]
   );
 
   return (

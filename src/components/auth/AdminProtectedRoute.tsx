@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import { Permission } from '../../types';
 import { getUnifiedLoginPath } from '../../lib/staffAuth';
@@ -9,10 +11,33 @@ interface AdminProtectedRouteProps {
 }
 
 export default function AdminProtectedRoute({ children, permission }: AdminProtectedRouteProps) {
-  const { admin, loading, can } = useAdminAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { admin, loading: adminLoading, refreshAdmin, can } = useAdminAuth();
   const location = useLocation();
+  const [staffCheckDone, setStaffCheckDone] = useState(false);
 
-  if (loading) {
+  useEffect(() => {
+    if (authLoading || adminLoading) return;
+
+    if (admin || !user) {
+      setStaffCheckDone(true);
+      return;
+    }
+
+    let mounted = true;
+    setStaffCheckDone(false);
+    void refreshAdmin().finally(() => {
+      if (mounted) setStaffCheckDone(true);
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, [admin, user, authLoading, adminLoading, refreshAdmin]);
+
+  const verifying = authLoading || adminLoading || (Boolean(user) && !admin && !staffCheckDone);
+
+  if (verifying) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-canvas">
         <div className="text-center">
@@ -23,8 +48,12 @@ export default function AdminProtectedRoute({ children, permission }: AdminProte
     );
   }
 
-  if (!admin) {
+  if (!user) {
     return <Navigate to={getUnifiedLoginPath(location.pathname)} replace />;
+  }
+
+  if (!admin) {
+    return <Navigate to="/account" replace />;
   }
 
   if (permission && !can(permission)) {

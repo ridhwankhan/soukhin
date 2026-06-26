@@ -19,14 +19,13 @@ import {
 } from '../lib/customerService';
 import { consumePendingAction, consumeReturnPath, PendingAction, savePendingAction } from '../lib/pendingAction';
 import { checkStaffEmail, fetchMyAdminProfile } from '../lib/adminService';
-import { canStaffUseStorefront } from '../lib/staffAuth';
 import { isValidEmail, isValidPhone, normalizePhone } from '../lib/validators';
 import { checkClientRateLimit, formatRetryAfter } from '../lib/rateLimit';
 import { clearSessionMarkers, touchSession } from '../lib/sessionManager';
 import { withTimeout } from '../lib/asyncUtils';
 import { useSessionManager } from '../hooks/useSessionManager';
 import SessionTimeoutWarning from '../components/auth/SessionTimeoutWarning';
-import { AdminRole } from '../types';
+import { AdminRole, AdminUser } from '../types';
 
 interface SignUpInput {
   name: string;
@@ -43,7 +42,7 @@ interface AuthContextType {
   loading: boolean;
   profileLoading: boolean;
   isEmailVerified: boolean;
-  signIn: (email: string, password: string) => Promise<{ error?: string; isStaff?: boolean; staffRole?: AdminRole }>;
+  signIn: (email: string, password: string) => Promise<{ error?: string; isStaff?: boolean; staffRole?: AdminRole; adminProfile?: AdminUser }>;
   signUp: (input: SignUpInput) => Promise<{ error?: string; needsEmailVerification?: boolean }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -121,23 +120,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const completeAuthFlow = useCallback(
     async (authUser: User) => {
-      const adminProfile = await fetchMyAdminProfile();
-
-      if (adminProfile && !canStaffUseStorefront(adminProfile.role)) {
-        navigate('/admin', { replace: true });
-        return;
-      }
-
       await loadProfile(authUser);
       const pending = consumePendingAction();
       if (pending) {
         handlePendingAction(pending);
-        return;
       }
-
-      // Storefront-capable staff stay on the current page; AuthPage handles their redirect.
     },
-    [handlePendingAction, loadProfile, navigate]
+    [handlePendingAction, loadProfile]
   );
 
   useEffect(() => {
@@ -261,7 +250,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await supabase.auth.signOut();
         return { error: 'Your staff account is not active. Contact the store owner.' };
       }
-      return { isStaff: true, staffRole: admin.role };
+      return { isStaff: true, staffRole: admin.role, adminProfile: admin };
     }
 
     return {};
