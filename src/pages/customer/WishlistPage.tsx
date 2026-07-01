@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, Trash2 } from 'lucide-react';
 import ProductCard from '../../components/product/ProductCard';
-import { useWishlist } from '../../context/WishlistContext';
+import { useWishlist, WISHLIST_MAX_ITEMS } from '../../context/WishlistContext';
 
 export default function WishlistPage() {
-  const { items, clearWishlist } = useWishlist();
+  const { items, removeItem, clearWishlist, limitMessage, clearLimitMessage } = useWishlist();
 
   return (
     <div className="min-h-screen bg-elevated">
@@ -22,7 +22,9 @@ export default function WishlistPage() {
               <h1 className="font-serif text-3xl md:text-4xl font-medium text-ink tracking-tight">
                 Wishlist
               </h1>
-              <p className="text-ink-muted text-sm mt-1">{items.length} saved {items.length === 1 ? 'item' : 'items'}</p>
+              <p className="text-ink-muted text-sm mt-1">
+                {items.length} of {WISHLIST_MAX_ITEMS} saved {items.length === 1 ? 'item' : 'items'}
+              </p>
             </div>
             {items.length > 0 && (
               <button
@@ -38,6 +40,14 @@ export default function WishlistPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        {limitMessage && (
+          <div className="mb-6 flex items-center justify-between gap-4 rounded-sm border border-accent/30 bg-accent/5 px-4 py-3 text-sm text-ink">
+            <span>{limitMessage}</span>
+            <button type="button" onClick={clearLimitMessage} className="text-accent font-medium hover:underline shrink-0">
+              Dismiss
+            </button>
+          </div>
+        )}
         {items.length === 0 ? (
           <div className="py-24 text-center">
             <div className="w-16 h-16 border-2 border-line flex items-center justify-center mx-auto mb-5">
@@ -58,7 +68,10 @@ export default function WishlistPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, delay: index * 0.05 }}
               >
-                <ProductCard product={product} />
+                <ProductCard
+                  product={product}
+                  onRemove={() => removeItem(product.id)}
+                />
               </motion.div>
             ))}
           </div>

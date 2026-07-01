@@ -58,7 +58,7 @@ export const NAV_LINKS = [
   { href: '/category/home-living', label: 'Home & Living', labelBn: 'ঘর ও জীবনযাত্রা', hasDropdown: true },
   { href: '/category/food-pitha', label: 'Food & Pitha', labelBn: 'খাবার ও পিঠা' },
   { href: '/category/jewelry', label: 'Jewelry', labelBn: 'গয়না', hasDropdown: true },
-  { href: '/category/gifts', label: 'Gifts', labelBn: 'উপহার' },
+  { href: '/category/gifts', label: 'Gifts', labelBn: 'উপহার', hasDropdown: true },
   { href: '/category/new-arrivals', label: 'New Arrivals', labelBn: 'নতুন সংগ্রহ' },
 ];
 
@@ -105,6 +105,26 @@ export const NAV_DROPDOWNS = {
       { href: '/category/jewelry-bangles', label: 'Bangles', labelBn: 'চুড়ি' },
       { href: '/category/jewelry-rings', label: 'Rings', labelBn: 'আংটি' },
       { href: '/category/jewelry-bridal', label: 'Bridal/Festive', labelBn: 'বিয়ে/উৎসব' },
+    ],
+  },
+  gifts: {
+    'Gift Hampers': [
+      { href: '/category/gifts', label: 'All Gift Hampers', labelBn: 'সব উপহার' },
+    ],
+    'Artisan Luxe': [
+      { href: '/category/3d-prints', label: 'All Artisan Luxe', labelBn: 'সব আর্টিসান লাক্স' },
+      { href: '/category/3d-bookmarks', label: 'Designer Bookmarks', labelBn: 'ডিজাইনার বুকমার্ক' },
+      { href: '/category/3d-coasters', label: 'Luxury Coasters', labelBn: 'লাক্সারি কোস্টার' },
+      { href: '/category/3d-wall-decor', label: 'Statement Wall Art', labelBn: 'ওয়াল আর্ট' },
+      { href: '/category/3d-keyrings', label: 'Charm Keychains', labelBn: 'চার্ম কীচেইন' },
+      { href: '/category/3d-printed-gifts', label: 'Curated Gift Pieces', labelBn: 'কিউরেটেড উপহার' },
+      { href: '/category/3d-character-models', label: 'Icon Figurines', labelBn: 'আইকন ফিগারিন' },
+    ],
+    'More Gift Finds': [
+      { href: '/category/bedsheets', label: 'Luxury Bedding', labelBn: 'লাক্সারি বিছানা' },
+      { href: '/category/2d-art', label: 'Gallery Prints', labelBn: 'গ্যালারি আর্ট' },
+      { href: '/category/dp-covers', label: 'Profile Studio', labelBn: 'প্রোফাইল স্টুডিও' },
+      { href: '/category/3d-night-lights', label: 'Ambient Glow Lamps', labelBn: 'নাইট ল্যাম্প' },
     ],
   },
 };

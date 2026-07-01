@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { Upload, X, Loader2 } from 'lucide-react';
 import { Product } from '../../types';
 import { AssignableCategory } from '../../lib/categoryService';
 import { ProductInput, saveProduct } from '../../lib/productService';
 import { uploadProductImages } from '../../lib/imageUploadService';
 import Button from '../../components/ui/Button';
+import ImageUploadField, { ImageUploadFieldHandle } from './ImageUploadField';
 
 interface ProductFormProps {
   product: Product;
@@ -58,13 +58,11 @@ export default function ProductForm({
   onClose,
   onSaved,
 }: ProductFormProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageRef = useRef<ImageUploadFieldHandle>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [imageUrls, setImageUrls] = useState<string[]>(product.images.filter((u) => !u.includes('placeholder')));
-  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     name: product.name,
@@ -119,23 +117,6 @@ export default function ProductForm({
     onClose();
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    if (!files.length) return;
-    setPendingFiles((prev) => [...prev, ...files]);
-    setPreviews((prev) => [...prev, ...files.map((f) => URL.createObjectURL(f))]);
-    e.target.value = '';
-  };
-
-  const removePending = (index: number) => {
-    setPendingFiles((prev) => prev.filter((_, i) => i !== index));
-    setPreviews((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const removeImageUrl = (index: number) => {
-    setImageUrls((prev) => prev.filter((_, i) => i !== index));
-  };
-
   const parseList = (value: string) =>
     value.split(',').map((s) => s.trim()).filter(Boolean);
 
@@ -152,11 +133,9 @@ export default function ProductForm({
 
       let finalImages = [...imageUrls];
 
-      if (pendingFiles.length > 0) {
-        setUploading(true);
-        const uploaded = await uploadProductImages(pendingFiles, product.id || 'new');
+      if (imageRef.current?.hasPending()) {
+        const uploaded = await imageRef.current.uploadPending(product.id || 'new');
         finalImages = [...finalImages, ...uploaded];
-        setUploading(false);
       }
 
       if (finalImages.length === 0) {
@@ -283,44 +262,17 @@ export default function ProductForm({
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-2">Product Images</label>
-            <p className="text-xs text-ink-secondary mb-3">Images are auto-compressed to WebP (~400KB) for fast loading without visible quality loss.</p>
-
-            <div className="flex flex-wrap gap-2 mb-3">
-              {imageUrls.map((url, i) => (
-                <div key={url} className="relative w-20 h-20 rounded overflow-hidden border border-line">
-                  <img src={url} alt="" className="w-full h-full object-cover" />
-                  {canEdit && (
-                    <button type="button" onClick={() => removeImageUrl(i)} className="absolute top-0.5 right-0.5 p-0.5 bg-red-500 text-white rounded-full">
-                      <X className="w-3 h-3" />
-                    </button>
-                  )}
-                </div>
-              ))}
-              {previews.map((url, i) => (
-                <div key={url} className="relative w-20 h-20 rounded overflow-hidden border-2 border-dashed border-accent">
-                  <img src={url} alt="" className="w-full h-full object-cover opacity-80" />
-                  {canEdit && (
-                    <button type="button" onClick={() => removePending(i)} className="absolute top-0.5 right-0.5 p-0.5 bg-red-500 text-white rounded-full">
-                      <X className="w-3 h-3" />
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {canEdit && (
-              <>
-                <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileSelect} />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-line rounded-sm w-full hover:border-accent hover:bg-canvas transition-colors text-sm text-ink-secondary"
-                >
-                  {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                  Upload images (auto-compressed)
-                </button>
-              </>
-            )}
+            <ImageUploadField
+              ref={imageRef}
+              urls={imageUrls}
+              onUrlsChange={setImageUrls}
+              onUpload={uploadProductImages}
+              disabled={!canEdit}
+              uploading={uploading}
+              onUploadingChange={setUploading}
+              hint="Upload multiple images or paste links. First image = main photo. JPEG/PNG → WebP. GIFs keep animation."
+              buttonLabel="Upload from computer (multiple allowed)"
+            />
           </div>
 
           <div>

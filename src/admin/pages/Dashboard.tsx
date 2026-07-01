@@ -14,31 +14,45 @@ import {
 import { fetchDashboardSummary, DashboardSummary } from '../../lib/dashboardService';
 import { fetchAdminOrders } from '../../lib/orderService';
 import { fetchLowStockProducts } from '../../lib/productService';
+import { fetchPotentialCustomers, PotentialCustomer } from '../../lib/potentialCustomerService';
 import CategoryRevenueChart from '../components/CategoryRevenueChart';
 import { Order } from '../../types';
+import { UserPlus } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [lowStockProducts, setLowStockProducts] = useState<Awaited<ReturnType<typeof fetchLowStockProducts>>>([]);
+  const [potentialCustomers, setPotentialCustomers] = useState<PotentialCustomer[]>([]);
+  const [potentialCount, setPotentialCount] = useState(0);
+  const [dbSetupHint, setDbSetupHint] = useState('');
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
-        const [stats, orders, lowStock] = await Promise.all([
+        const [stats, orders, lowStock, leads] = await Promise.all([
           fetchDashboardSummary(),
           fetchAdminOrders(undefined, undefined, undefined),
           fetchLowStockProducts(),
+          fetchPotentialCustomers().catch(() => [] as PotentialCustomer[]),
         ]);
         setSummary(stats);
         setRecentOrders(orders.slice(0, 5));
         setLowStockProducts(lowStock);
-      } catch {
+        setPotentialCustomers(leads.slice(0, 5));
+        setPotentialCount(leads.length);
+        setDbSetupHint('');
+      } catch (e) {
         setSummary(null);
         setRecentOrders([]);
         setLowStockProducts([]);
+        setPotentialCustomers([]);
+        const msg = e instanceof Error ? e.message : '';
+        if (msg.includes('create_order_admin') || msg.includes('list_potential')) {
+          setDbSetupHint('Database update needed — double-click OPEN_DATABASE_UPDATE.bat in your Soukhin folder, copy all, run in Supabase SQL Editor.');
+        }
       } finally {
         setLoading(false);
       }
@@ -68,6 +82,13 @@ export default function AdminDashboard() {
       value: summary?.pendingOrders ?? 0,
       icon: Clock,
       color: 'bg-amber-100 text-amber-600',
+    },
+    {
+      label: 'Potential Leads',
+      value: potentialCount,
+      icon: UserPlus,
+      color: 'bg-orange-100 text-orange-600',
+      href: '/admin/potential-customers',
     },
     {
       label: 'Customers',
@@ -102,26 +123,45 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {dbSetupHint && (
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-900">
+          {dbSetupHint}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((stat, idx) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
-            className="bg-elevated rounded-lg p-6 shadow-sm"
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-ink-secondary">{stat.label}</p>
-                <p className="text-2xl font-semibold text-ink mt-1">{stat.value}</p>
+        {statCards.map((stat, idx) => {
+          const inner = (
+            <>
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-ink-secondary">{stat.label}</p>
+                  <p className="text-2xl font-semibold text-ink mt-1">{stat.value}</p>
+                </div>
+                <div className={`p-3 rounded-lg ${stat.color}`}>
+                  <stat.icon className="w-5 h-5" />
+                </div>
               </div>
-              <div className={`p-3 rounded-lg ${stat.color}`}>
-                <stat.icon className="w-5 h-5" />
-              </div>
-            </div>
-          </motion.div>
-        ))}
+            </>
+          );
+          return (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              className="bg-elevated rounded-lg p-6 shadow-sm"
+            >
+              {'href' in stat && stat.href ? (
+                <Link to={stat.href} className="block hover:opacity-90">
+                  {inner}
+                </Link>
+              ) : (
+                inner
+              )}
+            </motion.div>
+          );
+        })}
       </div>
 
       <CategoryRevenueChart />
@@ -148,6 +188,58 @@ export default function AdminDashboard() {
       </motion.div>
 
       <div className="grid lg:grid-cols-2 gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-elevated rounded-lg shadow-sm"
+        >
+          <div className="p-4 border-b border-line flex items-center justify-between">
+            <h2 className="font-semibold text-ink flex items-center gap-2">
+              <UserPlus className="w-5 h-5 text-orange-500" />
+              Potential Customers
+            </h2>
+            <Link to="/admin/potential-customers" className="text-sm text-accent hover:underline">
+              View All
+            </Link>
+          </div>
+          <div className="divide-y divide-line">
+            {potentialCustomers.length === 0 ? (
+              <p className="p-6 text-sm text-ink-secondary text-center">
+                No leads yet — use Orders → Potential Customer, or{' '}
+                <Link to="/admin/potential-customers" className="text-accent hover:underline">
+                  add one here
+                </Link>
+                . Not shown in Orders list.
+              </p>
+            ) : (
+              potentialCustomers.map((lead) => (
+                <Link
+                  key={lead.id}
+                  to="/admin/potential-customers"
+                  className="flex items-center gap-4 p-4 hover:bg-canvas transition-colors"
+                >
+                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                    {lead.images?.[0] ? (
+                      <img src={lead.images[0]} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <UserPlus className="w-5 h-5 text-orange-600" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm text-ink">{lead.name}</p>
+                    <p className="text-xs text-ink-secondary truncate">
+                      {lead.phone || lead.email || lead.socialLink || 'No contact'}
+                    </p>
+                  </div>
+                  <p className="text-xs text-ink-muted">
+                    until {new Date(lead.purgeAfter).toLocaleDateString('en-GB')}
+                  </p>
+                </Link>
+              ))
+            )}
+          </div>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

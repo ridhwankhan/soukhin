@@ -19,6 +19,7 @@ import SupportFab from './components/layout/SupportFab';
 // Customer Pages
 import HomePage from './pages/customer/HomePage';
 import CategoryPage from './pages/customer/CategoryPage';
+import ProductPage from './pages/customer/ProductPage';
 import WishlistPage from './pages/customer/WishlistPage';
 import CheckoutPage from './pages/customer/CheckoutPage';
 import AuthPage from './pages/customer/AuthPage';
@@ -36,6 +37,7 @@ const AdminLoginPage = lazy(() => import('./admin/pages/AdminLoginPage'));
 const AdminLayout = lazy(() => import('./admin/AdminLayout'));
 const AdminDashboard = lazy(() => import('./admin/pages/Dashboard'));
 const OrdersPage = lazy(() => import('./admin/pages/OrdersPage'));
+const PotentialCustomersPage = lazy(() => import('./admin/pages/PotentialCustomersPage'));
 const ProductsPage = lazy(() => import('./admin/pages/ProductsPage'));
 const UsersPage = lazy(() => import('./admin/pages/UsersPage'));
 const {
@@ -119,6 +121,11 @@ function App() {
                 <CategoryPage />
               </CustomerLayout>
             } />
+            <Route path="/product/:id" element={
+              <CustomerLayout>
+                <ProductPage />
+              </CustomerLayout>
+            } />
             <Route path="/wishlist" element={
               <CustomerLayout>
                 <WishlistPage />
@@ -192,6 +199,7 @@ function App() {
             }>
               <Route index element={<AdminDashboard />} />
               <Route path="orders" element={<OrdersPage />} />
+              <Route path="potential-customers" element={<PotentialCustomersPage />} />
               <Route path="products" element={<ProductsPage />} />
               <Route path="inventory" element={<InventoryPage />} />
               <Route path="categories" element={<CategoriesPage />} />

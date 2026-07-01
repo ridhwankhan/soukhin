@@ -4,9 +4,10 @@ export const ROLE_PERMISSIONS: RolePermission[] = [
   {
     role: 'owner',
     permissions: [
-      'view-dashboard', 'view-orders', 'update-orders',
+      'view-dashboard', 'view-orders', 'update-orders', 'create-manual-orders', 'update-order-details',
       'view-products', 'manage-products', 'view-inventory', 'manage-inventory',
-      'view-customers', 'manage-customers', 'view-reviews', 'manage-reviews',
+      'view-customers', 'manage-customers', 'send-customer-notifications',
+      'view-reviews', 'manage-reviews',
       'view-coupons', 'manage-coupons', 'view-content', 'manage-content',
       'view-settings', 'manage-settings', 'view-users', 'manage-users', 'manage-staff',
       'view-audit-log',
@@ -15,9 +16,10 @@ export const ROLE_PERMISSIONS: RolePermission[] = [
   {
     role: 'admin',
     permissions: [
-      'view-dashboard', 'view-orders', 'update-orders',
+      'view-dashboard', 'view-orders', 'update-orders', 'create-manual-orders', 'update-order-details',
       'view-products', 'manage-products', 'view-inventory', 'manage-inventory',
-      'view-customers', 'manage-customers', 'view-reviews', 'manage-reviews',
+      'view-customers', 'manage-customers', 'send-customer-notifications',
+      'view-reviews', 'manage-reviews',
       'view-coupons', 'manage-coupons', 'view-content', 'manage-content',
       'view-settings', 'view-users', 'manage-staff',
     ],
@@ -25,8 +27,8 @@ export const ROLE_PERMISSIONS: RolePermission[] = [
   {
     role: 'moderator',
     permissions: [
-      'view-dashboard', 'view-orders', 'view-products',
-      'view-inventory', 'view-reviews', 'manage-reviews',
+      'view-dashboard', 'view-orders', 'create-manual-orders', 'update-order-details', 'view-products',
+      'view-inventory', 'view-customers', 'view-reviews', 'manage-reviews',
       'view-coupons', 'manage-coupons',
       'view-content', 'manage-content',
     ],
@@ -34,14 +36,15 @@ export const ROLE_PERMISSIONS: RolePermission[] = [
   {
     role: 'order-manager',
     permissions: [
-      'view-dashboard', 'view-orders', 'update-orders',
-      'view-coupons', 'manage-coupons',
+      'view-dashboard', 'view-orders', 'update-orders', 'create-manual-orders', 'update-order-details',
+      'view-customers', 'view-coupons', 'manage-coupons',
     ],
   },
   {
     role: 'inventory-manager',
     permissions: [
-      'view-dashboard', 'view-products', 'manage-products', 'view-inventory', 'manage-inventory',
+      'view-dashboard', 'view-orders', 'create-manual-orders', 'update-order-details',
+      'view-products', 'manage-products', 'view-inventory', 'manage-inventory',
       'view-coupons', 'manage-coupons',
     ],
   },

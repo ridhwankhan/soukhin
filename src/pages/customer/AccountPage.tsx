@@ -6,6 +6,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useStaffAccess } from '../../hooks/useStaffAccess';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import CustomerNotificationsPanel from '../../components/account/CustomerNotificationsPanel';
+import PasswordOtpForm from '../../components/auth/PasswordOtpForm';
 
 export default function AccountPage() {
   const navigate = useNavigate();
@@ -15,6 +17,8 @@ export default function AccountPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [saving, setSaving] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState('');
   const [openingDashboard, setOpeningDashboard] = useState(false);
   const [dashboardError, setDashboardError] = useState('');
 
@@ -116,6 +120,8 @@ export default function AccountPage() {
           </motion.div>
         )}
 
+        <CustomerNotificationsPanel />
+
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -192,6 +198,42 @@ export default function AccountPage() {
               </Button>
             </div>
           </form>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-elevated rounded-lg shadow-sm p-6"
+        >
+          {passwordSuccess && (
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-sm text-sm text-green-700">
+              {passwordSuccess}
+            </div>
+          )}
+          {showChangePassword ? (
+            <PasswordOtpForm
+              purpose="change"
+              defaultEmail={user?.email ?? ''}
+              emailLocked
+              onSuccess={(msg) => {
+                setPasswordSuccess(msg);
+                setShowChangePassword(false);
+              }}
+              onCancel={() => setShowChangePassword(false)}
+            />
+          ) : (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <p className="font-semibold text-ink">Password</p>
+                <p className="text-sm text-ink-secondary mt-0.5">
+                  Change your password using a PIN sent to your email.
+                </p>
+              </div>
+              <Button type="button" variant="outline" onClick={() => setShowChangePassword(true)}>
+                Change password
+              </Button>
+            </div>
+          )}
         </motion.div>
 
         <p className="text-center mt-6">

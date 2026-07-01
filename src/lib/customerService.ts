@@ -102,8 +102,14 @@ export async function ensureCustomerProfile(
   return createCustomerProfile({ userId, ...fallback });
 }
 
-export async function fetchAdminCustomers(): Promise<Customer[]> {
-  const { data, error } = await supabase.rpc('list_customers_admin');
+export async function fetchAdminCustomers(
+  search?: string,
+  sort: 'spent' | 'orders' | 'newest' | 'name' = 'spent'
+): Promise<Customer[]> {
+  const { data, error } = await supabase.rpc('list_customers_admin', {
+    p_search: search || null,
+    p_sort: sort,
+  });
   if (error) throw error;
   return ((data as Customer[]) ?? []).map((c) => ({
     ...c,

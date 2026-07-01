@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Minus, Plus, ChevronLeft, ChevronRight, Package, Truck, Leaf } from 'lucide-react';
 import { Product } from '../../types';
-import Badge from '../ui/Badge';
+import ProductImage from '../ui/ProductImage';
 import Button from '../ui/Button';
 import { useProtectedCart } from '../../hooks/useProtectedCart';
 import { useWishlist } from '../../context/WishlistContext';
@@ -34,9 +34,11 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
     <div className="grid md:grid-cols-2 gap-8 p-6 md:p-8">
       <div className="space-y-4">
         <div className="relative aspect-square bg-surface rounded-lg overflow-hidden">
-          <img
+          <ProductImage
             src={product.images[selectedImage]}
             alt={product.name}
+            productId={product.id}
+            productName={product.name}
             className="w-full h-full object-cover"
           />
           {product.badges.length > 0 && (
@@ -58,7 +60,7 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
                   selectedImage === idx ? 'border-accent' : 'border-transparent'
                 }`}
               >
-                <img src={img} alt="" className="w-full h-full object-cover" />
+                <img src={img} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = ''; }} />
               </button>
             ))}
           </div>

@@ -6,6 +6,7 @@ import {
   AlertTriangle,
   Pencil,
   Plus,
+  Search,
 } from 'lucide-react';
 import { fetchAdminMessages, markMessageRead } from '../../lib/notificationService';
 import {
@@ -282,23 +283,115 @@ export function CategoriesPage() {
 
 // Customers Page
 export function CustomersPage() {
+  const { can } = useAdminAuth();
+  const canNotify = can('send-customer-notifications');
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState<'spent' | 'orders' | 'newest' | 'name'>('spent');
+  const [notifyCustomer, setNotifyCustomer] = useState<Customer | null>(null);
+  const [notifyForm, setNotifyForm] = useState({
+    title: '',
+    body: '',
+    notificationType: 'general' as 'general' | 'voucher' | 'promo',
+    couponCode: '',
+  });
+  const [notifySaving, setNotifySaving] = useState(false);
+  const [notifyError, setNotifyError] = useState('');
+  const [notifySuccess, setNotifySuccess] = useState('');
+
+  const loadCustomers = async () => {
+    setLoading(true);
+    try {
+      setCustomers(await fetchAdminCustomers(search || undefined, sort));
+    } catch {
+      setCustomers([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    void fetchAdminCustomers()
-      .then(setCustomers)
-      .catch(() => setCustomers([]))
-      .finally(() => setLoading(false));
-  }, []);
+    const timer = setTimeout(() => void loadCustomers(), 300);
+    return () => clearTimeout(timer);
+  }, [search, sort]);
+
+  const openNotify = (customer: Customer) => {
+    setNotifyCustomer(customer);
+    setNotifyForm({
+      title: '',
+      body: '',
+      notificationType: 'voucher',
+      couponCode: '',
+    });
+    setNotifyError('');
+    setNotifySuccess('');
+  };
+
+  const handleSendNotification = async () => {
+    if (!notifyCustomer?.email) {
+      setNotifyError('This customer has no email on file.');
+      return;
+    }
+    if (!notifyForm.title.trim() || !notifyForm.body.trim()) {
+      setNotifyError('Title and message are required.');
+      return;
+    }
+    setNotifySaving(true);
+    setNotifyError('');
+    try {
+      const { sendCustomerNotification } = await import('../../lib/customerNotificationService');
+      await sendCustomerNotification({
+        customerId: notifyCustomer.id,
+        recipientEmail: notifyCustomer.email,
+        recipientName: notifyCustomer.name,
+        title: notifyForm.title.trim(),
+        body: notifyForm.body.trim(),
+        notificationType: notifyForm.notificationType,
+        couponCode: notifyForm.couponCode.trim() || undefined,
+      });
+      setNotifySuccess(`Notification sent to ${notifyCustomer.name}. They will see it on the website and receive an email.`);
+      setTimeout(() => {
+        setNotifyCustomer(null);
+        setNotifySuccess('');
+      }, 2500);
+    } catch (e) {
+      setNotifyError(e instanceof Error ? e.message : 'Could not send notification.');
+    } finally {
+      setNotifySaving(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-ink">Customers</h1>
         <p className="text-sm text-ink-secondary">
-          {loading ? 'Loading…' : `${customers.length} customers from orders`}
+          {loading ? 'Loading…' : `${customers.length} registered customers — find top buyers and reach out`}
         </p>
+      </div>
+
+      <div className="bg-elevated rounded-lg shadow-sm p-4 flex flex-wrap gap-4">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-secondary" />
+          <input
+            type="text"
+            placeholder="Search by name, email, or phone..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
+          />
+        </div>
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as typeof sort)}
+          className="px-4 py-2 border border-line rounded-sm bg-elevated"
+        >
+          <option value="spent">Top spenders</option>
+          <option value="orders">Most orders</option>
+          <option value="newest">Newest</option>
+          <option value="name">Name A–Z</option>
+        </select>
       </div>
 
       <div className="bg-elevated rounded-lg shadow-sm overflow-hidden">
@@ -307,17 +400,19 @@ export function CustomersPage() {
             <thead>
               <tr className="bg-canvas text-sm text-ink-secondary">
                 <th className="text-left p-4 font-medium">Customer</th>
+                <th className="text-left p-4 font-medium">Email</th>
                 <th className="text-left p-4 font-medium">Phone</th>
                 <th className="text-left p-4 font-medium">Orders</th>
                 <th className="text-left p-4 font-medium">Total Spent</th>
                 <th className="text-left p-4 font-medium">Joined</th>
+                {canNotify && <th className="text-right p-4 font-medium">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
               {!loading && customers.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-sm text-ink-secondary">
-                    No customers yet. They appear here when orders are placed.
+                  <td colSpan={canNotify ? 7 : 6} className="p-8 text-center text-sm text-ink-secondary">
+                    No customers yet. They appear here when they sign up and place orders.
                   </td>
                 </tr>
               )}
@@ -328,11 +423,17 @@ export function CustomersPage() {
                       <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
                         <span className="text-white font-medium">{customer.name.charAt(0)}</span>
                       </div>
-                      <div>
-                        <p className="font-medium text-ink">{customer.name}</p>
-                        {customer.email && <p className="text-xs text-ink-secondary">{customer.email}</p>}
-                      </div>
+                      <p className="font-medium text-ink">{customer.name}</p>
                     </div>
+                  </td>
+                  <td className="p-4">
+                    {customer.email ? (
+                      <a href={`mailto:${customer.email}`} className="text-sm text-accent hover:underline">
+                        {customer.email}
+                      </a>
+                    ) : (
+                      <span className="text-sm text-ink-secondary">—</span>
+                    )}
                   </td>
                   <td className="p-4 text-sm text-ink-secondary">{customer.phone}</td>
                   <td className="p-4 text-sm text-ink">{customer.orders}</td>
@@ -340,12 +441,82 @@ export function CustomersPage() {
                   <td className="p-4 text-sm text-ink-secondary">
                     {new Date(customer.createdAt).toLocaleDateString('en-GB')}
                   </td>
+                  {canNotify && (
+                    <td className="p-4 text-right space-x-2">
+                      {customer.email && (
+                        <button
+                          type="button"
+                          onClick={() => openNotify(customer)}
+                          className="px-3 py-1 text-sm bg-accent text-white rounded hover:bg-accent-hover"
+                        >
+                          Send offer
+                        </button>
+                      )}
+                      {customer.email && (
+                        <a
+                          href={`mailto:${customer.email}?subject=${encodeURIComponent('A special offer from Soukhin')}`}
+                          className="px-3 py-1 text-sm border border-line rounded hover:bg-surface inline-block"
+                        >
+                          Email
+                        </a>
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+
+      {notifyCustomer && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setNotifyCustomer(null)}>
+          <div className="bg-elevated rounded-lg p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-semibold text-lg mb-1">Send notification & email</h3>
+            <p className="text-sm text-ink-secondary mb-4">
+              To {notifyCustomer.name} ({notifyCustomer.email})
+            </p>
+            {notifyError && <p className="text-sm text-red-600 mb-3">{notifyError}</p>}
+            {notifySuccess && <p className="text-sm text-green-600 mb-3">{notifySuccess}</p>}
+            <div className="space-y-3">
+              <select
+                value={notifyForm.notificationType}
+                onChange={(e) => setNotifyForm({ ...notifyForm, notificationType: e.target.value as typeof notifyForm.notificationType })}
+                className="w-full px-3 py-2 border border-line rounded-sm"
+              >
+                <option value="voucher">Voucher / Coupon</option>
+                <option value="promo">Promotion</option>
+                <option value="general">General message</option>
+              </select>
+              <input
+                placeholder="Title e.g. Eid special — 15% off"
+                value={notifyForm.title}
+                onChange={(e) => setNotifyForm({ ...notifyForm, title: e.target.value })}
+                className="w-full px-3 py-2 border border-line rounded-sm"
+              />
+              <textarea
+                placeholder="Message body..."
+                rows={4}
+                value={notifyForm.body}
+                onChange={(e) => setNotifyForm({ ...notifyForm, body: e.target.value })}
+                className="w-full px-3 py-2 border border-line rounded-sm"
+              />
+              {(notifyForm.notificationType === 'voucher' || notifyForm.notificationType === 'promo') && (
+                <input
+                  placeholder="Coupon code (optional)"
+                  value={notifyForm.couponCode}
+                  onChange={(e) => setNotifyForm({ ...notifyForm, couponCode: e.target.value.toUpperCase() })}
+                  className="w-full px-3 py-2 border border-line rounded-sm font-mono"
+                />
+              )}
+            </div>
+            <div className="flex gap-2 justify-end mt-6">
+              <Button variant="outline" onClick={() => setNotifyCustomer(null)}>Cancel</Button>
+              <Button onClick={() => void handleSendNotification()} loading={notifySaving}>Send</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

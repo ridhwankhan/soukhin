@@ -1,314 +1,144 @@
-# Soukhin (শৌখিন) — Premium Bangladeshi Lifestyle Ecommerce
+<div align="center">
 
-[![Repository](https://img.shields.io/badge/GitHub-ridhwankhan%2Fsoukhin-1B4332?style=flat-square&logo=github)](https://github.com/ridhwankhan/soukhin)
+# Shoukhin · শৌখিন
 
-> **New to deploying?** Read **[DEPLOY_FROM_ZERO.md](./DEPLOY_FROM_ZERO.md)** — click-by-click guide (Supabase + Vercel, free).
+### Premium Bangladeshi lifestyle ecommerce — built end-to-end, deployed to production
 
-Production-ready storefront and admin dashboard. **React + Vite + Supabase + Vercel.**
+[![Live Demo](https://img.shields.io/badge/Live_Demo-soukhin.vercel.app-C2704A?style=for-the-badge)](https://soukhin.vercel.app)
+[![React](https://img.shields.io/badge/React_18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=black)](https://supabase.com)
+[![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
 
-**Your Supabase project:** `https://yxctdtihkmslpidscfph.supabase.co`  
-**Live site:** `https://soukhin.vercel.app`
+**[→ Open the live store](https://soukhin.vercel.app)** · **[Track an order](https://soukhin.vercel.app/track-order)** · **[About the brand](https://soukhin.vercel.app/about)**
+
+*Wearables · Homemade pitha · Jewelry · Gift hampers — bilingual EN/BN, mobile-first, production-hardened.*
+
+</div>
 
 ---
 
-## Login credentials (how to access everything)
+## At a glance
 
-### Store owner — admin dashboard
+| | |
+|---|---|
+| **What it is** | Full-stack ecommerce for a real Bangladeshi lifestyle brand — storefront + role-based admin dashboard |
+| **Stack** | React 18 · TypeScript · Vite · Tailwind · Supabase (Postgres, Auth, Storage, Edge Functions) · Vercel |
+| **Highlights** | Server-validated checkout · 5 staff roles · bKash integration · analytics dashboard · rate limiting & RLS |
+| **Built by** | [Ridhwan](mailto:ridhwankhan03@gmail.com) — full-stack developer |
 
-| Field | Value |
+---
+
+## Screenshots
+
+> **📸 Add your images:** Save PNGs to [`docs/screenshots/`](./docs/screenshots/) using the filenames below.  
+> Full capture guide: **[docs/screenshots/README.md](./docs/screenshots/README.md)**
+
+### Storefront
+
+<p align="center">
+  <img src="./docs/screenshots/01-hero-home.png" alt="Homepage hero — premium lifestyle ecommerce" width="100%" />
+</p>
+
+<p align="center">
+  <img src="./docs/screenshots/02-category-shop.png" alt="Category browsing with product grid" width="49%" />
+  <img src="./docs/screenshots/03-product-detail.png" alt="Product detail page" width="49%" />
+</p>
+
+<p align="center">
+  <img src="./docs/screenshots/04-checkout.png" alt="Checkout flow" width="49%" />
+  <img src="./docs/screenshots/05-mobile-home.png" alt="Mobile-responsive homepage" width="24%" />
+</p>
+
+### Admin dashboard
+
+<p align="center">
+  <img src="./docs/screenshots/06-admin-dashboard.png" alt="Admin analytics dashboard" width="100%" />
+</p>
+
+<p align="center">
+  <img src="./docs/screenshots/07-admin-products.png" alt="Product management" width="49%" />
+  <img src="./docs/screenshots/08-admin-orders.png" alt="Order management" width="49%" />
+</p>
+
+---
+
+## Why this project stands out
+
+This is not a tutorial clone — it is a **production deployment** solving real ecommerce problems for the Bangladesh market.
+
+### Customer experience
+- **Bilingual UI** — English + Bengali labels across navigation, categories, and content
+- **Rich catalog** — nested categories, search, filters, featured & new-arrival sections
+- **Account system** — email verification, wishlist, order history, profile management
+- **Checkout** — cart persistence, server-side price validation, COD + manual bKash + tokenized bKash (edge function)
+- **Trust & support** — order tracking, contact form with spam protection, WhatsApp FAB, policies & FAQ
+- **Polish** — Framer Motion animations, light/dark theme, responsive layout, compressed image uploads
+
+### Admin & operations
+- **Role-based access** — Owner, Admin, Moderator, Order Manager, Inventory Manager
+- **Staff onboarding** — invite flow via Supabase Edge Function + email
+- **Products** — CRUD with Supabase Storage, low-stock alerts
+- **Orders** — status workflow, analytics, category revenue charts (Recharts)
+- **Security** — session idle timeout, permission checks on every admin action, audit-friendly design
+
+### Engineering depth
+- **9 SQL migrations** — schema, RLS policies, seed data, production hardening
+- **Edge functions** — `invite-staff`, `bkash-payment`
+- **Security** — rate limits on auth/contact/search/track-order; `create_order_secure` RPC; no service keys in frontend
+- **DevOps** — one-click SQL setup script, env template for Vercel, load-test script
+
+---
+
+## Architecture
+
+```mermaid
+flowchart LR
+  subgraph Client
+    A[React SPA<br/>Vite + Tailwind]
+  end
+  subgraph Vercel
+    B[Static hosting<br/>+ env vars]
+  end
+  subgraph Supabase
+    C[(Postgres + RLS)]
+    D[Auth]
+    E[Storage]
+    F[Edge Functions<br/>bKash · invites]
+  end
+  A --> B
+  A --> D
+  A --> C
+  A --> E
+  A --> F
+  F --> C
+```
+
+---
+
+## Feature matrix
+
+| Area | Capabilities |
+|------|----------------|
+| **Storefront** | Catalog, search, cart, wishlist, checkout, track order, contact |
+| **Payments** | Cash on delivery, manual bKash TX ID, tokenized bKash API |
+| **Auth** | Customer signup + email verify; unified `/auth` for staff & shoppers |
+| **Admin** | Dashboard analytics, products, orders, users, announcements, settings |
+| **i18n** | Bengali + English across nav, categories, hero, footer |
+| **Theme** | Light / dark mode with brand tokens |
+
+---
+
+## Tech stack
+
+| Layer | Tools |
 |-------|--------|
-| **Sign in** | [https://soukhin.vercel.app/auth](https://soukhin.vercel.app/auth) — same page as customers |
-| **Email** | `shoukhin.lifestyle.bd@gmail.com` |
-| **Password** | The password **you set** in Supabase (see below) |
-| **After login** | Redirects automatically to `/admin` dashboard |
-
-Staff and owner use the **same Sign In button** on the storefront. No separate `/admin/login` page needed (that URL redirects to Sign In).
-
-| Role | After sign-in | Can shop on storefront? |
-|------|---------------|-------------------------|
-| **Owner / Admin** | Admin dashboard | Browse store via **View Store** in dashboard menu |
-| **Inventory / Order manager / Moderator** | Admin dashboard (or checkout if they were shopping) | Yes — cart, wishlist, and checkout |
-
-The password is **not stored in GitHub** (security). You create or reset it in Supabase:
-
-1. [Supabase Dashboard](https://supabase.com/dashboard) → your project → **Authentication** → **Users**
-2. If no user exists: **Add user** → email `shoukhin.lifestyle.bd@gmail.com` → choose a password → ✅ **Auto Confirm User**
-3. If user exists: click the user → **Send password recovery** or set a new password
-4. Confirm **Table Editor → `admin_users`** has a row with the same email and role `owner` (created by `ONE_CLICK_DATABASE_SETUP.sql`)
-
-After login you can manage products, orders, staff, and settings.
-
-### Customer accounts (shoppers)
-
-| Field | Value |
-|-------|--------|
-| **Sign up / sign in** | [https://soukhin.vercel.app/auth](https://soukhin.vercel.app/auth) |
-| **Who** | Anyone — customers create their own account with email + password |
-| **Note** | Email must be verified before checkout |
-
-### Adding staff (inventory manager, order manager, etc.)
-
-1. Log in as Owner at `/auth`
-2. Go to **Admin → Users** (`/admin/users`)
-3. Add staff email + role → **Send invite**
-4. They set a password from the invite email and sign in at **`/auth`** (same page as customers)
-
----
-
-## Store contact (on the website)
-
-| Channel | Details |
-|---------|---------|
-| **Email** | [shoukhin.lifestyle.bd@gmail.com](mailto:shoukhin.lifestyle.bd@gmail.com) |
-| **Phone / WhatsApp** | [01577577168](https://wa.me/8801577577168) |
-| **Developer** | [ridhwankhan03@gmail.com](mailto:ridhwankhan03@gmail.com) |
-
----
-
-## Deploy in 3 steps (summary)
-
-1. **Supabase** — SQL Editor → paste all of [`supabase/ONE_CLICK_DATABASE_SETUP.sql`](./supabase/ONE_CLICK_DATABASE_SETUP.sql) → **RUN** → create user in Authentication  
-2. **Vercel** — import [github.com/ridhwankhan/soukhin](https://github.com/ridhwankhan/soukhin) → add env vars → Deploy  
-3. **Test** — open `https://your-app.vercel.app/auth` and sign in as owner
-
-Full details: **[DEPLOY_FROM_ZERO.md](./DEPLOY_FROM_ZERO.md)**
-
-### Can I just import the env file?
-
-| Where | Import .env? | How |
-|-------|--------------|-----|
-| **Your PC** (local) | ✅ Yes | `copy env.import.template .env` → edit → `npm run dev` |
-| **Vercel** (live site) | ✅ Yes | Fill `env.import.template` → **Import .env** on deploy screen |
-| **GitHub** | ❌ No | Never push `.env` — secrets would be public |
-| **Supabase** | ❌ No | Database uses SQL paste (`ONE_CLICK_DATABASE_SETUP.sql`), not env file |
-
-Use **[env.import.template](./env.import.template)** — fill it once, import on Vercel.
-
-### Vercel environment variables (manual names if needed)
-
-| Variable | Example |
-|----------|---------|
-| `VITE_SUPABASE_URL` | `https://yxctdtihkmslpidscfph.supabase.co` |
-| `VITE_SUPABASE_ANON_KEY` | `sb_publishable_...` from Supabase → Settings → API |
-| `VITE_SITE_URL` | `https://soukhin.vercel.app` |
-| `VITE_WHATSAPP_NUMBER` | `8801577577168` (01577577168 in international format) |
-
----
-
-## What works today
-
-### Customer website
-- Product catalog from Supabase (categories, search, filters)
-- Sign up / sign in with email verification (required before checkout)
-- Shopping cart, wishlist, checkout with server-validated prices
-- Cash on delivery + manual bKash transaction ID
-- bKash tokenized checkout (edge function — configure credentials to enable)
-- Order tracking by order number + phone
-- Contact form with spam protection
-- Order history on account page
-
-### Admin dashboard (`/admin` — sign in via `/auth`)
-- Role-based access: **Owner**, **Admin**, **Moderator**, **Order Manager**, **Inventory Manager**
-- **Staff & role management** (Owner + Admin): add emails, assign roles, send invite, deactivate
-- Products CRUD with compressed image upload to Supabase Storage
-- Orders, messages, dashboard analytics
-- Session idle timeout + permission checks on every API call
-
----
-
-## Roles & who can do what
-
-| Role | Access |
-|------|--------|
-| **Owner** | Everything + assign any role (including Admin/Owner) |
-| **Admin** | Store operations + add **Inventory Manager**, **Order Manager**, **Moderator** |
-| **Inventory Manager** | Add/edit/remove products and stock |
-| **Order Manager** | View and update orders |
-| **Moderator** | Reviews and customer messages |
-
-### Adding team members (Owner / Admin)
-
-1. Go to **Admin → Users** (`/admin/users`)
-2. Click **Add Staff Member** — enter name, email, role
-3. Click **Send invite** — they get an email to set a password
-4. They sign in at **`/auth`** with that email (redirects to dashboard).
-
-> **Owner only** can promote someone to Admin or Owner. Admins can add multiple Inventory Managers, Order Managers, etc.
-
----
-
-## Free deployment guide (step by step)
-
-Everything below stays on **free tiers** for a small launch. No credit card required for Vercel + Supabase free plans.
-
-### Cost summary
-
-| Service | Free tier | Paid when |
-|---------|-----------|-----------|
-| [Supabase](https://supabase.com) | 500 MB DB, 1 GB storage, 50k MAU auth | High traffic / storage |
-| [Vercel](https://vercel.com) | Hobby hosting, 100 GB bandwidth/mo | Commercial use at scale |
-| [Cloudflare](https://cloudflare.com) | DNS + CDN + basic DDoS (optional) | Advanced WAF |
-| Domain `.com` | — | ~$10–15/year (optional; use `*.vercel.app` free subdomain first) |
-
----
-
-### Step 1 — Supabase project (backend)
-
-1. Go to [supabase.com](https://supabase.com) → **Start your project** → New organization → **New project**
-2. Choose region **Singapore** (closest to Bangladesh)
-3. Save your **database password**
-4. Wait for the project to finish provisioning
-
-**Run database migrations** (required, in order):
-
-1. Open **SQL Editor** in Supabase dashboard
-2. Run each file from `supabase/migrations/` in order:
-   - `20260625181910_001_initial_schema.sql`
-   - `20260625183059_003_restructure_categories.sql`
-   - `20260625182007_002_seed_data.sql`
-   - `20260626120000_004_customer_auth.sql`
-   - `20260626140000_005_orders_analytics_notifications.sql`
-   - `20260626160000_006_products_storage.sql`
-   - `20260626180000_007_admin_security.sql`
-   - `20260626200000_008_production_hardening.sql`
-   - `20260626220000_009_staff_management.sql`
-
-**Get API keys:** Settings → API → copy **Project URL** and **anon public** key.
-
-**Auth URLs:** Authentication → URL Configuration (set after Vercel deploy in Step 4):
-- Site URL: `https://your-app.vercel.app`
-- Redirect URLs: `https://your-app.vercel.app/auth?verified=1`
-
----
-
-### Step 2 — Create the Owner account
-
-In **SQL Editor**, run (use your real email):
-
-```sql
-INSERT INTO admin_users (email, name, role, is_active)
-VALUES ('shoukhin.lifestyle.bd@gmail.com', 'Soukhin Owner', 'owner', true)
-ON CONFLICT (email) DO UPDATE SET role = 'owner', is_active = true;
-```
-
-In **Authentication → Users → Add user**:
-- Email: same as above
-- Password: strong password
-- ✅ Auto Confirm User (so you can log in immediately)
-
-Sign in at `https://your-app.vercel.app/auth` after deploy.
-
----
-
-### Step 3 — Deploy edge functions (invites + bKash)
-
-Install [Supabase CLI](https://supabase.com/docs/guides/cli):
-
-```bash
-npm install -g supabase
-supabase login
-supabase link --project-ref YOUR_PROJECT_REF
-```
-
-Deploy functions:
-
-```bash
-supabase functions deploy invite-staff
-supabase functions deploy bkash-payment
-```
-
-Set secrets (Dashboard → Edge Functions → Secrets, or CLI):
-
-```
-SUPABASE_URL=https://xxx.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-SUPABASE_ANON_KEY=your_anon_key
-SITE_URL=https://your-app.vercel.app
-ALLOWED_SITE_ORIGINS=https://your-app.vercel.app
-
-# bKash (sandbox first — optional until you have merchant account)
-BKASH_APP_KEY=
-BKASH_APP_SECRET=
-BKASH_USERNAME=
-BKASH_PASSWORD=
-BKASH_BASE_URL=https://tokenized.sandbox.bka.sh/v1.2.0-beta
-```
-
----
-
-### Step 4 — Deploy frontend on Vercel (free)
-
-1. Push this repo to GitHub (already at `github.com/ridhwankhan/soukhin`)
-2. Go to [vercel.com](https://vercel.com) → **Add New → Project** → Import `ridhwankhan/soukhin`
-3. Framework: **Vite**
-4. Build command: `npm run build`
-5. Output directory: `dist`
-6. Environment variables:
-
-```
-VITE_SUPABASE_URL=https://xxx.supabase.co
-VITE_SUPABASE_ANON_KEY=your_anon_key
-VITE_SITE_URL=https://soukhin.vercel.app
-VITE_BKASH_ENABLED=false
-VITE_WHATSAPP_NUMBER=8801577577168
-```
-
-7. Click **Deploy**
-
-8. Copy your Vercel URL → go back to Supabase **Auth → URL Configuration** and set Site URL + Redirect URLs to match.
-
-9. Redeploy on Vercel if you changed env vars.
-
-**Custom domain (optional, paid yearly):** Vercel → Project → Settings → Domains → add `soukhin.com` → point DNS as instructed.
-
----
-
-### Step 5 — Make it fully functional (checklist)
-
-- [ ] All 9 migrations applied in Supabase
-- [ ] Owner row in `admin_users` + Auth user with same email
-- [ ] Vercel env vars set, site loads
-- [ ] Supabase Auth redirect URLs match Vercel URL
-- [ ] `invite-staff` function deployed (for team invites)
-- [ ] Sign in at `/auth` as owner → lands on `/admin`
-- [ ] Add products under **Admin → Products** (upload images)
-- [ ] Create customer account on storefront, verify email, place test order
-- [ ] Test order tracking at `/track-order`
-- [ ] Add inventory managers under **Admin → Users** → Send invite
-- [ ] WhatsApp `8801577577168` is set in code; add `VITE_WHATSAPP_NUMBER=8801577577168` on Vercel if you override env
-- [ ] When bKash merchant ready: set secrets, `VITE_BKASH_ENABLED=true`, redeploy
-
----
-
-### Step 6 — Local development
-
-```bash
-git clone https://github.com/ridhwankhan/soukhin.git
-cd soukhin
-npm install
-cp .env.example .env   # fill in Supabase URL + anon key
-npm run dev            # http://localhost:5173
-```
-
-```bash
-npm run build          # production build
-npm run load-test      # stress-test public endpoints (optional)
-```
-
----
-
-## Environment variables
-
-| Variable | Where | Purpose |
-|----------|-------|---------|
-| `VITE_SUPABASE_URL` | Vercel + `.env` | Supabase project URL |
-| `VITE_SUPABASE_ANON_KEY` | Vercel + `.env` | Public API key |
-| `VITE_SITE_URL` | Vercel + `.env` | Your live URL (bKash origin check) |
-| `VITE_WHATSAPP_NUMBER` | Vercel + `.env` | `8801577577168` — store WhatsApp |
-| `VITE_BKASH_ENABLED` | Vercel | `true` when bKash is configured |
-| Edge function secrets | Supabase only | bKash keys, service role, `SITE_URL` |
-
-Never commit `.env` or the **service role** key to GitHub.
+| **Frontend** | React 18, TypeScript, Vite, React Router, Tailwind CSS, Framer Motion, Lucide |
+| **Data viz** | Recharts (admin revenue & category breakdown) |
+| **Backend** | Supabase — PostgreSQL, Row Level Security, Auth, Storage, Edge Functions |
+| **Hosting** | Vercel (frontend), Supabase cloud (backend) |
+| **Payments** | bKash tokenized checkout (sandbox + production-ready edge function) |
+| **Quality** | ESLint, TypeScript strict check, client-side image compression |
 
 ---
 
@@ -316,43 +146,63 @@ Never commit `.env` or the **service role** key to GitHub.
 
 ```
 src/
-├── admin/              # Dashboard (login, products, orders, users, …)
-├── components/         # UI, auth guards, cart, layout
-├── config/             # Brand, delivery, payment, roles
-├── context/            # Auth, AdminAuth, Cart, Wishlist
-├── hooks/              # Session manager, debounce
+├── admin/              # Dashboard — products, orders, users, analytics
+├── components/         # UI, layout, cart, auth guards
+├── config/             # Brand tokens, roles, delivery, payment
+├── context/            # Auth, cart, wishlist, theme
 ├── lib/                # Supabase services (orders, products, staff, …)
-├── pages/customer/     # Storefront pages
+├── pages/customer/     # Storefront
 └── pages/info/         # About, contact, policies
 
 supabase/
-├── migrations/         # Run in order on Supabase
-└── functions/          # invite-staff, bkash-payment
+├── migrations/         # Versioned schema (9 files)
+├── functions/          # invite-staff, bkash-payment
+└── ONE_CLICK_DATABASE_SETUP.sql
 ```
 
 ---
 
-## Security
+## Security (production-minded)
 
-- Admin routes require staff login + server-side permission checks
-- Checkout prices validated on server (`create_order_secure`)
-- Rate limits on contact, search, track order, auth
+- Admin routes gated by role + server-side permission checks
+- Checkout prices re-validated in Postgres (`create_order_secure`) — client cannot tamper with totals
+- Rate limiting on contact, search, track-order, and auth endpoints
 - Product image uploads restricted to staff with `manage-products`
-- bKash payments verify order ownership + amount
+- bKash callback verifies order ownership and amount
+- Secrets live in Vercel / Supabase — never committed to Git
 
 ---
 
-## Tech stack
+## Run locally
 
-React 18 · TypeScript · Vite · Tailwind CSS · Supabase · Three.js · Framer Motion · Recharts
+```bash
+git clone https://github.com/ridhwankhan/soukhin.git
+cd soukhin
+npm install
+cp env.import.template .env   # add Supabase URL + anon key
+npm run dev                   # http://localhost:5173
+```
+
+```bash
+npm run build      # production build
+npm run typecheck  # TypeScript
+npm run load-test  # optional API stress test
+```
+
+**Deploy from scratch:** see **[DEPLOY_FROM_ZERO.md](./DEPLOY_FROM_ZERO.md)** — Supabase + Vercel step-by-step.
 
 ---
 
-## Support contact
+## Developer
 
-- **Store email:** shoukhin.lifestyle.bd@gmail.com  
-- **Phone / WhatsApp:** 01577577168 ([wa.me/8801577577168](https://wa.me/8801577577168))  
-- **Admin sign-in:** https://soukhin.vercel.app/auth (owner email above + Supabase password)  
-- **Developer:** ridhwankhan03@gmail.com
+**Ridhwan** — full-stack developer  
+📧 [ridhwankhan03@gmail.com](mailto:ridhwankhan03@gmail.com)  
+🔗 [Live demo](https://soukhin.vercel.app) · [GitHub](https://github.com/ridhwankhan/soukhin)
 
-MIT License · Built for the Bangladeshi ecommerce community.
+*Store contact (brand): [shoukhin.lifestyle.bd@gmail.com](mailto:shoukhin.lifestyle.bd@gmail.com) · WhatsApp via site*
+
+---
+
+<p align="center">
+  <sub>MIT License · Built for the Bangladeshi ecommerce community</sub>
+</p>

@@ -74,7 +74,19 @@ export type CategorySlug =
   | 'jewelry-necklaces'
   | 'jewelry-bangles'
   | 'jewelry-rings'
-  | 'jewelry-bridal';
+  | 'jewelry-bridal'
+  | '3d-prints'
+  | '3d-bookmarks'
+  | '3d-character-models'
+  | '3d-coasters'
+  | '3d-printed-gifts'
+  | '3d-keyrings'
+  | '3d-wall-decor'
+  | 'bedsheets'
+  | '2d-art'
+  | 'dp-covers'
+  | '3d-models'
+  | '3d-night-lights';
 
 export interface Category {
   id: string;
@@ -111,6 +123,14 @@ export type OrderStatus =
   | 'delivered'
   | 'cancelled'
   | 'refunded';
+
+export type OrderLabel =
+  | 'very-important'
+  | 'urgent'
+  | 'gift'
+  | 'fragile'
+  | 'pre-order'
+  | 'vip';
 
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
@@ -159,6 +179,14 @@ export interface Order {
   total: number;
   adminNotes?: string;
   paymentTransactionId?: string;
+  isManualOrder?: boolean;
+  createdByAdminId?: string;
+  createdByAdminName?: string;
+  completedAt?: string;
+  purgeAfter?: string;
+  estimatedDelivery?: string;
+  orderLabels?: OrderLabel[];
+  socialLink?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -201,12 +229,15 @@ export type Permission =
   | 'view-dashboard'
   | 'view-orders'
   | 'update-orders'
+  | 'create-manual-orders'
+  | 'update-order-details'
   | 'view-products'
   | 'manage-products'
   | 'view-inventory'
   | 'manage-inventory'
   | 'view-customers'
   | 'manage-customers'
+  | 'send-customer-notifications'
   | 'view-reviews'
   | 'manage-reviews'
   | 'view-coupons'
@@ -219,6 +250,20 @@ export type Permission =
   | 'manage-users'
   | 'manage-staff'
   | 'view-audit-log';
+
+export type CustomerNotificationType = 'general' | 'voucher' | 'promo';
+
+export interface CustomerNotification {
+  id: string;
+  title: string;
+  body: string;
+  notificationType: CustomerNotificationType;
+  couponCode?: string;
+  isRead: boolean;
+  emailSent: boolean;
+  sentBy?: string;
+  createdAt: string;
+}
 
 // Announcement Type
 export interface Announcement {

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, MessageSquare, ShoppingBag, X } from 'lucide-react';
-import { fetchAdminNotifications, markMessageRead, AdminNotification } from '../../lib/notificationService';
+import { Bell, MessageSquare, ShoppingBag, X, ImageOff } from 'lucide-react';
+import { fetchAdminNotifications, markMessageRead, markImageReportRead, AdminNotification } from '../../lib/notificationService';
 
 export default function NotificationPanel() {
   const navigate = useNavigate();
@@ -45,6 +45,16 @@ export default function NotificationPanel() {
     if (notification.type === 'message' && notification.isUnread) {
       try {
         await markMessageRead(notification.id);
+        setNotifications((prev) =>
+          prev.map((n) => (n.id === notification.id ? { ...n, isUnread: false } : n))
+        );
+      } catch {
+        // ignore
+      }
+    }
+    if (notification.type === 'image' && notification.isUnread) {
+      try {
+        await markImageReportRead(notification.id);
         setNotifications((prev) =>
           prev.map((n) => (n.id === notification.id ? { ...n, isUnread: false } : n))
         );
@@ -105,10 +115,12 @@ export default function NotificationPanel() {
                   >
                     <div className="flex gap-3">
                       <div className={`p-2 rounded-full h-fit ${
-                        notification.type === 'order' ? 'bg-blue-100' : 'bg-amber-100'
+                        notification.type === 'order' ? 'bg-blue-100' : notification.type === 'image' ? 'bg-red-100' : 'bg-amber-100'
                       }`}>
                         {notification.type === 'order' ? (
                           <ShoppingBag className="w-4 h-4 text-blue-600" />
+                        ) : notification.type === 'image' ? (
+                          <ImageOff className="w-4 h-4 text-red-600" />
                         ) : (
                           <MessageSquare className="w-4 h-4 text-amber-600" />
                         )}

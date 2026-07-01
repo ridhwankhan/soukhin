@@ -8,8 +8,9 @@ import { getStaffPostLoginPath } from '../../lib/staffAuth';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { CONTACT_EMAIL } from '../../config';
+import PasswordOtpForm from '../../components/auth/PasswordOtpForm';
 
-type AuthMode = 'login' | 'register' | 'verify';
+type AuthMode = 'login' | 'register' | 'verify' | 'forgot';
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -173,13 +174,21 @@ export default function AuthPage() {
             </div>
           </Link>
           <h1 className="text-2xl font-serif font-semibold text-ink">
-            {activeMode === 'register' ? 'Create Your Account' : activeMode === 'verify' ? 'Verify Your Email' : 'Welcome Back'}
+            {activeMode === 'register'
+              ? 'Create Your Account'
+              : activeMode === 'verify'
+              ? 'Verify Your Email'
+              : activeMode === 'forgot'
+              ? 'Reset Password'
+              : 'Welcome Back'}
           </h1>
           <p className="text-sm text-ink-secondary mt-2">
             {activeMode === 'register'
               ? 'Sign up to shop, track orders, and manage your details.'
               : activeMode === 'verify'
               ? 'Confirm your email to start shopping with Soukhin.'
+              : activeMode === 'forgot'
+              ? 'Enter your email — we will send a PIN to set a new password.'
               : 'Sign in to shop — staff emails go to the dashboard automatically.'}
           </p>
         </div>
@@ -189,7 +198,7 @@ export default function AuthPage() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-elevated rounded-lg shadow-sm p-6"
         >
-          {activeMode !== 'verify' && (
+          {activeMode !== 'verify' && activeMode !== 'forgot' && (
             <div className="flex border border-line rounded-sm mb-6 overflow-hidden">
               <button
                 type="button"
@@ -246,7 +255,26 @@ export default function AuthPage() {
               <Button type="submit" className="w-full" size="lg" loading={submitting}>
                 Sign In
               </Button>
+              <button
+                type="button"
+                onClick={() => { setActiveMode('forgot'); setError(''); setSuccess(''); }}
+                className="w-full text-sm text-accent hover:underline"
+              >
+                Forgot password?
+              </button>
             </form>
+          )}
+
+          {activeMode === 'forgot' && (
+            <PasswordOtpForm
+              purpose="forgot"
+              defaultEmail={loginForm.email}
+              onSuccess={(msg) => {
+                setSuccess(msg);
+                setActiveMode('login');
+              }}
+              onCancel={() => setActiveMode('login')}
+            />
           )}
 
           {activeMode === 'register' && (
@@ -330,7 +358,7 @@ export default function AuthPage() {
             </div>
           )}
 
-          {activeMode !== 'verify' && (
+          {activeMode !== 'verify' && activeMode !== 'forgot' && (
             <p className="mt-6 text-xs text-center text-ink-secondary">
               Need help? Email us at{' '}
               <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent underline">

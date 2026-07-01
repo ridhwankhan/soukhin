@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 
 export interface AdminNotification {
-  type: 'message' | 'order';
+  type: 'message' | 'order' | 'image';
   id: string;
   title: string;
   body: string;
@@ -11,7 +11,7 @@ export interface AdminNotification {
 }
 
 interface NotificationRow {
-  type: 'message' | 'order';
+  type: 'message' | 'order' | 'image';
   id: string;
   title: string;
   body: string;
@@ -33,6 +33,11 @@ export async function fetchAdminNotifications(): Promise<AdminNotification[]> {
     createdAt: row.created_at,
     link: row.link,
   }));
+}
+
+export async function markImageReportRead(reportId: string): Promise<void> {
+  const { error } = await supabase.rpc('mark_image_report_read_admin', { p_report_id: reportId });
+  if (error) throw error;
 }
 
 export async function markMessageRead(messageId: string): Promise<void> {

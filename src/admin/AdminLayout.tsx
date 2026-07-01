@@ -21,7 +21,8 @@ import {
   Star,
   Ticket,
   FileText,
-  UserCog
+  UserCog,
+  UserPlus,
 } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import NotificationPanel from './components/NotificationPanel';
@@ -40,6 +41,12 @@ const navItems = [
     label: 'Orders',
     icon: ShoppingBag,
     href: '/admin/orders',
+    permissions: ['view-orders'] as Permission[],
+  },
+  {
+    label: 'Potential Customers',
+    icon: UserPlus,
+    href: '/admin/potential-customers',
     permissions: ['view-orders'] as Permission[],
   },
   {

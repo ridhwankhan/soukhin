@@ -1,6 +1,7 @@
-import { CartItem, Order, OrderItem, OrderStatus, PaymentMethod, PaymentStatus, ShippingInfo } from '../types';
+import { CartItem, Order, OrderItem, OrderStatus, PaymentMethod, PaymentStatus, ShippingInfo, OrderLabel } from '../types';
 import { supabase } from './supabase';
 import { checkClientRateLimit, formatRetryAfter, isRateLimitError } from './rateLimit';
+import { parseSupabaseError } from './parseSupabaseError';
 
 export interface CreateOrderInput {
   customerId: string;
@@ -32,6 +33,14 @@ interface DbOrderRow {
   payment_transaction_id: string | null;
   status: OrderStatus;
   admin_notes: string | null;
+  is_manual_order?: boolean;
+  created_by_admin_id?: string;
+  created_by_admin_name?: string;
+  completed_at?: string;
+  purge_after?: string;
+  social_link?: string | null;
+  estimated_delivery?: string | null;
+  order_labels?: string[] | null;
   created_at: string;
   updated_at: string;
   items?: DbOrderItemRow[];
@@ -96,6 +105,14 @@ function mapDbOrder(row: DbOrderRow): Order {
     total: row.total,
     adminNotes: row.admin_notes ?? undefined,
     paymentTransactionId: row.payment_transaction_id ?? undefined,
+    isManualOrder: row.is_manual_order ?? false,
+    createdByAdminId: row.created_by_admin_id,
+    createdByAdminName: row.created_by_admin_name,
+    completedAt: row.completed_at,
+    purgeAfter: row.purge_after,
+    estimatedDelivery: row.estimated_delivery ?? undefined,
+    socialLink: row.social_link ?? undefined,
+    orderLabels: (row.order_labels ?? []) as Order['orderLabels'],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -164,6 +181,103 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus): P
   const { error } = await supabase.rpc('update_order_status_admin', {
     p_order_id: orderId,
     p_status: status,
+  });
+  if (error) throw error;
+}
+
+export interface ManualOrderInput {
+  customerName: string;
+  customerPhone?: string;
+  customerEmail?: string;
+  socialLink?: string;
+  shippingAddress?: string;
+  shippingAreaSlug: string;
+  shippingAreaLabel: string;
+  shippingNotes?: string;
+  paymentMethod: PaymentMethod;
+  paymentStatus?: PaymentStatus;
+  status?: OrderStatus;
+  adminNotes?: string;
+  estimatedDelivery?: string;
+  orderLabels?: OrderLabel[];
+  items: { productId: string; quantity: number; selectedSize?: string; selectedColor?: string }[];
+}
+
+export async function createManualOrder(input: ManualOrderInput): Promise<{
+  orderNumber: string;
+  orderId: string;
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+  createdBy: string;
+}> {
+  const payload = {
+    customer_name: input.customerName,
+    customer_phone: input.customerPhone ?? '',
+    customer_email: input.customerEmail ?? '',
+    social_link: input.socialLink ?? '',
+    shipping_address: input.shippingAddress ?? '',
+    shipping_area_slug: input.shippingAreaSlug,
+    shipping_area_label: input.shippingAreaLabel,
+    shipping_notes: input.shippingNotes ?? '',
+    payment_method: input.paymentMethod,
+    payment_status: input.paymentStatus ?? 'pending',
+    status: input.status ?? 'confirmed',
+    admin_notes: input.adminNotes ?? '',
+    estimated_delivery: input.estimatedDelivery ?? '',
+    order_labels: input.orderLabels ?? [],
+    items: input.items.map((item) => ({
+      product_id: item.productId,
+      quantity: item.quantity,
+      selected_size: item.selectedSize ?? '',
+      selected_color: item.selectedColor ?? '',
+    })),
+  };
+
+  const { data, error } = await supabase.rpc('create_order_admin', { p_payload: payload });
+  if (error) throw new Error(parseSupabaseError(error));
+
+  const result = data as {
+    orderId: string;
+    orderNumber: string;
+    subtotal: number;
+    deliveryFee: number;
+    total: number;
+    createdBy: string;
+  };
+
+  return {
+    orderId: result.orderId,
+    orderNumber: result.orderNumber,
+    subtotal: result.subtotal,
+    deliveryFee: result.deliveryFee,
+    total: result.total,
+    createdBy: result.createdBy,
+  };
+}
+
+export interface UpdateOrderDetailsInput {
+  estimatedDelivery?: string;
+  orderLabels?: OrderLabel[];
+  shippingNotes?: string;
+  adminNotes?: string;
+  socialLink?: string;
+}
+
+export async function updateOrderDetails(
+  orderId: string,
+  input: UpdateOrderDetailsInput
+): Promise<void> {
+  const payload: Record<string, unknown> = {};
+  if (input.estimatedDelivery !== undefined) payload.estimated_delivery = input.estimatedDelivery;
+  if (input.orderLabels !== undefined) payload.order_labels = input.orderLabels;
+  if (input.shippingNotes !== undefined) payload.shipping_notes = input.shippingNotes;
+  if (input.adminNotes !== undefined) payload.admin_notes = input.adminNotes;
+  if (input.socialLink !== undefined) payload.social_link = input.socialLink;
+
+  const { error } = await supabase.rpc('update_order_details_admin', {
+    p_order_id: orderId,
+    p_payload: payload,
   });
   if (error) throw error;
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ShoppingBag, Heart, Search, User, ChevronDown, LogIn, Home, Shield } from 'lucide-react';
@@ -14,6 +14,79 @@ interface HeaderProps {
   onCartClick: () => void;
   searchOpen: boolean;
   onSearchToggle: () => void;
+}
+
+type DropdownContent = (typeof NAV_DROPDOWNS)[keyof typeof NAV_DROPDOWNS];
+
+function clampDropdownToViewport(panel: HTMLElement) {
+  const pad = 16;
+  panel.style.marginLeft = '0px';
+  const rect = panel.getBoundingClientRect();
+  let shift = 0;
+  if (rect.right > window.innerWidth - pad) {
+    shift = window.innerWidth - pad - rect.right;
+  }
+  if (rect.left + shift < pad) {
+    shift += pad - (rect.left + shift);
+  }
+  panel.style.marginLeft = shift ? `${shift}px` : '0px';
+}
+
+function NavMegaMenu({
+  isOpen,
+  align,
+  content,
+}: {
+  isOpen: boolean;
+  align: 'center' | 'end';
+  content: DropdownContent;
+}) {
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (!isOpen || !panelRef.current) return;
+    const panel = panelRef.current;
+    const adjust = () => clampDropdownToViewport(panel);
+    adjust();
+    window.addEventListener('resize', adjust);
+    return () => window.removeEventListener('resize', adjust);
+  }, [isOpen, content]);
+
+  const positionClass =
+    align === 'end' ? 'right-0 left-auto translate-x-0' : 'left-1/2 -translate-x-1/2';
+
+  return (
+    <motion.div
+      ref={panelRef}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 10 }}
+      transition={{ duration: 0.2 }}
+      className={`absolute top-full pt-4 w-max max-w-[calc(100vw-2rem)] z-50 ${positionClass}`}
+    >
+      <div className="bg-elevated rounded-lg shadow-xl border border-line p-5 sm:p-6 flex flex-wrap gap-6 sm:gap-8">
+        {Object.entries(content).map(([section, items]) => (
+          <div key={section} className="min-w-[10rem] max-w-[14rem]">
+            <h3 className="text-xs font-semibold text-accent uppercase tracking-wider mb-3 border-b border-accent/20 pb-2">
+              {section}
+            </h3>
+            <div className="space-y-2">
+              {items.map((item) => (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className="block text-sm text-ink hover:text-accent py-1 transition-colors"
+                >
+                  <span>{item.label}</span>
+                  <span className="text-xs text-ink-muted ml-1">{item.labelBn}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
 }
 
 export default function Header({ onCartClick, searchOpen, onSearchToggle }: HeaderProps) {
@@ -136,35 +209,11 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
                   {/* Mega Menu Dropdown */}
                   <AnimatePresence>
                     {link.hasDropdown && activeDropdown === link.href && dropdownContent && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-max"
-                      >
-                        <div className="bg-elevated rounded-lg shadow-xl border border-line p-6 flex gap-8">
-                          {Object.entries(dropdownContent).map(([section, items]) => (
-                            <div key={section}>
-                              <h3 className="text-xs font-semibold text-accent uppercase tracking-wider mb-3 border-b border-accent/20 pb-2">
-                                {section}
-                              </h3>
-                              <div className="space-y-2">
-                                {items.map((item) => (
-                                  <Link
-                                    key={item.href}
-                                    to={item.href}
-                                    className="block text-sm text-ink hover:text-accent py-1 transition-colors"
-                                  >
-                                    <span>{item.label}</span>
-                                    <span className="text-xs text-ink-muted ml-1">{item.labelBn}</span>
-                                  </Link>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </motion.div>
+                      <NavMegaMenu
+                        isOpen
+                        align={link.href === '/category/gifts' ? 'end' : 'center'}
+                        content={dropdownContent}
+                      />
                     )}
                   </AnimatePresence>
                 </div>

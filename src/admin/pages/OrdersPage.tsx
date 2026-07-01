@@ -1,10 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, Filter, ChevronDown, Eye, Edit2, Phone, MapPin, Package } from 'lucide-react';
+import { Search, ChevronDown, Eye, Phone, MapPin, Package, Plus, UserCheck, UserPlus } from 'lucide-react';
 import { fetchAdminOrders, updateOrderStatus } from '../../lib/orderService';
 import { OrderStatus, Order, PaymentStatus } from '../../types';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
+import ManualOrderForm from '../components/ManualOrderForm';
+import PotentialCustomerForm from '../components/PotentialCustomerForm';
+import OrderLabelBadges from '../components/OrderLabelBadges';
+import OrderDetailsEditor from '../components/OrderDetailsEditor';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 import { BRAND_CONFIG } from '../../config';
 
 const STATUS_CONFIG: Record<OrderStatus, { label: string; color: string }> = {
@@ -25,13 +31,19 @@ const PAYMENT_STATUS_CONFIG: Record<PaymentStatus, { label: string; color: strin
 };
 
 export default function OrdersPage() {
+  const { can } = useAdminAuth();
+  const canCreateManual = can('create-manual-orders');
+  const canUpdateStatus = can('update-orders');
+  const canEditDetails = can('update-order-details');
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
   const [paymentFilter, setPaymentFilter] = useState<PaymentStatus | 'all'>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [editStatus, setEditStatus] = useState<OrderStatus | null>(null);
+  const [showManualOrder, setShowManualOrder] = useState(false);
+  const [showPotentialCustomer, setShowPotentialCustomer] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const loadOrders = useCallback(async () => {
     setLoading(true);
@@ -66,17 +78,39 @@ export default function OrdersPage() {
     } catch {
       // ignore
     }
-    setEditStatus(null);
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-ink">Orders</h1>
           <p className="text-sm text-ink-secondary">{loading ? 'Loading...' : `${filteredOrders.length} orders found`}</p>
         </div>
+        {canCreateManual && (
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setShowManualOrder(true)}>
+              <Plus className="w-4 h-4 mr-1" />
+              Add Order (Staff)
+            </Button>
+            <Button variant="outline" onClick={() => setShowPotentialCustomer(true)}>
+              <UserPlus className="w-4 h-4 mr-1" />
+              Potential Customer
+            </Button>
+          </div>
+        )}
       </div>
+
+      {successMessage && (
+        <div className="p-3 bg-green-50 border border-green-200 rounded text-sm text-green-800 flex flex-wrap items-center gap-2">
+          <span>{successMessage}</span>
+          {successMessage.includes('potential customer') && (
+            <Link to="/admin/potential-customers" className="font-medium text-accent hover:underline">
+              View Potential Customers →
+            </Link>
+          )}
+        </div>
+      )}
 
       {/* Filters */}
       <div className="bg-elevated rounded-lg shadow-sm p-4 flex flex-wrap gap-4">
@@ -147,6 +181,14 @@ export default function OrdersPage() {
                   <td className="p-4">
                     <p className="font-medium text-ink">{order.orderNumber}</p>
                     <p className="text-xs text-ink-secondary">{order.paymentMethod.toUpperCase()}</p>
+                    {order.isManualOrder && (
+                      <span className="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-100 text-purple-700">
+                        <UserCheck className="w-3 h-3" /> Staff
+                      </span>
+                    )}
+                    <div className="mt-1">
+                      <OrderLabelBadges labels={order.orderLabels} />
+                    </div>
                   </td>
                   <td className="p-4">
                     <p className="font-medium text-ink">{order.shipping.name}</p>
@@ -200,16 +242,36 @@ export default function OrdersPage() {
                 <p className="text-sm text-ink-secondary">
                   {new Date(selectedOrder.createdAt).toLocaleString('en-GB')}
                 </p>
+                {selectedOrder.isManualOrder && selectedOrder.createdByAdminName && (
+                  <p className="text-xs text-purple-700 mt-1 flex items-center gap-1">
+                    <UserCheck className="w-3.5 h-3.5" />
+                    Placed by {selectedOrder.createdByAdminName}
+                    {selectedOrder.purgeAfter && (
+                      <span className="text-ink-secondary">
+                        · data removed after {new Date(selectedOrder.purgeAfter).toLocaleDateString('en-GB')}
+                      </span>
+                    )}
+                  </p>
+                )}
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col items-end gap-2">
+                <div className="flex gap-2">
                 <span className={`px-3 py-1 rounded text-sm font-medium ${STATUS_CONFIG[selectedOrder.status].color}`}>
                   {STATUS_CONFIG[selectedOrder.status].label}
                 </span>
                 <span className={`px-3 py-1 rounded text-sm font-medium ${PAYMENT_STATUS_CONFIG[selectedOrder.paymentStatus].color}`}>
                   {PAYMENT_STATUS_CONFIG[selectedOrder.paymentStatus].label}
                 </span>
+                </div>
+                <OrderLabelBadges labels={selectedOrder.orderLabels} />
               </div>
             </div>
+
+            {selectedOrder.estimatedDelivery && (
+              <p className="text-sm text-ink-secondary mb-4">
+                Estimated delivery: <span className="font-medium text-ink">{selectedOrder.estimatedDelivery}</span>
+              </p>
+            )}
 
             {selectedOrder.paymentTransactionId && (
               <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-sm text-sm">
@@ -229,6 +291,16 @@ export default function OrdersPage() {
                   <p className="text-sm text-ink-secondary">{selectedOrder.shipping.phone}</p>
                   {selectedOrder.shipping.email && (
                     <p className="text-sm text-ink-secondary">{selectedOrder.shipping.email}</p>
+                  )}
+                  {selectedOrder.socialLink && (
+                    <a
+                      href={selectedOrder.socialLink.startsWith('http') ? selectedOrder.socialLink : `https://${selectedOrder.socialLink}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-accent hover:underline"
+                    >
+                      Social profile
+                    </a>
                   )}
                 </div>
               </div>
@@ -283,7 +355,19 @@ export default function OrdersPage() {
               </div>
             </div>
 
+            {canEditDetails && (
+              <OrderDetailsEditor
+                order={selectedOrder}
+                onSaved={(updated) => {
+                  const merged = { ...selectedOrder, ...updated };
+                  setSelectedOrder(merged);
+                  setOrders((prev) => prev.map((o) => (o.id === merged.id ? merged : o)));
+                }}
+              />
+            )}
+
             {/* Status Update */}
+            {canUpdateStatus && (
             <div className="border-t border-line pt-6">
               <h3 className="font-medium text-ink mb-3">Update Status</h3>
               <div className="flex flex-wrap gap-2">
@@ -302,9 +386,10 @@ export default function OrdersPage() {
                 ))}
               </div>
             </div>
+            )}
 
-            {/* Notes */}
-            {(selectedOrder.shipping.notes || selectedOrder.adminNotes) && (
+            {/* Notes (read-only when editor is hidden) */}
+            {!canEditDetails && (selectedOrder.shipping.notes || selectedOrder.adminNotes) && (
               <div className="mt-6 border-t border-line pt-6">
                 <h3 className="font-medium text-ink mb-3">Notes</h3>
                 {selectedOrder.shipping.notes && (
@@ -323,6 +408,41 @@ export default function OrdersPage() {
             )}
           </div>
         )}
+      </Modal>
+
+      <Modal
+        isOpen={showManualOrder}
+        onClose={() => setShowManualOrder(false)}
+        size="lg"
+      >
+        <div className="p-6">
+          <h2 className="text-xl font-semibold text-ink mb-4 pr-8">Add Order on Behalf of Customer</h2>
+          <ManualOrderForm
+            onCancel={() => setShowManualOrder(false)}
+            onSuccess={(orderNumber) => {
+              setShowManualOrder(false);
+              setSuccessMessage(`Order ${orderNumber} created successfully.`);
+              void loadOrders();
+            }}
+          />
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showPotentialCustomer}
+        onClose={() => setShowPotentialCustomer(false)}
+        size="lg"
+      >
+        <div className="p-6">
+          <h2 className="text-xl font-semibold text-ink mb-4 pr-8">Save Potential Customer</h2>
+          <PotentialCustomerForm
+            onCancel={() => setShowPotentialCustomer(false)}
+            onSuccess={(name) => {
+              setShowPotentialCustomer(false);
+              setSuccessMessage(`${name} saved as potential customer (not an order).`);
+            }}
+          />
+        </div>
       </Modal>
     </div>
   );

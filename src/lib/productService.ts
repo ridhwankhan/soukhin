@@ -53,6 +53,29 @@ export function mapDbProduct(row: DbProductRow): Product {
   };
 }
 
+export async function fetchProductById(productId: string): Promise<Product | null> {
+  const { data, error } = await supabase
+    .from('products')
+    .select(`
+      id, sku, name, name_bn, price, sale_price, images, stock,
+      description, description_bn, size_options, color_options,
+      food_note, delivery_note, tags, is_active, is_featured, badges,
+      created_at, updated_at,
+      categories ( slug )
+    `)
+    .eq('id', productId)
+    .eq('is_active', true)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) return null;
+
+  return mapDbProduct({
+    ...(data as unknown as DbProductRow),
+    category_slug: (data.categories as { slug: string } | null)?.slug ?? 'gifts',
+  });
+}
+
 export async function fetchProductsByCategory(
   categorySlug: string,
   activeOnly = true
