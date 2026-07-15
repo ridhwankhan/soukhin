@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Package,
@@ -7,6 +8,8 @@ import {
   Pencil,
   Plus,
   Search,
+  Shield,
+  UserMinus,
 } from 'lucide-react';
 import { fetchAdminMessages, markMessageRead } from '../../lib/notificationService';
 import {
@@ -15,6 +18,15 @@ import {
   updateProductStock,
 } from '../../lib/productService';
 import { fetchAdminCustomers } from '../../lib/customerService';
+import {
+  fetchStaffMembers,
+  mapStaffError,
+  saveStaffMember,
+  setStaffActive,
+  StaffMember,
+} from '../../lib/staffService';
+import { ROLE_LABELS } from '../../config/roles';
+import { AdminRole } from '../../types';
 import {
   fetchAdminCoupons,
   saveCoupon,
@@ -282,14 +294,23 @@ export function CategoriesPage() {
 }
 
 // Customers Page
+const STAFF_ROLES: AdminRole[] = ['moderator', 'order-manager', 'inventory-manager', 'admin'];
+
 export function CustomersPage() {
-  const { can } = useAdminAuth();
+  const { can, admin } = useAdminAuth();
   const canNotify = can('send-customer-notifications');
+  const canManageStaff = can('manage-staff') || can('manage-users');
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [staffList, setStaffList] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<'spent' | 'orders' | 'newest' | 'name'>('spent');
   const [notifyCustomer, setNotifyCustomer] = useState<Customer | null>(null);
+  const [promoteCustomer, setPromoteCustomer] = useState<Customer | null>(null);
+  const [promoteRole, setPromoteRole] = useState<AdminRole>('order-manager');
+  const [promoteSaving, setPromoteSaving] = useState(false);
+  const [staffActionError, setStaffActionError] = useState('');
+  const [staffActionSuccess, setStaffActionSuccess] = useState('');
   const [notifyForm, setNotifyForm] = useState({
     title: '',
     body: '',
@@ -303,11 +324,73 @@ export function CustomersPage() {
   const loadCustomers = async () => {
     setLoading(true);
     try {
-      setCustomers(await fetchAdminCustomers(search || undefined, sort));
+      const [customerRows, staffRows] = await Promise.all([
+        fetchAdminCustomers(search || undefined, sort),
+        canManageStaff ? fetchStaffMembers() : Promise.resolve([] as StaffMember[]),
+      ]);
+      setCustomers(customerRows);
+      setStaffList(staffRows);
     } catch {
       setCustomers([]);
+      setStaffList([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const staffByEmail = new Map(
+    staffList.map((s) => [s.email.toLowerCase(), s])
+  );
+
+  const assignableRoles = (): AdminRole[] => {
+    if (admin?.role === 'owner') return STAFF_ROLES;
+    if (admin?.role === 'admin') return ['moderator', 'order-manager', 'inventory-manager'];
+    return [];
+  };
+
+  const openPromote = (customer: Customer) => {
+    const existing = customer.email ? staffByEmail.get(customer.email.toLowerCase()) : undefined;
+    setPromoteRole(existing?.role ?? 'order-manager');
+    setPromoteCustomer(customer);
+    setStaffActionError('');
+    setStaffActionSuccess('');
+  };
+
+  const handlePromoteSave = async () => {
+    if (!promoteCustomer?.email) {
+      setStaffActionError('Customer needs an email to become staff.');
+      return;
+    }
+    setPromoteSaving(true);
+    setStaffActionError('');
+    try {
+      await saveStaffMember({
+        id: staffByEmail.get(promoteCustomer.email.toLowerCase())?.id,
+        name: promoteCustomer.name,
+        email: promoteCustomer.email,
+        role: promoteRole,
+      });
+      setStaffActionSuccess(`${promoteCustomer.name} is now staff (${ROLE_LABELS[promoteRole]}). They can open Dashboard after you link their account under Staff & Roles.`);
+      setPromoteCustomer(null);
+      await loadCustomers();
+    } catch (e) {
+      setStaffActionError(mapStaffError(e));
+    } finally {
+      setPromoteSaving(false);
+    }
+  };
+
+  const handleRemoveStaff = async (customer: Customer) => {
+    const member = customer.email ? staffByEmail.get(customer.email.toLowerCase()) : undefined;
+    if (!member) return;
+    if (!confirm(`Remove staff access from ${customer.name}? They will be a normal customer again.`)) return;
+    setStaffActionError('');
+    try {
+      await setStaffActive(member.id, false);
+      setStaffActionSuccess(`${customer.name} no longer has dashboard access.`);
+      await loadCustomers();
+    } catch (e) {
+      setStaffActionError(mapStaffError(e));
     }
   };
 
@@ -369,7 +452,20 @@ export function CustomersPage() {
         <p className="text-sm text-ink-secondary">
           {loading ? 'Loading…' : `${customers.length} registered customers — find top buyers and reach out`}
         </p>
+        {canManageStaff && (
+          <p className="text-xs text-ink-muted mt-1">
+            Promote customers to staff here, or manage all roles in{' '}
+            <Link to="/admin/users" className="text-accent hover:underline font-medium">Staff & Roles</Link>.
+          </p>
+        )}
       </div>
+
+      {staffActionError && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">{staffActionError}</div>
+      )}
+      {staffActionSuccess && (
+        <div className="p-3 bg-green-50 border border-green-200 rounded text-sm text-green-700">{staffActionSuccess}</div>
+      )}
 
       <div className="bg-elevated rounded-lg shadow-sm p-4 flex flex-wrap gap-4">
         <div className="relative flex-1 min-w-[200px]">
@@ -405,25 +501,39 @@ export function CustomersPage() {
                 <th className="text-left p-4 font-medium">Orders</th>
                 <th className="text-left p-4 font-medium">Total Spent</th>
                 <th className="text-left p-4 font-medium">Joined</th>
-                {canNotify && <th className="text-right p-4 font-medium">Actions</th>}
+                {(canNotify || canManageStaff) && <th className="text-right p-4 font-medium">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
               {!loading && customers.length === 0 && (
                 <tr>
-                  <td colSpan={canNotify ? 7 : 6} className="p-8 text-center text-sm text-ink-secondary">
+                  <td colSpan={canNotify || canManageStaff ? 7 : 6} className="p-8 text-center text-sm text-ink-secondary">
                     No customers yet. They appear here when they sign up and place orders.
                   </td>
                 </tr>
               )}
-              {customers.map((customer) => (
+              {customers.map((customer) => {
+                const staffMember = customer.email
+                  ? staffByEmail.get(customer.email.toLowerCase())
+                  : undefined;
+                const isActiveStaff = Boolean(staffMember?.isActive);
+
+                return (
                 <tr key={customer.id} className="hover:bg-canvas">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
                         <span className="text-white font-medium">{customer.name.charAt(0)}</span>
                       </div>
-                      <p className="font-medium text-ink">{customer.name}</p>
+                      <div>
+                        <p className="font-medium text-ink">{customer.name}</p>
+                        {isActiveStaff && staffMember && (
+                          <span className="inline-flex items-center gap-1 mt-0.5 px-1.5 py-0.5 bg-accent/10 text-accent text-[10px] font-medium rounded">
+                            <Shield className="w-3 h-3" />
+                            Staff · {ROLE_LABELS[staffMember.role]}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </td>
                   <td className="p-4">
@@ -441,9 +551,39 @@ export function CustomersPage() {
                   <td className="p-4 text-sm text-ink-secondary">
                     {new Date(customer.createdAt).toLocaleDateString('en-GB')}
                   </td>
-                  {canNotify && (
+                  {(canNotify || canManageStaff) && (
                     <td className="p-4 text-right space-x-2">
-                      {customer.email && (
+                      {canManageStaff && customer.email && (
+                        isActiveStaff ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => openPromote(customer)}
+                              className="px-3 py-1 text-sm border border-line rounded hover:bg-surface"
+                            >
+                              Change role
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void handleRemoveStaff(customer)}
+                              className="px-3 py-1 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50 inline-flex items-center gap-1"
+                            >
+                              <UserMinus className="w-3.5 h-3.5" />
+                              Remove staff
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => openPromote(customer)}
+                            className="px-3 py-1 text-sm bg-accent text-white rounded hover:bg-accent-hover inline-flex items-center gap-1"
+                          >
+                            <Shield className="w-3.5 h-3.5" />
+                            Make staff
+                          </button>
+                        )
+                      )}
+                      {canNotify && customer.email && (
                         <button
                           type="button"
                           onClick={() => openNotify(customer)}
@@ -452,7 +592,7 @@ export function CustomersPage() {
                           Send offer
                         </button>
                       )}
-                      {customer.email && (
+                      {canNotify && customer.email && (
                         <a
                           href={`mailto:${customer.email}?subject=${encodeURIComponent('A special offer from Soukhin')}`}
                           className="px-3 py-1 text-sm border border-line rounded hover:bg-surface inline-block"
@@ -463,7 +603,8 @@ export function CustomersPage() {
                     </td>
                   )}
                 </tr>
-              ))}
+              );
+              })}
             </tbody>
           </table>
         </div>
@@ -513,6 +654,36 @@ export function CustomersPage() {
             <div className="flex gap-2 justify-end mt-6">
               <Button variant="outline" onClick={() => setNotifyCustomer(null)}>Cancel</Button>
               <Button onClick={() => void handleSendNotification()} loading={notifySaving}>Send</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {promoteCustomer && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setPromoteCustomer(null)}>
+          <div className="bg-elevated rounded-lg p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-semibold text-lg mb-1">Staff role for {promoteCustomer.name}</h3>
+            <p className="text-sm text-ink-secondary mb-4">{promoteCustomer.email}</p>
+            {staffActionError && <p className="text-sm text-red-600 mb-3">{staffActionError}</p>}
+            <label className="block text-sm font-medium text-ink mb-1.5">Dashboard role</label>
+            <select
+              value={promoteRole}
+              onChange={(e) => setPromoteRole(e.target.value as AdminRole)}
+              className="w-full px-4 py-2.5 border border-line rounded-sm bg-elevated focus:outline-none focus:ring-2 focus:ring-accent mb-4"
+            >
+              {assignableRoles().map((role) => (
+                <option key={role} value={role}>{ROLE_LABELS[role]}</option>
+              ))}
+            </select>
+            <p className="text-xs text-ink-secondary mb-4">
+              After saving, open <Link to="/admin/users" className="text-accent hover:underline">Staff & Roles</Link> and click <strong>Link account</strong> if they already registered.
+            </p>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setPromoteCustomer(null)}>Cancel</Button>
+              <Button onClick={() => void handlePromoteSave()} loading={promoteSaving}>
+                <Shield className="w-4 h-4 mr-1" />
+                Save staff role
+              </Button>
             </div>
           </div>
         </div>

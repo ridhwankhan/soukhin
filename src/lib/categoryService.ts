@@ -1,6 +1,7 @@
 import { Category, CategorySlug } from '../types';
 import { supabase } from './supabase';
 import { resolveCategoryImage } from './categoryImages';
+import { buildSubcategoryGroups, type LabeledGroup } from './categoryGroups';
 
 interface DbCategoryRow {
   id: string;
@@ -59,27 +60,17 @@ export async function getTopLevelCategories(): Promise<Category[]> {
     .map((c) => mapCategory(c));
 }
 
+export type { LabeledGroup };
+
 export async function getSubcategoriesForParent(parentSlug: string): Promise<Category[]> {
+  const groups = await getSubcategoryGroupsForParent(parentSlug);
+  return groups.flatMap((g) => g.items);
+}
+
+/** Grouped subcategories for storefront nav (Women / Men / Artisan Luxe / etc.). */
+export async function getSubcategoryGroupsForParent(parentSlug: string): Promise<LabeledGroup<Category>[]> {
   const all = await fetchCategoryNav();
-  const parent = all.find((c) => c.slug === parentSlug);
-  if (!parent) return [];
-
-  const directChildren = all.filter((c) => c.parent_id === parent.id);
-
-  // Flatten: if children have their own children (wearables-women), show leaf subcats for storefront nav
-  const leaves: DbCategoryRow[] = [];
-  for (const child of directChildren) {
-    const grandchildren = all.filter((c) => c.parent_id === child.id);
-    if (grandchildren.length > 0) {
-      leaves.push(...grandchildren);
-    } else {
-      leaves.push(child);
-    }
-  }
-
-  return leaves
-    .sort((a, b) => a.display_order - b.display_order)
-    .map((c) => mapCategory(c));
+  return buildSubcategoryGroups(all, parentSlug, (row) => mapCategory(row));
 }
 
 export async function findCategoryBySlug(slug: string): Promise<Category | null> {

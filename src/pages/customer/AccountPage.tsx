@@ -7,7 +7,7 @@ import { useStaffAccess } from '../../hooks/useStaffAccess';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import CustomerNotificationsPanel from '../../components/account/CustomerNotificationsPanel';
-import PasswordOtpForm from '../../components/auth/PasswordOtpForm';
+import { readLastAdminPath } from '../../lib/adminSessionCache';
 
 export default function AccountPage() {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ export default function AccountPage() {
     setOpeningDashboard(true);
     await refreshAdmin();
     setOpeningDashboard(false);
-    navigate('/admin');
+    navigate(readLastAdminPath() ?? '/admin');
   };
 
   const handleSave = async (e: React.FormEvent) => {

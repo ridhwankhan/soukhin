@@ -1,6 +1,7 @@
 import { CategorySlug, Product, ProductBadge } from '../types';
 import { supabase } from './supabase';
 import { getCategoryIdBySlug } from './categoryService';
+import { parseSupabaseError } from './parseSupabaseError';
 
 interface DbProductRow {
   id: string;
@@ -137,6 +138,25 @@ export async function fetchFeaturedProducts(limit = 8): Promise<Product[]> {
 }
 
 export async function fetchNewArrivals(limit = 8): Promise<Product[]> {
+  return fetchProductsByBadge('new', limit);
+}
+
+export async function fetchHotProducts(limit = 12): Promise<Product[]> {
+  const [hot, featured] = await Promise.all([
+    fetchProductsByBadge('hot', limit),
+    fetchFeaturedProducts(limit),
+  ]);
+  const seen = new Set<string>();
+  const merged: Product[] = [];
+  for (const p of [...hot, ...featured]) {
+    if (seen.has(p.id)) continue;
+    seen.add(p.id);
+    merged.push(p);
+  }
+  return merged.slice(0, limit);
+}
+
+export async function fetchProductsByBadge(badge: ProductBadge, limit = 12): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select(`
@@ -146,6 +166,7 @@ export async function fetchNewArrivals(limit = 8): Promise<Product[]> {
       categories ( slug )
     `)
     .eq('is_active', true)
+    .contains('badges', [badge])
     .order('created_at', { ascending: false })
     .limit(limit);
 
@@ -157,6 +178,45 @@ export async function fetchNewArrivals(limit = 8): Promise<Product[]> {
       category_slug: (row.categories as { slug: string } | null)?.slug ?? 'gifts',
     })
   );
+}
+
+/** Products with NEW badge float to the top of category grids. */
+export function sortProductsWithNewFirst(products: Product[], sortBy: 'newest' | 'popular' | 'price-low-high' | 'price-high-low'): Product[] {
+  const sorted = [...products];
+  const newBoost = (p: Product) => (p.badges.includes('new') ? 1 : 0);
+
+  switch (sortBy) {
+    case 'newest':
+      sorted.sort((a, b) => {
+        const boost = newBoost(b) - newBoost(a);
+        if (boost !== 0) return boost;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+      break;
+    case 'price-low-high':
+      sorted.sort((a, b) => {
+        const boost = newBoost(b) - newBoost(a);
+        if (boost !== 0) return boost;
+        return (a.salePrice ?? a.price) - (b.salePrice ?? b.price);
+      });
+      break;
+    case 'price-high-low':
+      sorted.sort((a, b) => {
+        const boost = newBoost(b) - newBoost(a);
+        if (boost !== 0) return boost;
+        return (b.salePrice ?? b.price) - (a.salePrice ?? a.price);
+      });
+      break;
+    case 'popular':
+      sorted.sort((a, b) => {
+        const boost = newBoost(b) - newBoost(a);
+        if (boost !== 0) return boost;
+        return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
+      });
+      break;
+  }
+
+  return sorted;
 }
 
 export async function searchProducts(query: string, limit = 20): Promise<Product[]> {
@@ -214,7 +274,8 @@ export async function saveProduct(input: ProductInput): Promise<Product> {
   };
 
   const { data, error } = await supabase.rpc('upsert_product_admin', { p_payload: payload });
-  if (error) throw error;
+  if (error) throw new Error(parseSupabaseError(error));
+  if (!data) throw new Error('Product was not saved. Check the category and try again.');
   return mapDbProduct(data as DbProductRow);
 }
 

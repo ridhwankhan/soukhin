@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { useRef, useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import CachedAdminOutlet from './components/CachedAdminOutlet';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -25,6 +26,11 @@ import {
   UserPlus,
 } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
+import {
+  hasStaffAccessGranted,
+  readCachedAdminProfile,
+  saveLastAdminPath,
+} from '../lib/adminSessionCache';
 import NotificationPanel from './components/NotificationPanel';
 import { BRAND_CONFIG, ROLE_LABELS } from '../config';
 import { Permission } from '../types';
@@ -36,6 +42,12 @@ const navItems = [
     href: '/admin',
     exact: true,
     permissions: ['view-dashboard'] as Permission[],
+  },
+  {
+    label: 'Staff & Roles',
+    icon: UserCog,
+    href: '/admin/users',
+    permissions: ['view-users'] as Permission[],
   },
   {
     label: 'Orders',
@@ -91,6 +103,7 @@ const navItems = [
     permissions: ['view-content'] as Permission[],
     children: [
       { label: 'Banners', href: '/admin/banners' },
+      { label: 'New Releases', href: '/admin/new-releases' },
       { label: 'Hero Section', href: '/admin/hero' },
       { label: 'Announcements', href: '/admin/announcements' },
     ],
@@ -109,13 +122,9 @@ const navItems = [
       { label: 'Payment', href: '/admin/settings/payment' },
       { label: 'Delivery', href: '/admin/settings/delivery' },
       { label: 'Store', href: '/admin/settings/store' },
+      { label: 'Google Sheets', href: '/admin/settings/data-sync' },
+      { label: 'Staff & Roles', href: '/admin/users' },
     ],
-  },
-  {
-    label: 'Users',
-    icon: UserCog,
-    href: '/admin/users',
-    permissions: ['view-users'] as Permission[],
   },
   {
     label: 'Audit Log',
@@ -131,12 +140,17 @@ export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const lastAdminRef = useRef(admin ?? readCachedAdminProfile());
+  if (admin) lastAdminRef.current = admin;
 
-  if (!admin) {
+  useEffect(() => {
+    saveLastAdminPath(location.pathname);
+  }, [location.pathname]);
+
+  const user = admin ?? lastAdminRef.current ?? readCachedAdminProfile();
+  if (!user && !hasStaffAccessGranted()) {
     return null;
   }
-
-  const user = admin;
 
   const toggleExpand = (label: string) => {
     setExpandedItems(prev =>
@@ -310,7 +324,7 @@ export default function AdminLayout() {
 
         {/* Page Content */}
         <main className="p-6">
-          <Outlet />
+          <CachedAdminOutlet />
         </main>
       </div>
     </div>

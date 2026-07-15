@@ -5,6 +5,7 @@ import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { AuthProvider } from './context/AuthContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
+import { AnnouncementProvider } from './context/AnnouncementContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminProtectedRoute from './components/auth/AdminProtectedRoute';
 import CartResumeHandler from './components/cart/CartResumeHandler';
@@ -32,31 +33,26 @@ import ContactPage from './pages/info/ContactPage';
 import FAQPage from './pages/info/FAQPage';
 import { ReturnExchangePage, PrivacyPage, TermsPage } from './pages/info/PolicyPages';
 
-// Admin — lazy-loaded so storefront visitors don't download charts/admin bundles
+// Admin shell + key pages loaded eagerly so tab-focus auth checks never suspend/unmount forms.
+import AdminLayout from './admin/AdminLayout';
+import OrdersPage from './admin/pages/OrdersPage';
+import PotentialCustomersPage from './admin/pages/PotentialCustomersPage';
+import UsersPage from './admin/pages/UsersPage';
+import ProductsPage from './admin/pages/ProductsPage';
 const AdminLoginPage = lazy(() => import('./admin/pages/AdminLoginPage'));
-const AdminLayout = lazy(() => import('./admin/AdminLayout'));
 const AdminDashboard = lazy(() => import('./admin/pages/Dashboard'));
-const OrdersPage = lazy(() => import('./admin/pages/OrdersPage'));
-const PotentialCustomersPage = lazy(() => import('./admin/pages/PotentialCustomersPage'));
-const ProductsPage = lazy(() => import('./admin/pages/ProductsPage'));
-const UsersPage = lazy(() => import('./admin/pages/UsersPage'));
-const {
+import {
   InventoryPage,
-  CategoriesPage,
   CustomersPage,
   ReviewsPage,
   CouponsPage,
   MessagesPage,
   AuditLogPage,
-} = {
-  InventoryPage: lazy(() => import('./admin/pages/OtherPages').then((m) => ({ default: m.InventoryPage }))),
-  CategoriesPage: lazy(() => import('./admin/pages/OtherPages').then((m) => ({ default: m.CategoriesPage }))),
-  CustomersPage: lazy(() => import('./admin/pages/OtherPages').then((m) => ({ default: m.CustomersPage }))),
-  ReviewsPage: lazy(() => import('./admin/pages/OtherPages').then((m) => ({ default: m.ReviewsPage }))),
-  CouponsPage: lazy(() => import('./admin/pages/OtherPages').then((m) => ({ default: m.CouponsPage }))),
-  MessagesPage: lazy(() => import('./admin/pages/OtherPages').then((m) => ({ default: m.MessagesPage }))),
-  AuditLogPage: lazy(() => import('./admin/pages/OtherPages').then((m) => ({ default: m.AuditLogPage }))),
-};
+} from './admin/pages/OtherPages';
+import CategoriesAdminPage from './admin/pages/CategoriesAdminPage';
+import { HeroEditorPage, BannersEditorPage, NewReleasesEditorPage } from './admin/pages/ContentPages';
+import DataSyncPage from './admin/pages/DataSyncPage';
+import AnnouncementsPage from './admin/pages/AnnouncementsPage';
 const {
   PaymentSettingsPage,
   DeliverySettingsPage,
@@ -108,6 +104,7 @@ function App() {
         <Router>
           <AuthProvider>
           <AdminAuthProvider>
+          <AnnouncementProvider>
           <Suspense fallback={<RouteFallback />}>
           <Routes>
             {/* Customer Routes */}
@@ -202,22 +199,25 @@ function App() {
               <Route path="potential-customers" element={<PotentialCustomersPage />} />
               <Route path="products" element={<ProductsPage />} />
               <Route path="inventory" element={<InventoryPage />} />
-              <Route path="categories" element={<CategoriesPage />} />
+              <Route path="categories" element={<CategoriesAdminPage />} />
               <Route path="customers" element={<CustomersPage />} />
               <Route path="reviews" element={<ReviewsPage />} />
               <Route path="coupons" element={<CouponsPage />} />
-              <Route path="banners" element={<div className="p-8 text-center">Banners Management - Coming Soon</div>} />
-              <Route path="hero" element={<div className="p-8 text-center">Hero Section Editor - Coming Soon</div>} />
-              <Route path="announcements" element={<div className="p-8 text-center">Announcements Editor - Coming Soon</div>} />
+              <Route path="banners" element={<BannersEditorPage />} />
+              <Route path="new-releases" element={<NewReleasesEditorPage />} />
+              <Route path="hero" element={<HeroEditorPage />} />
+              <Route path="announcements" element={<AnnouncementsPage />} />
               <Route path="messages" element={<MessagesPage />} />
               <Route path="settings/payment" element={<PaymentSettingsPage />} />
               <Route path="settings/delivery" element={<DeliverySettingsPage />} />
               <Route path="settings/store" element={<StoreSettingsPage />} />
+              <Route path="settings/data-sync" element={<DataSyncPage />} />
               <Route path="users" element={<UsersPage />} />
               <Route path="audit-log" element={<AuditLogPage />} />
             </Route>
           </Routes>
           </Suspense>
+          </AnnouncementProvider>
           </AdminAuthProvider>
           </AuthProvider>
         </Router>

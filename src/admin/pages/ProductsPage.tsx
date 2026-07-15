@@ -1,26 +1,61 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Search, Edit2, Trash2, Eye } from 'lucide-react';
 import { Product } from '../../types';
 import { fetchAllProducts, deleteProduct, createEmptyProduct } from '../../lib/productService';
 import { fetchAssignableCategories, AssignableCategory } from '../../lib/categoryService';
+import { formatProductPrice } from '../../lib/formatPrice';
+import { loadAdminWorkspace, saveAdminWorkspace } from '../../lib/adminWorkspace';
+import { useFlushOnPageHide } from '../../hooks/useFlushOnPageHide';
 import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import ProductForm from '../components/ProductForm';
+import CategorySelect from '../../components/admin/CategorySelect';
 import { useAdminAuth } from '../../context/AdminAuthContext';
-import { BRAND_CONFIG } from '../../config';
+
+/** Survives remounts when auth briefly flickers on alt-tab. */
+let productsPageDataCache: { products: Product[]; categories: AssignableCategory[] } | null = null;
+
+type ProductsWorkspace = {
+  search: string;
+  categoryFilter: string;
+  modal: {
+    productId: string | 'new';
+    isEditing: boolean;
+    isNew: boolean;
+  } | null;
+};
+
+const WORKSPACE_KEY = 'products';
+
+function readProductsWorkspace(): ProductsWorkspace | null {
+  return loadAdminWorkspace<ProductsWorkspace>(WORKSPACE_KEY);
+}
 
 export default function ProductsPage() {
   const { can } = useAdminAuth();
   const canManage = can('manage-products');
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<AssignableCategory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isNew, setIsNew] = useState(false);
+  const initialWs = useMemo(() => readProductsWorkspace(), []);
+  const [products, setProducts] = useState<Product[]>(() => productsPageDataCache?.products ?? []);
+  const [categories, setCategories] = useState<AssignableCategory[]>(() => productsPageDataCache?.categories ?? []);
+  const [loading, setLoading] = useState(() => !productsPageDataCache);
+  const [search, setSearch] = useState(initialWs?.search ?? '');
+  const [categoryFilter, setCategoryFilter] = useState(initialWs?.categoryFilter ?? 'all');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(() => {
+    if (initialWs?.modal?.isNew) {
+      const cat = initialWs.categoryFilter !== 'all' ? initialWs.categoryFilter : undefined;
+      return createEmptyProduct(cat);
+    }
+    if (initialWs?.modal && !initialWs.modal.isNew && productsPageDataCache) {
+      return productsPageDataCache.products.find((p) => p.id === initialWs.modal!.productId) ?? null;
+    }
+    return null;
+  });
+  const [isEditing, setIsEditing] = useState(() => initialWs?.modal?.isEditing ?? false);
+  const [isNew, setIsNew] = useState(() => initialWs?.modal?.isNew ?? false);
+  const workspaceRestored = useRef(
+    Boolean(initialWs?.modal && (initialWs.modal.isNew || productsPageDataCache))
+  );
 
   const categoryIdMap = useMemo(
     () => Object.fromEntries(categories.map((c) => [c.slug, c.id])),
@@ -28,16 +63,17 @@ export default function ProductsPage() {
   );
 
   const loadData = useCallback(async (options?: { silent?: boolean }) => {
-    if (!options?.silent) setLoading(true);
+    if (!options?.silent && !productsPageDataCache) setLoading(true);
     try {
       const [prods, cats] = await Promise.all([
         fetchAllProducts(false),
         fetchAssignableCategories(),
       ]);
+      productsPageDataCache = { products: prods, categories: cats };
       setProducts(prods);
       setCategories(cats);
     } catch {
-      if (!options?.silent) setProducts([]);
+      if (!options?.silent && !productsPageDataCache) setProducts([]);
     } finally {
       if (!options?.silent) setLoading(false);
     }
@@ -46,6 +82,81 @@ export default function ProductsPage() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  const restoreModalFromWorkspace = useCallback(
+    (prods: Product[], cats: AssignableCategory[]) => {
+      if (workspaceRestored.current) return;
+      const ws = loadAdminWorkspace<ProductsWorkspace>(WORKSPACE_KEY);
+      if (!ws) return;
+
+      workspaceRestored.current = true;
+      setSearch(ws.search ?? '');
+      setCategoryFilter(ws.categoryFilter ?? 'all');
+
+      if (!ws.modal) return;
+
+      if (ws.modal.isNew) {
+        const defaultCat =
+          (ws.categoryFilter !== 'all' ? ws.categoryFilter : undefined) ?? cats[0]?.slug;
+        setSelectedProduct(createEmptyProduct(defaultCat));
+        setIsNew(true);
+        setIsEditing(true);
+        return;
+      }
+
+      const product = prods.find((p) => p.id === ws.modal!.productId);
+      if (product) {
+        setSelectedProduct(product);
+        setIsEditing(ws.modal.isEditing);
+        setIsNew(false);
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (loading || workspaceRestored.current) return;
+    if (products.length === 0 && categories.length === 0) return;
+    restoreModalFromWorkspace(products, categories);
+  }, [loading, products, categories, restoreModalFromWorkspace]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const workspace: ProductsWorkspace = {
+        search,
+        categoryFilter,
+        modal: selectedProduct
+          ? {
+              productId: isNew ? 'new' : selectedProduct.id,
+              isEditing,
+              isNew,
+            }
+          : null,
+      };
+      saveAdminWorkspace(WORKSPACE_KEY, workspace);
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [search, categoryFilter, selectedProduct, isEditing, isNew]);
+
+  useFlushOnPageHide(() => {
+    saveAdminWorkspace(WORKSPACE_KEY, {
+      search,
+      categoryFilter,
+      modal: selectedProduct
+        ? { productId: isNew ? 'new' : selectedProduct.id, isEditing, isNew }
+        : null,
+    });
+  });
+
+  const closeModal = () => {
+    setSelectedProduct(null);
+    setIsEditing(false);
+    setIsNew(false);
+    const ws = loadAdminWorkspace<ProductsWorkspace>(WORKSPACE_KEY);
+    if (ws) {
+      saveAdminWorkspace(WORKSPACE_KEY, { ...ws, modal: null });
+    }
+  };
 
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
@@ -101,16 +212,13 @@ export default function ProductsPage() {
             className="w-full pl-10 pr-4 py-2 border border-line rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
-        <select
+        <CategorySelect
+          categories={categories}
           value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
+          onChange={setCategoryFilter}
+          includeAllOption={{ value: 'all', label: 'All Categories' }}
           className="px-4 py-2 border border-line rounded-sm bg-elevated focus:outline-none focus:ring-2 focus:ring-accent"
-        >
-          <option value="all">All Categories</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.slug}>{cat.name}</option>
-          ))}
-        </select>
+        />
       </div>
 
       <div className="bg-elevated rounded-lg shadow-sm overflow-hidden">
@@ -149,7 +257,7 @@ export default function ProductsPage() {
                     </td>
                     <td className="p-4 text-sm text-ink-secondary capitalize">{product.category.replace(/-/g, ' ')}</td>
                     <td className="p-4 font-medium text-accent">
-                      {BRAND_CONFIG.currency.symbol}{(product.salePrice ?? product.price).toLocaleString()}
+                      {formatProductPrice(product.price, product.salePrice)}
                     </td>
                     <td className="p-4">
                       <span className={`px-2 py-1 rounded text-xs font-medium ${
@@ -186,7 +294,7 @@ export default function ProductsPage() {
 
       <Modal
         isOpen={!!selectedProduct}
-        onClose={() => { setSelectedProduct(null); setIsEditing(false); setIsNew(false); }}
+        onClose={closeModal}
         size="xl"
       >
         {selectedProduct && (
@@ -197,8 +305,11 @@ export default function ProductsPage() {
               isEditing={isEditing}
               isNew={isNew}
               categoryIdMap={categoryIdMap}
-              onClose={() => { setSelectedProduct(null); setIsEditing(false); setIsNew(false); }}
-              onSaved={() => loadData({ silent: !!selectedProduct })}
+              onClose={closeModal}
+              onSaved={() => {
+                closeModal();
+                loadData({ silent: !!selectedProduct });
+              }}
             />
           ) : (
             <div className="p-8 text-center text-sm text-ink-secondary">Loading categories…</div>

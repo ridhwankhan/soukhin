@@ -13,7 +13,10 @@
     "load-test": "node scripts/load-test.mjs",
     "build-sql": "node scripts/build-one-click-sql.mjs",
     "fix-staff-db": "node scripts/apply-staff-fix.mjs",
-    "deploy-password-otp": "node scripts/deploy-password-otp.mjs"
+    "deploy-password-otp": "node scripts/deploy-password-otp.mjs",
+    "deploy-invite-staff": "node scripts/deploy-invite-staff.mjs",
+    "deploy-sync-google-sheets": "node scripts/deploy-sync-google-sheets.mjs",
+    "import-3d-products": "node scripts/import-3d-products.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",

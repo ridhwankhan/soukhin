@@ -2,6 +2,9 @@ import { SiteSettings } from '../types';
 
 // Store contact — email public; WhatsApp uses dial code only (number not shown on site)
 export const CONTACT_EMAIL = 'shoukhin.lifestyle.bd@gmail.com';
+/** Technical / system emails (OTP, password reset, staff notifications) */
+export const TECHNICAL_EMAIL = 'shoukhin.lifestyle.bd@gmail.com';
+export const TECHNICAL_FROM = `Shoukhin <${TECHNICAL_EMAIL}>`;
 export const CONTACT_MAILTO = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Shoukhin — Customer enquiry')}`;
 /** International format for wa.me (not displayed publicly) */
 export const WHATSAPP_DIAL = '8801577577168';

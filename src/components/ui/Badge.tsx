@@ -6,10 +6,14 @@ interface BadgeProps {
 }
 
 const badgeConfig: Record<ProductBadge, { bg: string; text: string; label: string }> = {
-  'new':           { bg: 'bg-accent-soft',  text: 'text-white',        label: 'New' },
-  'eid-collection':{ bg: 'bg-accent',       text: 'text-white',        label: 'Eid' },
-  'best-seller':   { bg: 'bg-accent-soft',  text: 'text-white',        label: 'Best Seller' },
-  'pre-order':     { bg: 'bg-ink',          text: 'text-white',        label: 'Pre-order' },
+  'new': { bg: 'bg-accent', text: 'text-white', label: 'NEW' },
+  'hot': { bg: 'bg-red-600', text: 'text-white', label: 'HOT' },
+  'eid-collection': { bg: 'bg-accent', text: 'text-white', label: 'Eid' },
+  'best-seller': { bg: 'bg-accent-soft', text: 'text-white', label: 'Best Seller' },
+  'pre-order': { bg: 'bg-ink', text: 'text-white', label: 'Pre-order' },
+  'featured': { bg: 'bg-[#1A5276]', text: 'text-white', label: 'Featured' },
+  'sale': { bg: 'bg-red-600', text: 'text-white', label: 'Sale' },
+  'limited-edition': { bg: 'bg-[#4A4A4A]', text: 'text-white', label: 'Limited' },
 };
 
 export default function Badge({ badge, size = 'md' }: BadgeProps) {

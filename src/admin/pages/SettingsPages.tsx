@@ -1,17 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Save, AlertCircle } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { PAYMENT_CONFIG, DELIVERY_CONFIG, SITE_SETTINGS } from '../../config';
+import { fetchSiteSettingsAdmin, saveSiteSetting } from '../../lib/settingsService';
 
 export function PaymentSettingsPage() {
   const [config, setConfig] = useState(PAYMENT_CONFIG);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSave = () => {
-    console.log('Save payment config:', config);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+  useEffect(() => {
+    void fetchSiteSettingsAdmin().then((s) => {
+      const payment = s.payment as typeof PAYMENT_CONFIG | undefined;
+      if (payment) setConfig(payment);
+    }).catch(() => {});
+  }, []);
+
+  const handleSave = async () => {
+    setError('');
+    try {
+      await saveSiteSetting('payment', config);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Save failed');
+    }
   };
 
   return (
@@ -34,6 +48,9 @@ export function PaymentSettingsPage() {
         >
           Settings saved successfully!
         </motion.div>
+      )}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">{error}</div>
       )}
 
       <div className="bg-elevated rounded-lg shadow-sm p-6 space-y-6">
@@ -319,13 +336,49 @@ export function DeliverySettingsPage() {
 
 export function StoreSettingsPage() {
   const [settings, setSettings] = useState(SITE_SETTINGS);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    void fetchSiteSettingsAdmin().then((s) => {
+      setSettings((prev) => ({
+        ...prev,
+        hero: { ...prev.hero, ...(s.hero as object) },
+        announcementBar: (s.announcement as { text?: string })?.text ?? prev.announcementBar,
+        announcementBarBn: (s.announcement as { textBn?: string })?.textBn ?? prev.announcementBarBn,
+      }));
+    }).catch(() => {});
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setMessage('');
+    try {
+      await saveSiteSetting('hero', settings.hero);
+      await saveSiteSetting('announcement', {
+        text: settings.announcementBar,
+        textBn: settings.announcementBarBn,
+      });
+      setMessage('Store settings saved.');
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : 'Save failed');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-ink">Store Settings</h1>
-        <p className="text-sm text-ink-secondary">General store configuration</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-ink">Store Settings</h1>
+          <p className="text-sm text-ink-secondary">General store configuration</p>
+        </div>
+        <Button onClick={() => void handleSave()} loading={saving}>
+          <Save className="w-4 h-4 mr-2" /> Save Changes
+        </Button>
       </div>
+      {message && <div className="p-3 bg-green-50 border border-green-200 rounded-sm text-sm text-green-700">{message}</div>}
 
       <div className="bg-elevated rounded-lg shadow-sm p-6 space-y-6">
         {/* Hero Section */}

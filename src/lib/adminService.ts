@@ -7,6 +7,7 @@ interface AdminProfileRow {
   email: string;
   name: string;
   role: AdminRole;
+  additionalRoles?: AdminRole[];
   avatar?: string;
   isActive: boolean;
   createdAt: string;
@@ -19,6 +20,7 @@ function mapAdminProfile(row: AdminProfileRow): AdminUser {
     email: row.email,
     name: row.name,
     role: row.role,
+    additionalRoles: row.additionalRoles ?? [],
     avatar: row.avatar,
     createdAt: row.createdAt,
     lastLogin: row.lastLogin,

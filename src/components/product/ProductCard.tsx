@@ -7,6 +7,7 @@ import Badge from '../ui/Badge';
 import ProductImage from '../ui/ProductImage';
 import { useProtectedCart } from '../../hooks/useProtectedCart';
 import { useWishlist } from '../../context/WishlistContext';
+import { formatProductPrice, isUndeclaredPrice } from '../../lib/formatPrice';
 
 interface ProductCardProps {
   product: Product;
@@ -23,7 +24,8 @@ const ProductCard = memo(function ProductCard({ product, onClick, onRemove }: Pr
   const isWishlisted = isInWishlist(product.id);
   const inCart = isInCart(product.id);
   const displayPrice = product.salePrice ?? product.price;
-  const hasDiscount = product.salePrice && product.salePrice < product.price;
+  const hasDiscount = product.salePrice && product.salePrice < product.price && !isUndeclaredPrice(product.price);
+  const priceLabel = formatProductPrice(product.price, product.salePrice);
 
   const imageSrc = product.images[0] || '';
 
@@ -76,7 +78,12 @@ const ProductCard = memo(function ProductCard({ product, onClick, onRemove }: Pr
         )}
 
         <div className="absolute top-3 left-3 z-10 flex flex-wrap gap-1.5 pointer-events-none">
-          {product.badges.map(badge => (
+          {product.badges.includes('new') && (
+            <span className="px-2 py-1 bg-accent text-white text-[10px] font-bold tracking-widest uppercase shadow-sm">
+              NEW
+            </span>
+          )}
+          {product.badges.filter((b) => b !== 'new').map(badge => (
             <Badge key={badge} badge={badge} size="sm" />
           ))}
         </div>
@@ -163,8 +170,8 @@ const ProductCard = memo(function ProductCard({ product, onClick, onRemove }: Pr
         </h3>
         <p className="text-xs text-ink-secondary mb-2">{product.nameBn}</p>
         <div className="flex items-center gap-2">
-          <span className="text-lg font-semibold text-accent">
-            ৳{displayPrice.toLocaleString()}
+          <span className={`text-lg font-semibold ${isUndeclaredPrice(displayPrice) ? 'text-ink-secondary italic' : 'text-accent'}`}>
+            {priceLabel}
           </span>
           {hasDiscount && (
             <span className="text-sm text-ink-secondary line-through">

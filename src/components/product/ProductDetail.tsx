@@ -6,7 +6,7 @@ import ProductImage from '../ui/ProductImage';
 import Button from '../ui/Button';
 import { useProtectedCart } from '../../hooks/useProtectedCart';
 import { useWishlist } from '../../context/WishlistContext';
-import { BRAND_CONFIG } from '../../config';
+import { formatProductPrice, isUndeclaredPrice } from '../../lib/formatPrice';
 
 interface ProductDetailProps {
   product: Product;
@@ -22,7 +22,8 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
   const { isInWishlist, toggleItem } = useWishlist();
 
   const displayPrice = product.salePrice ?? product.price;
-  const hasDiscount = product.salePrice && product.salePrice < product.price;
+  const hasDiscount = product.salePrice && product.salePrice < product.price && !isUndeclaredPrice(product.price);
+  const priceLabel = formatProductPrice(product.price, product.salePrice);
   const isWishlisted = isInWishlist(product.id);
   const inCart = isInCart(product.id);
 
@@ -77,10 +78,12 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
         </div>
 
         <div className="flex items-baseline gap-3">
-          <span className="text-3xl font-bold text-accent">{BRAND_CONFIG.currency.symbol}{displayPrice.toLocaleString()}</span>
+          <span className={`text-3xl font-bold ${isUndeclaredPrice(displayPrice) ? 'text-ink-secondary italic' : 'text-accent'}`}>
+            {priceLabel}
+          </span>
           {hasDiscount && (
             <>
-              <span className="text-xl text-ink-secondary line-through">{BRAND_CONFIG.currency.symbol}{product.price.toLocaleString()}</span>
+              <span className="text-xl text-ink-secondary line-through">৳{product.price.toLocaleString()}</span>
               <span className="px-2 py-1 bg-accent-soft text-white text-sm rounded-sm">
                 {Math.round((1 - product.salePrice! / product.price) * 100)}% off
               </span>

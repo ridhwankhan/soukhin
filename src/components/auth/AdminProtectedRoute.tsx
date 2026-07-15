@@ -1,9 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { Shield, RefreshCw } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import { useStaffAccess } from '../../hooks/useStaffAccess';
+import {
+  hasStaffAccessGranted,
+  markStaffAccessGranted,
+  readCachedAdminProfile,
+} from '../../lib/adminSessionCache';
 import { Permission } from '../../types';
 import { getUnifiedLoginPath } from '../../lib/staffAuth';
 import { CONTACT_EMAIL } from '../../config';
@@ -66,14 +71,33 @@ function StaffAccessPending() {
   );
 }
 
+function hasTrustedStaffSession(): boolean {
+  return hasStaffAccessGranted() || Boolean(readCachedAdminProfile());
+}
+
 export default function AdminProtectedRoute({ children, permission }: AdminProtectedRouteProps) {
   const { user, loading: authLoading } = useAuth();
   const { admin, loading: adminLoading, refreshAdmin, can } = useAdminAuth();
   const { isStaffEmail, isOwnerEmail, showDashboard } = useStaffAccess();
   const location = useLocation();
-  const [staffCheckDone, setStaffCheckDone] = useState(false);
+  const [staffCheckDone, setStaffCheckDone] = useState(() => hasTrustedStaffSession());
+
+  const trustedRef = useRef(hasTrustedStaffSession());
+
+  if (admin) {
+    trustedRef.current = true;
+    markStaffAccessGranted();
+  }
+
+  const effectiveAdmin = admin ?? readCachedAdminProfile();
+  const sessionTrusted = trustedRef.current || hasTrustedStaffSession();
 
   useEffect(() => {
+    if (sessionTrusted) {
+      setStaffCheckDone(true);
+      return;
+    }
+
     if (authLoading || adminLoading) return;
 
     if (admin || !user) {
@@ -90,39 +114,53 @@ export default function AdminProtectedRoute({ children, permission }: AdminProte
     return () => {
       mounted = false;
     };
-  }, [admin, user, authLoading, adminLoading, refreshAdmin]);
+  }, [admin, user, authLoading, adminLoading, refreshAdmin, sessionTrusted]);
 
-  const verifying = authLoading || adminLoading || (Boolean(user) && !admin && !staffCheckDone);
+  const isFirstVisitVerify =
+    !sessionTrusted &&
+    ((authLoading && !user) ||
+      (adminLoading && !effectiveAdmin) ||
+      (Boolean(user) && !effectiveAdmin && !staffCheckDone));
 
-  if (verifying) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-canvas">
-        <div className="text-center">
-          <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-ink-secondary">Verifying staff access...</p>
+  // Trusted session: never kick the user out or unmount the dashboard on tab focus.
+  if (sessionTrusted || effectiveAdmin) {
+    if (permission && effectiveAdmin && !can(permission)) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-canvas px-4">
+          <div className="bg-elevated rounded-lg shadow-sm p-8 max-w-md text-center">
+            <h2 className="text-xl font-semibold text-ink mb-2">Access Denied</h2>
+            <p className="text-sm text-ink-secondary mb-4">
+              Your role ({effectiveAdmin.role}) does not have permission for this section.
+            </p>
+            <a href="/admin" className="text-accent hover:underline text-sm">Back to dashboard</a>
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
+
+    return <>{children}</>;
   }
 
-  if (!user) {
+  if (!user && !authLoading) {
     return <Navigate to={getUnifiedLoginPath(location.pathname)} replace />;
   }
 
-  if (!admin) {
+  if (!effectiveAdmin && !isFirstVisitVerify) {
     if (showDashboard || isStaffEmail || isOwnerEmail) {
       return <StaffAccessPending />;
     }
-    return <Navigate to="/account" replace />;
+    if (!authLoading) {
+      return <Navigate to="/account" replace />;
+    }
   }
 
-  if (permission && !can(permission)) {
+  if (permission && effectiveAdmin && !can(permission)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-canvas px-4">
         <div className="bg-elevated rounded-lg shadow-sm p-8 max-w-md text-center">
           <h2 className="text-xl font-semibold text-ink mb-2">Access Denied</h2>
           <p className="text-sm text-ink-secondary mb-4">
-            Your role ({admin.role}) does not have permission for this section.
+            Your role ({effectiveAdmin.role}) does not have permission for this section.
           </p>
           <a href="/admin" className="text-accent hover:underline text-sm">Back to dashboard</a>
         </div>
@@ -130,5 +168,17 @@ export default function AdminProtectedRoute({ children, permission }: AdminProte
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {effectiveAdmin ? children : null}
+      {isFirstVisitVerify && (
+        <div className="min-h-screen flex items-center justify-center bg-canvas">
+          <div className="text-center">
+            <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-sm text-ink-secondary">Verifying staff access...</p>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }

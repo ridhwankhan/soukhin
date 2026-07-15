@@ -71,6 +71,20 @@ export function hasPermission(role: AdminRole, permission: Permission): boolean 
   return rolePermission?.permissions.includes(permission) ?? false;
 }
 
+export function hasAnyPermission(roles: AdminRole[], permission: Permission): boolean {
+  return roles.some((role) => hasPermission(role, permission));
+}
+
+export function getPermissionsForRoles(roles: AdminRole[]): Permission[] {
+  const set = new Set<Permission>();
+  for (const role of roles) {
+    for (const p of getPermissions(role)) {
+      set.add(p);
+    }
+  }
+  return [...set];
+}
+
 export function getPermissions(role: AdminRole): Permission[] {
   const rolePermission = ROLE_PERMISSIONS.find(rp => rp.role === role);
   return rolePermission?.permissions ?? [];

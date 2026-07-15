@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
     const resendKey = Deno.env.get('RESEND_API_KEY') ?? '';
-    const fromEmail = Deno.env.get('NOTIFICATION_FROM_EMAIL') ?? 'Soukhin <onboarding@resend.dev>';
+    const fromEmail = Deno.env.get('NOTIFICATION_FROM_EMAIL') ?? 'Soukhin <shoukhin.lifestyle.bd@gmail.com>';
 
     const supabaseUser = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: `Bearer ${token}` } },

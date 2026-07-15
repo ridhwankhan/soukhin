@@ -1,28 +1,61 @@
 import { useRef, useState } from 'react';
-import { UserPlus } from 'lucide-react';
-import { createPotentialCustomer } from '../../lib/potentialCustomerService';
+import { Save, UserPlus } from 'lucide-react';
+import {
+  createPotentialCustomer,
+  updatePotentialCustomer,
+  PotentialCustomer,
+} from '../../lib/potentialCustomerService';
 import { parseSupabaseError } from '../../lib/parseSupabaseError';
 import { uploadLeadImages } from '../../lib/imageUploadService';
+import { usePersistFormDraft } from '../../hooks/useAdminFormDraft';
 import Button from '../../components/ui/Button';
 import ImageUploadField, { ImageUploadFieldHandle } from './ImageUploadField';
 
 interface PotentialCustomerFormProps {
+  lead?: PotentialCustomer;
   onSuccess: (name: string) => void;
   onCancel: () => void;
 }
 
-export default function PotentialCustomerForm({ onSuccess, onCancel }: PotentialCustomerFormProps) {
+export default function PotentialCustomerForm({ lead, onSuccess, onCancel }: PotentialCustomerFormProps) {
+  const isEditing = Boolean(lead);
   const imageRef = useRef<ImageUploadFieldHandle>(null);
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [socialLink, setSocialLink] = useState('');
-  const [interestSummary, setInterestSummary] = useState('');
-  const [notes, setNotes] = useState('');
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [name, setName] = useState(lead?.name ?? '');
+  const [phone, setPhone] = useState(lead?.phone ?? '');
+  const [email, setEmail] = useState(lead?.email ?? '');
+  const [socialLink, setSocialLink] = useState(lead?.socialLink ?? '');
+  const [interestSummary, setInterestSummary] = useState(lead?.interestSummary ?? '');
+  const [notes, setNotes] = useState(lead?.notes ?? '');
+  const [imageUrls, setImageUrls] = useState<string[]>(lead?.images ?? []);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  type LeadDraft = {
+    name: string;
+    phone: string;
+    email: string;
+    socialLink: string;
+    interestSummary: string;
+    notes: string;
+    imageUrls: string[];
+  };
+
+  const { clearDraft } = usePersistFormDraft<LeadDraft>(
+    'potential_customer_new',
+    () => ({ name, phone, email, socialLink, interestSummary, notes, imageUrls }),
+    (draft) => {
+      setName(draft.name);
+      setPhone(draft.phone);
+      setEmail(draft.email);
+      setSocialLink(draft.socialLink);
+      setInterestSummary(draft.interestSummary);
+      setNotes(draft.notes);
+      setImageUrls(draft.imageUrls);
+    },
+    [name, phone, email, socialLink, interestSummary, notes, imageUrls],
+    !isEditing
+  );
 
   const handleSubmit = async () => {
     setError('');
@@ -41,11 +74,11 @@ export default function PotentialCustomerForm({ onSuccess, onCancel }: Potential
     try {
       let images = [...imageUrls];
       if (imageRef.current?.hasPending()) {
-        const uploaded = await imageRef.current.uploadPending('new');
+        const uploaded = await imageRef.current.uploadPending(lead?.id ?? 'new');
         images = [...images, ...uploaded];
       }
 
-      const result = await createPotentialCustomer({
+      const input = {
         name: name.trim(),
         phone: phone.trim() || undefined,
         email: email.trim() || undefined,
@@ -53,7 +86,13 @@ export default function PotentialCustomerForm({ onSuccess, onCancel }: Potential
         interestSummary: interestSummary.trim() || undefined,
         notes: notes.trim() || undefined,
         images,
-      });
+      };
+
+      const result = isEditing && lead
+        ? await updatePotentialCustomer(lead.id, input)
+        : await createPotentialCustomer(input);
+
+      if (!isEditing) clearDraft();
       onSuccess(result.name);
     } catch (e) {
       setError(parseSupabaseError(e));
@@ -65,8 +104,9 @@ export default function PotentialCustomerForm({ onSuccess, onCancel }: Potential
   return (
     <div className="space-y-4 max-h-[75vh] overflow-y-auto pr-1">
       <p className="text-sm text-ink-secondary bg-amber-50 border border-amber-200 rounded p-3">
-        Save someone who showed interest but is not ready to order yet. They appear under{' '}
-        <strong>Potential Customers</strong> only — not in the orders list. Auto-removed after 10 days.
+        {isEditing
+          ? 'Update this lead’s details. They stay under Potential Customers until the expiry date.'
+          : 'Save someone who showed interest but is not ready to order yet. They appear under Potential Customers only — not in the orders list. Auto-removed after 10 days.'}
       </p>
 
       {error && (
@@ -149,8 +189,17 @@ export default function PotentialCustomerForm({ onSuccess, onCancel }: Potential
       <div className="flex gap-2 justify-end pt-2 border-t border-line">
         <Button variant="outline" onClick={onCancel}>Cancel</Button>
         <Button onClick={() => void handleSubmit()} loading={saving || uploading}>
-          <UserPlus className="w-4 h-4 mr-1" />
-          Save Potential Customer
+          {isEditing ? (
+            <>
+              <Save className="w-4 h-4 mr-1" />
+              Save Changes
+            </>
+          ) : (
+            <>
+              <UserPlus className="w-4 h-4 mr-1" />
+              Save Potential Customer
+            </>
+          )}
         </Button>
       </div>
     </div>

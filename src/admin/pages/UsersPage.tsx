@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Mail, Plus, Shield, UserCheck, UserX } from 'lucide-react';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import {
   fetchStaffMembers,
   inviteStaffByEmail,
+  linkStaffMember,
   mapStaffError,
   saveStaffMember,
   setStaffActive,
   StaffMember,
 } from '../../lib/staffService';
-import { ROLE_LABELS, hasPermission } from '../../config/roles';
+import { ROLE_LABELS, getPermissionsForRoles } from '../../config/roles';
 import { AdminRole } from '../../types';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -24,7 +26,7 @@ function assignableRoles(actorRole: AdminRole): AdminRole[] {
   return [];
 }
 
-const emptyForm = { name: '', email: '', role: 'inventory-manager' as AdminRole };
+const emptyForm = { name: '', email: '', role: 'inventory-manager' as AdminRole, additionalRoles: [] as AdminRole[] };
 
 export default function UsersPage() {
   const { admin, can } = useAdminAuth();
@@ -34,8 +36,10 @@ export default function UsersPage() {
   const [editing, setEditing] = useState<StaffMember | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [linkingId, setLinkingId] = useState<string | null>(null);
   const [invitingId, setInvitingId] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const [loadError, setLoadError] = useState('');
   const [success, setSuccess] = useState('');
 
   const canManage = can('manage-staff') || can('manage-users');
@@ -43,10 +47,12 @@ export default function UsersPage() {
 
   const loadStaff = useCallback(async () => {
     setLoading(true);
+    setLoadError('');
     try {
       setStaff(await fetchStaffMembers());
-    } catch {
+    } catch (err) {
       setStaff([]);
+      setLoadError(mapStaffError(err));
     } finally {
       setLoading(false);
     }
@@ -66,7 +72,12 @@ export default function UsersPage() {
 
   const openEdit = (member: StaffMember) => {
     setEditing(member);
-    setForm({ name: member.name, email: member.email, role: member.role });
+    setForm({
+      name: member.name,
+      email: member.email,
+      role: member.role,
+      additionalRoles: member.additionalRoles ?? [],
+    });
     setError('');
     setSuccess('');
     setModalOpen(true);
@@ -84,9 +95,13 @@ export default function UsersPage() {
         name: form.name,
         email: form.email,
         role: form.role,
+        additionalRoles: form.additionalRoles.filter((r) => r !== form.role),
       });
       await loadStaff();
-      setSuccess(editing ? 'Staff member updated.' : 'Staff member added. Send them an invite email next.');
+      const linkedNote = saved.isLinked
+        ? ' Their existing account was linked automatically.'
+        : ' Click Link account if they already registered, or Send invite for new users.';
+      setSuccess((editing ? 'Staff member updated.' : 'Staff member added.') + linkedNote);
       if (!editing) {
         setEditing(saved);
       }
@@ -94,6 +109,21 @@ export default function UsersPage() {
       setError(mapStaffError(err));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleLink = async (member: StaffMember) => {
+    setLinkingId(member.id);
+    setError('');
+    setSuccess('');
+    try {
+      await linkStaffMember(member.id);
+      await loadStaff();
+      setSuccess(`${member.email} is linked. They can sign in at /auth and open the Dashboard.`);
+    } catch (err) {
+      setError(mapStaffError(err));
+    } finally {
+      setLinkingId(null);
     }
   };
 
@@ -112,7 +142,8 @@ export default function UsersPage() {
   };
 
   const handleToggleActive = async (member: StaffMember) => {
-    if (!confirm(`${member.isActive ? 'Deactivate' : 'Reactivate'} ${member.name}?`)) return;
+    const action = member.isActive ? 'Remove staff access from' : 'Restore staff access for';
+    if (!confirm(`${action} ${member.name}? They will ${member.isActive ? 'no longer see the admin dashboard' : 'be able to open the dashboard again'}.`)) return;
     setError('');
     try {
       await setStaffActive(member.id, !member.isActive);
@@ -146,6 +177,12 @@ export default function UsersPage() {
         )}
       </div>
 
+      {loadError && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-sm text-sm text-red-700">
+          <p className="font-medium">Could not load staff list</p>
+          <p className="mt-1">{loadError}</p>
+        </div>
+      )}
       {error && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-sm text-sm text-red-700">{error}</div>
       )}
@@ -154,12 +191,16 @@ export default function UsersPage() {
       )}
 
       <div className="bg-accent/5 border border-accent/10 rounded-lg p-4 text-sm text-ink-secondary">
-        <p className="font-medium text-ink mb-1">How it works</p>
+        <p className="font-medium text-ink mb-1">Promote, demote & remove staff</p>
         <ol className="list-decimal list-inside space-y-1">
-          <li>Add a person with their email and role (e.g. Inventory Manager).</li>
-          <li>Click <strong>Send invite</strong> — they receive an email to set a password.</li>
-          <li>They sign in at <code className="text-xs bg-elevated px-1 rounded">/auth</code> with that email (same as customers).</li>
+          <li><strong>Make staff</strong> — add email + role, or promote from <Link to="/admin/customers" className="text-accent hover:underline">Customers</Link>.</li>
+          <li><strong>Change role</strong> — pick a new role and save.</li>
+          <li><strong>Remove staff access</strong> — they become a normal customer again (keeps their store account).</li>
+          <li><strong>Link account</strong> if they already signed up; <strong>Send invite</strong> for new users.</li>
         </ol>
+        <p className="mt-2 text-xs text-ink-muted">
+          You cannot remove your own access while you are the only owner. Add another owner first, then they can remove you.
+        </p>
         {admin?.role === 'admin' && (
           <p className="mt-2 text-amber-700">As Admin you can assign Moderator, Order Manager, and Inventory Manager roles only.</p>
         )}
@@ -179,6 +220,15 @@ export default function UsersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
+              {!loading && staff.length === 0 && !loadError && (
+                <tr>
+                  <td colSpan={canManage ? 6 : 5} className="p-8 text-center text-sm text-ink-secondary">
+                    No staff in the database yet. Click <strong>Add Staff Member</strong> above, or run{' '}
+                    <code className="text-xs bg-canvas px-1 rounded">FIX_STAFF_LIST.sql</code> in Supabase if
+                    you expected people here (e.g. Intisar).
+                  </td>
+                </tr>
+              )}
               {staff.map((member) => (
                 <motion.tr key={member.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   <td className="p-4">
@@ -186,15 +236,27 @@ export default function UsersPage() {
                       <div className="w-9 h-9 bg-accent rounded-full flex items-center justify-center text-white text-sm font-medium">
                         {member.name.charAt(0)}
                       </div>
-                      <span className="font-medium text-ink">{member.name}</span>
+                      <div>
+                        <span className="font-medium text-ink">{member.name}</span>
+                        {member.id === admin?.id && (
+                          <span className="block text-[10px] text-ink-muted">This is you</span>
+                        )}
+                      </div>
                     </div>
                   </td>
                   <td className="p-4 text-sm text-ink-secondary">{member.email}</td>
                   <td className="p-4">
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-accent/10 text-accent text-xs font-medium rounded">
-                      <Shield className="w-3 h-3" />
-                      {ROLE_LABELS[member.role]}
-                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-accent/10 text-accent text-xs font-medium rounded">
+                        <Shield className="w-3 h-3" />
+                        {ROLE_LABELS[member.role]}
+                      </span>
+                      {(member.additionalRoles ?? []).map((r) => (
+                        <span key={r} className="px-2 py-1 bg-surface text-ink-secondary text-xs rounded">
+                          + {ROLE_LABELS[r]}
+                        </span>
+                      ))}
+                    </div>
                   </td>
                   <td className="p-4">
                     {!member.isActive ? (
@@ -211,30 +273,46 @@ export default function UsersPage() {
                   {canManage && (
                     <td className="p-4 text-right space-x-1">
                       {!member.isLinked && member.isActive && (
-                        <button
-                          onClick={() => handleInvite(member)}
-                          disabled={invitingId === member.id}
-                          className="inline-flex items-center gap-1 px-2 py-1 text-xs text-accent hover:bg-accent/10 rounded"
-                          title="Send invite email"
-                        >
-                          <Mail className="w-3.5 h-3.5" />
-                          {invitingId === member.id ? 'Sending...' : 'Send invite'}
-                        </button>
+                        <>
+                          <button
+                            onClick={() => handleLink(member)}
+                            disabled={linkingId === member.id}
+                            className="inline-flex items-center gap-1 px-2 py-1 text-xs text-green-700 hover:bg-green-50 rounded"
+                            title="Link existing registered account"
+                          >
+                            <UserCheck className="w-3.5 h-3.5" />
+                            {linkingId === member.id ? 'Linking...' : 'Link account'}
+                          </button>
+                          <button
+                            onClick={() => handleInvite(member)}
+                            disabled={invitingId === member.id}
+                            className="inline-flex items-center gap-1 px-2 py-1 text-xs text-accent hover:bg-accent/10 rounded"
+                            title="Send invite email for new users"
+                          >
+                            <Mail className="w-3.5 h-3.5" />
+                            {invitingId === member.id ? 'Sending...' : 'Send invite'}
+                          </button>
+                        </>
                       )}
                       <button
                         onClick={() => openEdit(member)}
-                        className="px-2 py-1 text-xs text-ink-secondary hover:bg-surface rounded"
+                        className="px-2 py-1 text-xs font-medium text-accent hover:bg-accent/10 rounded border border-accent/20"
+                        disabled={member.id === admin?.id}
+                        title={member.id === admin?.id ? 'Use another owner account to change your own role' : undefined}
                       >
-                        Edit role
+                        Change role
                       </button>
-                      {member.id !== admin?.id && (
+                      {member.id !== admin?.id ? (
                         <button
                           onClick={() => handleToggleActive(member)}
-                          className="inline-flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"
+                          className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 rounded border border-red-200"
+                          title="Revoke dashboard access — they become a normal customer again"
                         >
                           {member.isActive ? <UserX className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}
-                          {member.isActive ? 'Deactivate' : 'Activate'}
+                          {member.isActive ? 'Remove staff access' : 'Restore staff access'}
                         </button>
+                      ) : (
+                        <span className="text-[10px] text-ink-muted px-1">Can&apos;t remove yourself</span>
                       )}
                     </td>
                   )}
@@ -285,6 +363,35 @@ export default function UsersPage() {
             </p>
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-ink mb-2">Additional roles (optional)</label>
+            <p className="text-xs text-ink-secondary mb-2">Stack extra access — e.g. Admin + Inventory Manager</p>
+            <div className="flex flex-wrap gap-3">
+              {roles.filter((r) => r !== form.role).map((role) => (
+                <label key={role} className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={form.additionalRoles.includes(role)}
+                    onChange={(e) => {
+                      setForm((prev) => ({
+                        ...prev,
+                        additionalRoles: e.target.checked
+                          ? [...prev.additionalRoles, role]
+                          : prev.additionalRoles.filter((r) => r !== role),
+                      }));
+                    }}
+                  />
+                  {ROLE_LABELS[role]}
+                </label>
+              ))}
+            </div>
+            {form.additionalRoles.length > 0 && (
+              <p className="text-xs text-accent mt-2">
+                Combined access: {getPermissionsForRoles([form.role, ...form.additionalRoles]).length} permissions
+              </p>
+            )}
+          </div>
+
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div className="flex gap-3 pt-2">
@@ -292,9 +399,14 @@ export default function UsersPage() {
               {editing ? 'Save changes' : 'Add staff member'}
             </Button>
             {editing && !editing.isLinked && (
-              <Button type="button" variant="outline" onClick={() => handleInvite(editing)} loading={invitingId === editing.id}>
-                <Mail className="w-4 h-4 mr-2" /> Send invite
-              </Button>
+              <>
+                <Button type="button" variant="outline" onClick={() => handleLink(editing)} loading={linkingId === editing.id}>
+                  <UserCheck className="w-4 h-4 mr-2" /> Link account
+                </Button>
+                <Button type="button" variant="outline" onClick={() => handleInvite(editing)} loading={invitingId === editing.id}>
+                  <Mail className="w-4 h-4 mr-2" /> Send invite
+                </Button>
+              </>
             )}
           </div>
         </form>

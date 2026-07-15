@@ -12,6 +12,18 @@ import OrderLabelBadges from '../components/OrderLabelBadges';
 import OrderDetailsEditor from '../components/OrderDetailsEditor';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import { BRAND_CONFIG } from '../../config';
+import { loadAdminWorkspace, saveAdminWorkspace } from '../../lib/adminWorkspace';
+import { useFlushOnPageHide } from '../../hooks/useFlushOnPageHide';
+
+const WORKSPACE_KEY = 'orders';
+
+type OrdersWorkspace = {
+  search: string;
+  statusFilter: OrderStatus | 'all';
+  paymentFilter: PaymentStatus | 'all';
+  showManualOrder: boolean;
+  showPotentialCustomer: boolean;
+};
 
 const STATUS_CONFIG: Record<OrderStatus, { label: string; color: string }> = {
   'pending': { label: 'Pending', color: 'bg-amber-100 text-amber-700' },
@@ -35,15 +47,40 @@ export default function OrdersPage() {
   const canCreateManual = can('create-manual-orders');
   const canUpdateStatus = can('update-orders');
   const canEditDetails = can('update-order-details');
+
+  const savedWs = loadAdminWorkspace<OrdersWorkspace>(WORKSPACE_KEY);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
-  const [paymentFilter, setPaymentFilter] = useState<PaymentStatus | 'all'>('all');
+  const [search, setSearch] = useState(savedWs?.search ?? '');
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>(savedWs?.statusFilter ?? 'all');
+  const [paymentFilter, setPaymentFilter] = useState<PaymentStatus | 'all'>(savedWs?.paymentFilter ?? 'all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [showManualOrder, setShowManualOrder] = useState(false);
-  const [showPotentialCustomer, setShowPotentialCustomer] = useState(false);
+  const [showManualOrder, setShowManualOrder] = useState(savedWs?.showManualOrder ?? false);
+  const [showPotentialCustomer, setShowPotentialCustomer] = useState(savedWs?.showPotentialCustomer ?? false);
   const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      saveAdminWorkspace(WORKSPACE_KEY, {
+        search,
+        statusFilter,
+        paymentFilter,
+        showManualOrder,
+        showPotentialCustomer,
+      });
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [search, statusFilter, paymentFilter, showManualOrder, showPotentialCustomer]);
+
+  useFlushOnPageHide(() => {
+    saveAdminWorkspace(WORKSPACE_KEY, {
+      search,
+      statusFilter,
+      paymentFilter,
+      showManualOrder,
+      showPotentialCustomer,
+    });
+  });
 
   const loadOrders = useCallback(async () => {
     setLoading(true);

@@ -1,9 +1,12 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Product } from '../../types';
-import { AssignableCategory } from '../../lib/categoryService';
+import { AssignableCategory, getCategoryIdBySlug } from '../../lib/categoryService';
 import { ProductInput, saveProduct } from '../../lib/productService';
 import { uploadProductImages } from '../../lib/imageUploadService';
+import { parseSupabaseError } from '../../lib/parseSupabaseError';
+import { useFlushOnPageHide } from '../../hooks/useFlushOnPageHide';
 import Button from '../../components/ui/Button';
+import CategorySelect from '../../components/admin/CategorySelect';
 import ImageUploadField, { ImageUploadFieldHandle } from './ImageUploadField';
 
 interface ProductFormProps {
@@ -19,12 +22,13 @@ interface ProductFormProps {
 const PRODUCT_DRAFT_KEY = 'soukhin_admin_product_draft';
 
 type ProductDraft = {
+  productId: string | 'new';
   form: {
     name: string;
     nameBn: string;
     categorySlug: string;
-    price: number;
-    salePrice: number | '';
+    priceInput: string;
+    salePrice: string;
     stock: number;
     sku: string;
     description: string;
@@ -40,6 +44,17 @@ type ProductDraft = {
   };
   imageUrls: string[];
 };
+
+function priceToInput(price: number): string {
+  return price > 0 ? String(price) : '';
+}
+
+function parsePriceInput(value: string): number {
+  const trimmed = value.trim();
+  if (!trimmed) return 0;
+  const n = Number(trimmed);
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
 
 function clearProductDraft() {
   try {
@@ -64,12 +79,12 @@ export default function ProductForm({
   const [error, setError] = useState('');
   const [imageUrls, setImageUrls] = useState<string[]>(product.images.filter((u) => !u.includes('placeholder')));
 
+  const draftKey = isNew ? 'new' : product.id || 'new';
+
   const [form, setForm] = useState({
     name: product.name,
     nameBn: product.nameBn,
     categorySlug: product.category,
-    price: product.price,
-    salePrice: product.salePrice ?? '',
     stock: product.stock,
     sku: product.sku,
     description: product.description,
@@ -83,37 +98,69 @@ export default function ProductForm({
     isActive: product.isActive,
     isFeatured: product.isFeatured,
   });
+  const [priceInput, setPriceInput] = useState(priceToInput(product.price));
+  const [salePriceInput, setSalePriceInput] = useState(
+    product.salePrice && product.salePrice > 0 ? String(product.salePrice) : ''
+  );
 
   const canEdit = isEditing || isNew;
 
+  const persistDraft = useCallback(() => {
+    if (!canEdit) return;
+    try {
+      const draft: ProductDraft = {
+        productId: draftKey,
+        form: { ...form, priceInput, salePrice: salePriceInput },
+        imageUrls,
+      };
+      sessionStorage.setItem(PRODUCT_DRAFT_KEY, JSON.stringify(draft));
+    } catch {
+      // ignore quota errors
+    }
+  }, [canEdit, draftKey, form, priceInput, salePriceInput, imageUrls]);
+
   useEffect(() => {
-    if (!isNew) return;
+    if (!canEdit) return;
     try {
       const raw = sessionStorage.getItem(PRODUCT_DRAFT_KEY);
       if (!raw) return;
       const draft = JSON.parse(raw) as ProductDraft;
-      setForm(draft.form);
+      if (draft.productId !== draftKey) return;
+      setForm({
+        name: draft.form.name,
+        nameBn: draft.form.nameBn,
+        categorySlug: draft.form.categorySlug,
+        stock: draft.form.stock,
+        sku: draft.form.sku,
+        description: draft.form.description,
+        descriptionBn: draft.form.descriptionBn,
+        sizeOptions: draft.form.sizeOptions,
+        colorOptions: draft.form.colorOptions,
+        foodNote: draft.form.foodNote,
+        deliveryNote: draft.form.deliveryNote,
+        tags: draft.form.tags,
+        badges: draft.form.badges,
+        isActive: draft.form.isActive,
+        isFeatured: draft.form.isFeatured,
+      });
+      setPriceInput(draft.form.priceInput ?? '');
+      setSalePriceInput(draft.form.salePrice ?? '');
       setImageUrls(draft.imageUrls ?? []);
     } catch {
       // ignore corrupt draft
     }
-  }, [isNew]);
+  }, [canEdit, draftKey]);
 
   useEffect(() => {
-    if (!isNew || !canEdit) return;
-    const timer = window.setTimeout(() => {
-      try {
-        const draft: ProductDraft = { form, imageUrls };
-        sessionStorage.setItem(PRODUCT_DRAFT_KEY, JSON.stringify(draft));
-      } catch {
-        // ignore quota errors
-      }
-    }, 400);
+    if (!canEdit) return;
+    const timer = window.setTimeout(() => persistDraft(), 400);
     return () => window.clearTimeout(timer);
-  }, [isNew, canEdit, form, imageUrls]);
+  }, [canEdit, persistDraft]);
+
+  useFlushOnPageHide(persistDraft);
 
   const handleClose = () => {
-    if (isNew) clearProductDraft();
+    if (canEdit) clearProductDraft();
     onClose();
   };
 
@@ -128,8 +175,13 @@ export default function ProductForm({
     setError('');
 
     try {
-      const categoryId = categoryIdMap[form.categorySlug];
-      if (!categoryId) throw new Error('Please select a valid category.');
+      let categoryId = categoryIdMap[form.categorySlug];
+      if (!categoryId) {
+        categoryId = (await getCategoryIdBySlug(form.categorySlug)) ?? undefined;
+      }
+      if (!categoryId) {
+        throw new Error('Please select a valid category from the list.');
+      }
 
       let finalImages = [...imageUrls];
 
@@ -142,14 +194,17 @@ export default function ProductForm({
         throw new Error('Add at least one product image.');
       }
 
+      const price = parsePriceInput(priceInput);
+      const salePrice = parsePriceInput(salePriceInput);
+
       const input: ProductInput = {
         id: isNew ? undefined : product.id,
         sku: form.sku,
         name: form.name.trim(),
         nameBn: form.nameBn.trim(),
         categoryId,
-        price: Number(form.price),
-        salePrice: form.salePrice ? Number(form.salePrice) : undefined,
+        price,
+        salePrice: salePrice > 0 ? salePrice : undefined,
         images: finalImages,
         stock: Number(form.stock),
         description: form.description.trim(),
@@ -165,11 +220,11 @@ export default function ProductForm({
       };
 
       await saveProduct(input);
-      if (isNew) clearProductDraft();
+      if (canEdit) clearProductDraft();
       onSaved();
       handleClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save product.');
+      setError(parseSupabaseError(err));
     } finally {
       setSaving(false);
       setUploading(false);
@@ -222,11 +277,45 @@ export default function ProductForm({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">Price (৳)</label>
-              <input type="number" min={0} value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} disabled={!canEdit} required className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas" />
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={priceInput}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  if (next !== '' && !/^\d+$/.test(next)) return;
+                  setPriceInput(next);
+                }}
+                onBlur={() => {
+                  if (!priceInput.trim()) setPriceInput('');
+                }}
+                disabled={!canEdit}
+                placeholder="UNDECLARED"
+                className={`w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas ${
+                  !priceInput.trim() ? 'text-ink-secondary italic' : ''
+                }`}
+              />
+              {!priceInput.trim() && (
+                <p className="mt-1 text-xs text-ink-secondary">Price not set — shows as UNDECLARED on the store.</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Sale Price</label>
-              <input type="number" min={0} value={form.salePrice} onChange={(e) => setForm({ ...form, salePrice: e.target.value })} disabled={!canEdit} className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas" />
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={salePriceInput}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  if (next !== '' && !/^\d+$/.test(next)) return;
+                  setSalePriceInput(next);
+                }}
+                disabled={!canEdit}
+                placeholder="Optional"
+                className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas"
+              />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -241,17 +330,13 @@ export default function ProductForm({
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Category</label>
-            <select
+            <CategorySelect
+              categories={categories}
               value={form.categorySlug}
-              onChange={(e) => setForm({ ...form, categorySlug: e.target.value })}
+              onChange={(categorySlug) => setForm({ ...form, categorySlug })}
               disabled={!canEdit}
               required
-              className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas"
-            >
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.slug}>{cat.name}</option>
-              ))}
-            </select>
+            />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Description</label>
@@ -285,7 +370,7 @@ export default function ProductForm({
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Badges (comma-separated)</label>
-            <input type="text" value={form.badges} onChange={(e) => setForm({ ...form, badges: e.target.value })} disabled={!canEdit} placeholder="new, best-seller" className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas" />
+            <input type="text" value={form.badges} onChange={(e) => setForm({ ...form, badges: e.target.value })} disabled={!canEdit} placeholder="new, hot, best-seller" className="w-full px-4 py-2 border border-line rounded-sm disabled:bg-canvas" />
           </div>
           <div className="flex gap-6">
             <label className="flex items-center gap-2 text-sm">

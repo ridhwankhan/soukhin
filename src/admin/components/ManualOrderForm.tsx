@@ -7,6 +7,7 @@ import { DELIVERY_AREAS } from '../../config/delivery';
 import { ORDER_LABEL_OPTIONS } from '../../config/orderLabels';
 import { Product, PaymentMethod, PaymentStatus, OrderStatus, OrderLabel } from '../../types';
 import { BRAND_CONFIG } from '../../config';
+import { usePersistFormDraft } from '../../hooks/useAdminFormDraft';
 import Button from '../../components/ui/Button';
 
 interface LineItem {
@@ -30,6 +31,24 @@ const PAYMENT_METHODS: { value: PaymentMethod; label: string }[] = [
   { value: 'bank-transfer', label: 'Bank Transfer' },
 ];
 
+type ManualOrderDraft = {
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  socialLink: string;
+  shippingAddress: string;
+  shippingAreaSlug: string;
+  shippingNotes: string;
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
+  orderStatus: OrderStatus;
+  adminNotes: string;
+  estimatedDelivery: string;
+  orderLabels: OrderLabel[];
+  productSearch: string;
+  items: { productId: string; quantity: number; selectedSize?: string; selectedColor?: string }[];
+};
+
 export default function ManualOrderForm({ onSuccess, onCancel }: ManualOrderFormProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [productSearch, setProductSearch] = useState('');
@@ -51,6 +70,67 @@ export default function ManualOrderForm({ onSuccess, onCancel }: ManualOrderForm
   const [adminNotes, setAdminNotes] = useState('');
   const [estimatedDelivery, setEstimatedDelivery] = useState(DELIVERY_AREAS[0].estimatedDays);
   const [orderLabels, setOrderLabels] = useState<OrderLabel[]>([]);
+  const [draftItems, setDraftItems] = useState<ManualOrderDraft['items']>([]);
+
+  const { clearDraft } = usePersistFormDraft<ManualOrderDraft>(
+    'manual_order',
+    () => ({
+      customerName,
+      customerPhone,
+      customerEmail,
+      socialLink,
+      shippingAddress,
+      shippingAreaSlug,
+      shippingNotes,
+      paymentMethod,
+      paymentStatus,
+      orderStatus,
+      adminNotes,
+      estimatedDelivery,
+      orderLabels,
+      productSearch,
+      items: lineItems.map((i) => ({
+        productId: i.productId,
+        quantity: i.quantity,
+        selectedSize: i.selectedSize,
+        selectedColor: i.selectedColor,
+      })),
+    }),
+    (draft) => {
+      setCustomerName(draft.customerName);
+      setCustomerPhone(draft.customerPhone);
+      setCustomerEmail(draft.customerEmail);
+      setSocialLink(draft.socialLink);
+      setShippingAddress(draft.shippingAddress);
+      setShippingAreaSlug(draft.shippingAreaSlug);
+      setShippingNotes(draft.shippingNotes);
+      setPaymentMethod(draft.paymentMethod);
+      setPaymentStatus(draft.paymentStatus);
+      setOrderStatus(draft.orderStatus);
+      setAdminNotes(draft.adminNotes);
+      setEstimatedDelivery(draft.estimatedDelivery);
+      setOrderLabels(draft.orderLabels);
+      setProductSearch(draft.productSearch);
+      setDraftItems(draft.items);
+    },
+    [
+      customerName,
+      customerPhone,
+      customerEmail,
+      socialLink,
+      shippingAddress,
+      shippingAreaSlug,
+      shippingNotes,
+      paymentMethod,
+      paymentStatus,
+      orderStatus,
+      adminNotes,
+      estimatedDelivery,
+      orderLabels,
+      productSearch,
+      lineItems,
+    ]
+  );
 
   useEffect(() => {
     const area = DELIVERY_AREAS.find((a) => a.id === shippingAreaSlug);
@@ -65,9 +145,28 @@ export default function ManualOrderForm({ onSuccess, onCancel }: ManualOrderForm
 
   useEffect(() => {
     void fetchAllProducts(true)
-      .then(setProducts)
+      .then((loaded) => {
+        setProducts(loaded);
+        if (draftItems.length > 0) {
+          const restored: LineItem[] = [];
+          for (const item of draftItems) {
+            const product = loaded.find((p) => p.id === item.productId);
+            if (product) {
+              restored.push({
+                productId: item.productId,
+                product,
+                quantity: item.quantity,
+                selectedSize: item.selectedSize,
+                selectedColor: item.selectedColor,
+              });
+            }
+          }
+          if (restored.length > 0) setLineItems(restored);
+        }
+      })
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filteredProducts = useMemo(() => {
@@ -153,6 +252,7 @@ export default function ManualOrderForm({ onSuccess, onCancel }: ManualOrderForm
           selectedColor: i.selectedColor,
         })),
       });
+      clearDraft();
       onSuccess(result.orderNumber);
     } catch (e) {
       setError(parseSupabaseError(e));

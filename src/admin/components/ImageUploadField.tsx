@@ -1,5 +1,6 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { Upload, X, Loader2, Link2 } from 'lucide-react';
+import { normalizeExternalImageUrl } from '../../lib/normalizeImageUrl';
 
 export interface ImageUploadFieldHandle {
   uploadPending: (folderId: string) => Promise<string[]>;
@@ -67,11 +68,12 @@ const ImageUploadField = forwardRef<ImageUploadFieldHandle, ImageUploadFieldProp
         setUrlError('Paste a full link starting with http:// or https://');
         return;
       }
-      if (urls.includes(trimmed)) {
+      const normalized = normalizeExternalImageUrl(trimmed);
+      if (urls.includes(normalized)) {
         setUrlError('This link is already added.');
         return;
       }
-      onUrlsChange([...urls, trimmed]);
+      onUrlsChange([...urls, normalized]);
       setUrlInput('');
     };
 

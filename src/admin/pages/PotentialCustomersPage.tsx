@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Trash2, UserPlus, ExternalLink } from 'lucide-react';
+import { Search, Trash2, UserPlus, ExternalLink, Edit2, Phone, Mail, MessageCircle } from 'lucide-react';
 import {
   fetchPotentialCustomers,
   deletePotentialCustomer,
   PotentialCustomer,
 } from '../../lib/potentialCustomerService';
+import { getLeadContactOptions, hasAnyLeadContact } from '../../lib/leadContact';
 import { parseSupabaseError } from '../../lib/parseSupabaseError';
 import Button from '../../components/ui/Button';
 import Modal from '../../components/ui/Modal';
@@ -16,6 +17,7 @@ export default function PotentialCustomersPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [showAdd, setShowAdd] = useState(false);
+  const [editingLead, setEditingLead] = useState<PotentialCustomer | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -108,69 +110,126 @@ export default function PotentialCustomersPage() {
                   </td>
                 </tr>
               )}
-              {leads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-canvas">
-                  <td className="p-4 font-medium text-ink">{lead.name}</td>
-                  <td className="p-4">
-                    {lead.images && lead.images.length > 0 ? (
-                      <div className="flex gap-1">
-                        {lead.images.slice(0, 3).map((url) => (
-                          <a
-                            key={url}
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="block w-10 h-10 rounded overflow-hidden border border-line"
-                          >
-                            <img src={url} alt="" className="w-full h-full object-cover" />
-                          </a>
-                        ))}
-                        {lead.images.length > 3 && (
-                          <span className="text-xs text-ink-secondary self-center">+{lead.images.length - 3}</span>
+              {leads.map((lead) => {
+                const contact = getLeadContactOptions(lead);
+                return (
+                  <tr key={lead.id} className="hover:bg-canvas">
+                    <td className="p-4 font-medium text-ink">{lead.name}</td>
+                    <td className="p-4">
+                      {lead.images && lead.images.length > 0 ? (
+                        <div className="flex gap-1">
+                          {lead.images.slice(0, 3).map((url) => (
+                            <a
+                              key={url}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block w-10 h-10 rounded overflow-hidden border border-line"
+                            >
+                              <img src={url} alt="" className="w-full h-full object-cover" />
+                            </a>
+                          ))}
+                          {lead.images.length > 3 && (
+                            <span className="text-xs text-ink-secondary self-center">+{lead.images.length - 3}</span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-ink-muted">—</span>
+                      )}
+                    </td>
+                    <td className="p-4 text-sm space-y-1">
+                      {lead.phone && <p>{lead.phone}</p>}
+                      {lead.email && (
+                        <a href={contact.email!} className="text-accent hover:underline block">
+                          {lead.email}
+                        </a>
+                      )}
+                      {lead.socialLink && (
+                        <a
+                          href={contact.social!}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-accent hover:underline inline-flex items-center gap-1"
+                        >
+                          Social <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </td>
+                    <td className="p-4 text-sm text-ink-secondary max-w-xs">
+                      <p>{lead.interestSummary || '—'}</p>
+                      {lead.notes && <p className="text-xs mt-1 text-ink-muted">{lead.notes}</p>}
+                    </td>
+                    <td className="p-4 text-sm text-ink-secondary">{lead.createdByAdminName ?? '—'}</td>
+                    <td className="p-4 text-sm text-ink-secondary">
+                      {new Date(lead.purgeAfter).toLocaleDateString('en-GB')}
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center justify-end gap-1 flex-wrap">
+                        {hasAnyLeadContact(lead) && (
+                          <div className="flex items-center gap-1 mr-1">
+                            {contact.phone && (
+                              <a
+                                href={contact.phone}
+                                className="p-2 text-accent hover:bg-accent/10 rounded"
+                                title="Call"
+                              >
+                                <Phone className="w-4 h-4" />
+                              </a>
+                            )}
+                            {contact.whatsapp && (
+                              <a
+                                href={contact.whatsapp}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-2 text-green-600 hover:bg-green-50 rounded"
+                                title="WhatsApp"
+                              >
+                                <MessageCircle className="w-4 h-4" />
+                              </a>
+                            )}
+                            {contact.email && (
+                              <a
+                                href={contact.email}
+                                className="p-2 text-accent hover:bg-accent/10 rounded"
+                                title="Email"
+                              >
+                                <Mail className="w-4 h-4" />
+                              </a>
+                            )}
+                            {contact.social && (
+                              <a
+                                href={contact.social}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-2 text-ink-secondary hover:bg-canvas rounded"
+                                title="Social profile"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </a>
+                            )}
+                          </div>
                         )}
+                        <button
+                          type="button"
+                          onClick={() => setEditingLead(lead)}
+                          className="p-2 text-ink-secondary hover:bg-canvas rounded"
+                          title="Edit"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void handleDelete(lead)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
-                    ) : (
-                      <span className="text-xs text-ink-muted">—</span>
-                    )}
-                  </td>
-                  <td className="p-4 text-sm space-y-1">
-                    {lead.phone && <p>{lead.phone}</p>}
-                    {lead.email && (
-                      <a href={`mailto:${lead.email}`} className="text-accent hover:underline block">
-                        {lead.email}
-                      </a>
-                    )}
-                    {lead.socialLink && (
-                      <a
-                        href={lead.socialLink.startsWith('http') ? lead.socialLink : `https://${lead.socialLink}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-accent hover:underline inline-flex items-center gap-1"
-                      >
-                        Social <ExternalLink className="w-3 h-3" />
-                      </a>
-                    )}
-                  </td>
-                  <td className="p-4 text-sm text-ink-secondary max-w-xs">
-                    <p>{lead.interestSummary || '—'}</p>
-                    {lead.notes && <p className="text-xs mt-1 text-ink-muted">{lead.notes}</p>}
-                  </td>
-                  <td className="p-4 text-sm text-ink-secondary">{lead.createdByAdminName ?? '—'}</td>
-                  <td className="p-4 text-sm text-ink-secondary">
-                    {new Date(lead.purgeAfter).toLocaleDateString('en-GB')}
-                  </td>
-                  <td className="p-4 text-right">
-                    <button
-                      type="button"
-                      onClick={() => void handleDelete(lead)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -187,6 +246,23 @@ export default function PotentialCustomersPage() {
               void load();
             }}
           />
+        </div>
+      </Modal>
+
+      <Modal isOpen={!!editingLead} onClose={() => setEditingLead(null)} size="lg">
+        <div className="p-6">
+          <h2 className="text-xl font-semibold text-ink mb-4 pr-8">Edit Potential Customer</h2>
+          {editingLead && (
+            <PotentialCustomerForm
+              lead={editingLead}
+              onCancel={() => setEditingLead(null)}
+              onSuccess={(name) => {
+                setEditingLead(null);
+                setSuccessMessage(`${name} updated.`);
+                void load();
+              }}
+            />
+          )}
         </div>
       </Modal>
     </div>

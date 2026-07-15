@@ -170,7 +170,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // INITIAL_SESSION is handled by bootstrap — avoid duplicate work
       if (event === 'INITIAL_SESSION') return;
 
+      if (event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        setLoading(false);
+        return;
+      }
+
       if (event === 'SIGNED_IN' && nextSession?.user) {
+        if (window.location.pathname.startsWith('/admin')) {
+          setLoading(false);
+          return;
+        }
         window.setTimeout(() => {
           void completeAuthFlow(nextSession.user!).finally(() => {
             if (mounted) setLoading(false);

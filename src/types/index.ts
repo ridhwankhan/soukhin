@@ -25,6 +25,7 @@ export interface Product {
 
 export type ProductBadge =
   | 'new'
+  | 'hot'
   | 'eid-collection'
   | 'best-seller'
   | 'pre-order'
@@ -34,6 +35,7 @@ export type ProductBadge =
 
 export const PRODUCT_BADGE_LABELS: Record<ProductBadge, string> = {
   'new': 'New',
+  'hot': 'Hot',
   'eid-collection': 'Eid',
   'best-seller': 'Best Seller',
   'pre-order': 'Pre-order',
@@ -215,6 +217,7 @@ export interface AdminUser {
   email: string;
   name: string;
   role: AdminRole;
+  additionalRoles?: AdminRole[];
   avatar?: string;
   createdAt: string;
   lastLogin?: string;

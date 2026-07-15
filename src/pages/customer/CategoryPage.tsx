@@ -2,14 +2,15 @@ import { useState, useEffect, useMemo } from 'react';
 import Breadcrumbs from '../../components/layout/Breadcrumbs';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { SlidersHorizontal, X, ChevronDown } from 'lucide-react';
+import { SlidersHorizontal, X } from 'lucide-react';
 import ProductCard from '../../components/product/ProductCard';
 import Modal from '../../components/ui/Modal';
 import ProductDetail from '../../components/product/ProductDetail';
 import EmptyCategoryModal from '../../components/category/EmptyCategoryModal';
 import { Category, Product, SortOption } from '../../types';
-import { fetchProductsByCategory } from '../../lib/productService';
-import { findCategoryBySlug, getSubcategoriesForParent, getTopLevelCategories } from '../../lib/categoryService';
+import { fetchProductsByCategory, sortProductsWithNewFirst } from '../../lib/productService';
+import { findCategoryBySlug, getSubcategoryGroupsForParent, getTopLevelCategories } from '../../lib/categoryService';
+import type { LabeledGroup } from '../../lib/categoryService';
 import { withTimeout } from '../../lib/asyncUtils';
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
@@ -22,7 +23,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 export default function CategoryPage() {
   const { slug } = useParams<{ slug: string }>();
   const [category, setCategory] = useState<Category | null>(null);
-  const [subcats, setSubcats] = useState<Category[]>([]);
+  const [categoryGroups, setCategoryGroups] = useState<LabeledGroup<Category>[]>([]);
   const [rawProducts, setRawProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [emptyModalOpen, setEmptyModalOpen] = useState(false);
@@ -36,6 +37,9 @@ export default function CategoryPage() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
+  const subcats = useMemo(() => categoryGroups.flatMap((g) => g.items), [categoryGroups]);
+  const showGroupedNav = categoryGroups.length > 1 && subcats.length > 5;
+
   useEffect(() => {
     if (!slug) return;
 
@@ -44,20 +48,20 @@ export default function CategoryPage() {
 
     const load = async () => {
       try {
-        const [cat, subs, products, topLevel] = await withTimeout(
+        const [cat, groups, products, topLevel] = await withTimeout(
           Promise.all([
             findCategoryBySlug(slug),
-            getSubcategoriesForParent(slug),
+            getSubcategoryGroupsForParent(slug),
             fetchProductsByCategory(slug),
             getTopLevelCategories(),
           ]),
           12_000,
-          [null, [], [], []] as [Category | null, Category[], Product[], Category[]]
+          [null, [], [], []] as [Category | null, LabeledGroup<Category>[], Product[], Category[]]
         );
 
         const isTopLevel = topLevel.some((c) => c.slug === slug);
         setCategory(cat ?? (isTopLevel ? topLevel.find((c) => c.slug === slug) ?? null : null));
-        setSubcats(subs);
+        setCategoryGroups(groups);
         setRawProducts(products);
 
         if (products.length === 0) {
@@ -65,7 +69,7 @@ export default function CategoryPage() {
         }
       } catch {
         setCategory(null);
-        setSubcats([]);
+        setCategoryGroups([]);
         setRawProducts([]);
         setEmptyModalOpen(true);
       } finally {
@@ -99,17 +103,10 @@ export default function CategoryPage() {
 
     switch (sortBy) {
       case 'newest':
-        filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        break;
       case 'price-low-high':
-        filtered.sort((a, b) => (a.salePrice ?? a.price) - (b.salePrice ?? b.price));
-        break;
       case 'price-high-low':
-        filtered.sort((a, b) => (b.salePrice ?? b.price) - (a.salePrice ?? a.price));
-        break;
       case 'popular':
-        filtered.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0));
-        break;
+        return sortProductsWithNewFirst(filtered, sortBy);
     }
 
     return filtered;
@@ -159,14 +156,49 @@ export default function CategoryPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {subcats.length > 0 && (
           <div className="mb-8">
-            <div className="flex flex-wrap gap-3">
-              <Link to={`/category/${slug}`} className="px-4 py-2 text-sm rounded-sm bg-accent text-white">All {category?.name || 'Products'}</Link>
-              {subcats.map((subcat) => (
-                <Link key={subcat.slug} to={`/category/${subcat.slug}`} className="px-4 py-2 text-sm rounded-sm border border-line text-ink hover:border-accent hover:text-accent">
-                  {subcat.name}
+            {showGroupedNav ? (
+              <div className="space-y-6">
+                <Link
+                  to={`/category/${slug}`}
+                  className="inline-flex px-4 py-2 text-sm rounded-sm bg-accent text-white"
+                >
+                  All {category?.name || 'Products'}
                 </Link>
-              ))}
-            </div>
+                {categoryGroups.map((group) => (
+                  <div key={group.label}>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-ink-secondary mb-2">
+                      {group.label}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {group.items.map((subcat) => (
+                        <Link
+                          key={subcat.slug}
+                          to={`/category/${subcat.slug}`}
+                          className="px-4 py-2 text-sm rounded-sm border border-line text-ink hover:border-accent hover:text-accent"
+                        >
+                          {subcat.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-3">
+                <Link to={`/category/${slug}`} className="px-4 py-2 text-sm rounded-sm bg-accent text-white">
+                  All {category?.name || 'Products'}
+                </Link>
+                {subcats.map((subcat) => (
+                  <Link
+                    key={subcat.slug}
+                    to={`/category/${subcat.slug}`}
+                    className="px-4 py-2 text-sm rounded-sm border border-line text-ink hover:border-accent hover:text-accent"
+                  >
+                    {subcat.name}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

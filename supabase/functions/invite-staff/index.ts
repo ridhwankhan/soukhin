@@ -81,11 +81,17 @@ Deno.serve(async (req) => {
     });
 
     if (inviteError) {
-      if (inviteError.message.includes('already been registered')) {
+      if (inviteError.message.includes('already been registered') || inviteError.message.includes('already registered')) {
+        const { data: linkResult, error: linkError } = await supabaseAdmin.rpc('link_staff_by_email_internal', {
+          p_email: email,
+        });
+        if (linkError) throw linkError;
+        const linked = linkResult as { linked?: boolean; message?: string };
         return new Response(
           JSON.stringify({
             invited: false,
-            message: 'This email already has an account. They can sign in at /auth directly.',
+            linked: linked.linked ?? false,
+            message: linked.message ?? 'This email already has an account. They can sign in at /auth directly.',
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );

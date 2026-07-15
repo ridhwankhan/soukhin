@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   ReactNode,
 } from 'react';
@@ -11,9 +12,18 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { fetchMyAdminProfileWithRetry, signInAdmin, signOutAdmin } from '../lib/adminService';
-import { hasPermission } from '../config/roles';
+import { hasAnyPermission } from '../config/roles';
 import { AdminUser, Permission } from '../types';
 import { clearSessionMarkers, touchSession } from '../lib/sessionManager';
+import {
+  cacheAdminProfile,
+  clearCachedAdminProfile,
+  clearStaffAccessGranted,
+  markStaffAccessGranted,
+  readCachedAdminProfile,
+  hasStaffAccessGranted,
+  clearLastAdminPath,
+} from '../lib/adminSessionCache';
 import { withTimeout } from '../lib/asyncUtils';
 import { useSessionManager } from '../hooks/useSessionManager';
 import SessionTimeoutWarning from '../components/auth/SessionTimeoutWarning';
@@ -39,9 +49,13 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const isOnAdminRoute = location.pathname.startsWith('/admin');
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [admin, setAdmin] = useState<AdminUser | null>(null);
+  const [admin, setAdmin] = useState<AdminUser | null>(() => readCachedAdminProfile());
   const [adminError, setAdminError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(
+    () => !(readCachedAdminProfile() || hasStaffAccessGranted())
+  );
+  const adminRef = useRef(admin);
+  adminRef.current = admin;
 
   const loadAdmin = useCallback(async (options?: { preserveOnFailure?: boolean }) => {
     const result = await withTimeout(fetchMyAdminProfileWithRetry(3), 15_000, {
@@ -51,23 +65,28 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
     if (result.admin) {
       setAdmin(result.admin);
+      cacheAdminProfile(result.admin);
+      markStaffAccessGranted();
       setAdminError(null);
       return result.admin;
     }
 
-    if (options?.preserveOnFailure) {
-      setAdmin((prev) => prev);
+    // Never wipe a working admin session on background refresh / tab focus timeouts.
+    if (options?.preserveOnFailure || adminRef.current) {
       if (result.error) setAdminError(result.error);
-      return null;
+      return adminRef.current;
     }
 
     setAdmin(null);
+    clearCachedAdminProfile();
     setAdminError(result.error ?? null);
     return null;
   }, []);
 
   const setAdminProfile = useCallback((profile: AdminUser | null) => {
     setAdmin(profile);
+    if (profile) cacheAdminProfile(profile);
+    else clearCachedAdminProfile();
   }, []);
 
   useEffect(() => {
@@ -103,7 +122,26 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
       if (event === 'INITIAL_SESSION') return;
 
+      if (event === 'SIGNED_OUT' || !nextSession?.user) {
+        setAdmin(null);
+        clearCachedAdminProfile();
+        clearStaffAccessGranted();
+        clearLastAdminPath();
+        setLoading(false);
+        return;
+      }
+
+      // Token refresh on tab focus — update session only, never re-bootstrap admin.
+      if (event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        setLoading(false);
+        return;
+      }
+
       if (event === 'SIGNED_IN' && nextSession?.user) {
+        if (adminRef.current || hasStaffAccessGranted() || readCachedAdminProfile()) {
+          setLoading(false);
+          return;
+        }
         setLoading(true);
         window.setTimeout(() => {
           void loadAdmin().finally(() => {
@@ -111,14 +149,6 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
           });
         }, 0);
         return;
-      }
-
-      if (nextSession?.user) {
-        window.setTimeout(() => {
-          void loadAdmin();
-        }, 0);
-      } else {
-        setAdmin(null);
       }
 
       setLoading(false);
@@ -168,6 +198,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     clearSessionMarkers('admin');
+    clearCachedAdminProfile();
+    clearStaffAccessGranted();
+    clearLastAdminPath();
     await withTimeout(signOutAdmin(), 5_000, undefined);
     setSession(null);
     setUser(null);
@@ -187,8 +220,10 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   const can = useCallback(
     (permission: Permission) => {
-      if (!admin) return false;
-      return hasPermission(admin.role, permission);
+      const profile = adminRef.current ?? readCachedAdminProfile();
+      if (!profile) return false;
+      const roles = [profile.role, ...(profile.additionalRoles ?? [])];
+      return hasAnyPermission(roles, permission);
     },
     [admin]
   );
@@ -203,7 +238,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       signIn,
       signOut,
       can,
-      refreshAdmin: loadAdmin,
+      refreshAdmin: () => loadAdmin({ preserveOnFailure: true }),
       setAdminProfile,
     }),
     [user, session, admin, adminError, loading, signIn, signOut, can, loadAdmin, setAdminProfile]

@@ -1,37 +1,60 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronLeft, ChevronRight, Truck, Shield, Award, Heart } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Truck, Shield, Award, Heart } from 'lucide-react';
 import HeroSection from '../../components/hero/HeroSection';
-import ProductCard from '../../components/product/ProductCard';
-import { fetchFeaturedProducts, fetchNewArrivals } from '../../lib/productService';
+import ProductCarousel from '../../components/home/ProductCarousel';
+import NewReleasesSlideshow, { NewReleaseSlide } from '../../components/home/NewReleasesSlideshow';
+import { fetchHotProducts, fetchNewArrivals } from '../../lib/productService';
 import { getTopLevelCategories } from '../../lib/categoryService';
+import { fetchPublicSiteSettings } from '../../lib/settingsService';
 import { Product, Category } from '../../types';
+
+const DEFAULT_BANNERS = [
+  { image: 'https://images.pexels.com/photos/10963904/pexels-photo-10963904.jpeg', title: 'Eid Collection', subtitle: 'Elegant Wearables for Everyone', link: '/category/wearables' },
+  { image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg', title: 'Homemade Delights', subtitle: 'Traditional Pitha & Food', link: '/category/food-pitha' },
+  { image: 'https://images.pexels.com/photos/2641170/pexels-photo-2641170.jpeg', title: 'Gift Hampers', subtitle: 'Curated with Love', link: '/category/gifts' },
+];
 
 export default function HomePage() {
   const [currentBanner, setCurrentBanner] = useState(0);
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
+  const [hotProducts, setHotProducts] = useState<Product[]>([]);
   const [shopCategories, setShopCategories] = useState<Category[]>([]);
+  const [banners, setBanners] = useState(DEFAULT_BANNERS);
+  const [releasePhotos, setReleasePhotos] = useState<NewReleaseSlide[]>([]);
 
   useEffect(() => {
-    fetchFeaturedProducts(8).then(setFeaturedProducts).catch(() => setFeaturedProducts([]));
-    fetchNewArrivals(8).then(setNewArrivals).catch(() => setNewArrivals([]));
+    fetchNewArrivals(12).then(setNewArrivals).catch(() => setNewArrivals([]));
+    fetchHotProducts(12).then(setHotProducts).catch(() => setHotProducts([]));
     getTopLevelCategories().then(setShopCategories).catch(() => setShopCategories([]));
+    fetchPublicSiteSettings().then((s) => {
+      const fromDb = s.banners as typeof DEFAULT_BANNERS | undefined;
+      if (fromDb?.length) setBanners(fromDb);
+      const releases = s.new_releases as NewReleaseSlide[] | undefined;
+      if (releases?.length) setReleasePhotos(releases.filter((r) => r.image && r.title));
+    }).catch(() => {});
   }, []);
 
-  const banners = [
-    { image: 'https://images.pexels.com/photos/10963904/pexels-photo-10963904.jpeg', title: 'Eid Collection', subtitle: 'Elegant Wearables for Everyone', link: '/category/wearables' },
-    { image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg', title: 'Homemade Delights', subtitle: 'Traditional Pitha & Food', link: '/category/food-pitha' },
-    { image: 'https://images.pexels.com/photos/2641170/pexels-photo-2641170.jpeg', title: 'Gift Hampers', subtitle: 'Curated with Love', link: '/category/gifts' },
-  ];
+  const newReleaseSlides = useMemo(() => {
+    const productSlides: NewReleaseSlide[] = newArrivals
+      .filter((p) => p.images[0])
+      .map((p) => ({
+        image: p.images[0],
+        title: p.name,
+        subtitle: p.nameBn || undefined,
+        link: `/product/${p.id}`,
+      }));
+    return [...releasePhotos, ...productSlides];
+  }, [releasePhotos, newArrivals]);
 
   useEffect(() => {
+    if (banners.length === 0) return;
     const timer = setInterval(() => {
       setCurrentBanner((prev) => (prev + 1) % banners.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [banners.length]);
 
   const nextBanner = () => setCurrentBanner((prev) => (prev + 1) % banners.length);
   const prevBanner = () => setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length);
@@ -39,6 +62,16 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       <HeroSection />
+
+      <NewReleasesSlideshow slides={newReleaseSlides} />
+
+      <ProductCarousel
+        title="Hot Picks"
+        subtitle="Trending products our customers love right now"
+        products={hotProducts}
+        viewAllHref="/category/new-arrivals"
+        accent="hot"
+      />
 
       {/* Categories */}
       <section className="py-16 md:py-24 bg-elevated">
@@ -57,10 +90,7 @@ export default function HomePage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Link
-                  to={`/category/${category.slug}`}
-                  className="group block"
-                >
+                <Link to={`/category/${category.slug}`} className="group block">
                   <div className="aspect-square rounded-lg overflow-hidden mb-3 bg-surface">
                     <img
                       src={category.image}
@@ -79,31 +109,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Products */}
-      {featuredProducts.length > 0 && (
-      <section className="py-16 md:py-24 bg-canvas">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-serif font-semibold text-ink mb-2">Featured Products</h2>
-              <p className="text-ink-secondary">Handpicked by our team</p>
-            </div>
-            <Link
-              to="/category/new-arrivals"
-              className="flex items-center gap-2 text-accent font-medium hover:underline"
-            >
-              View All <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {featuredProducts.slice(0, 8).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </div>
-      </section>
-      )}
+      <ProductCarousel
+        title="New Arrivals"
+        subtitle="Products marked NEW — always shown first in categories"
+        products={newArrivals}
+        viewAllHref="/category/new-arrivals"
+      />
 
       {/* Banner Carousel */}
       <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
@@ -115,11 +126,7 @@ export default function HomePage() {
             }`}
           >
             <div className="absolute inset-0 bg-black/40 z-10" />
-            <img
-              src={banner.image}
-              alt={banner.title}
-              className="w-full h-full object-cover"
-            />
+            <img src={banner.image} alt={banner.title} className="w-full h-full object-cover" />
             <div className="absolute inset-0 z-20 flex items-center justify-center text-center text-white px-4">
               <div>
                 <h2 className="text-4xl md:text-6xl font-serif font-bold mb-4">{banner.title}</h2>
@@ -160,32 +167,6 @@ export default function HomePage() {
           ))}
         </div>
       </section>
-
-      {/* New Arrivals */}
-      {newArrivals.length > 0 && (
-      <section className="py-16 md:py-24 bg-elevated">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-serif font-semibold text-ink mb-2">New Arrivals</h2>
-              <p className="text-ink-secondary">Fresh additions to our collection</p>
-            </div>
-            <Link
-              to="/category/new-arrivals"
-              className="flex items-center gap-2 text-accent font-medium hover:underline"
-            >
-              View All <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {newArrivals.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </div>
-      </section>
-      )}
 
       {/* Trust Badges */}
       <section className="py-16 bg-accent">
