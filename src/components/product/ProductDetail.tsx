@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Heart, ShoppingCart, Minus, Plus, ChevronLeft, ChevronRight, Package, Truck, Leaf } from 'lucide-react';
+import { Heart, ShoppingCart, Minus, Plus, Package, Truck, Leaf } from 'lucide-react';
 import { Product } from '../../types';
 import ProductImage from '../ui/ProductImage';
+import Badge from '../ui/Badge';
 import Button from '../ui/Button';
 import { useProtectedCart } from '../../hooks/useProtectedCart';
 import { useWishlist } from '../../context/WishlistContext';
@@ -13,7 +13,9 @@ interface ProductDetailProps {
   onClose?: () => void;
 }
 
-export default function ProductDetail({ product, onClose }: ProductDetailProps) {
+export default function ProductDetail({ product }: ProductDetailProps) {
+  const images = product.images?.length ? product.images : [''];
+  const badges = product.badges ?? [];
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string | undefined>(product.sizeOptions?.[0]);
   const [selectedColor, setSelectedColor] = useState<string | undefined>(product.colorOptions?.[0]);
@@ -22,10 +24,13 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
   const { isInWishlist, toggleItem } = useWishlist();
 
   const displayPrice = product.salePrice ?? product.price;
-  const hasDiscount = product.salePrice && product.salePrice < product.price && !isUndeclaredPrice(product.price);
+  const hasDiscount = Boolean(
+    product.salePrice && product.salePrice < product.price && !isUndeclaredPrice(product.price)
+  );
   const priceLabel = formatProductPrice(product.price, product.salePrice);
   const isWishlisted = isInWishlist(product.id);
   const inCart = isInCart(product.id);
+  const safeImageIndex = Math.min(selectedImage, Math.max(images.length - 1, 0));
 
   const handleAddToCart = () => {
     addItem(product, quantity, selectedSize, selectedColor);
@@ -36,32 +41,40 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
       <div className="space-y-4">
         <div className="relative aspect-square bg-surface rounded-lg overflow-hidden">
           <ProductImage
-            src={product.images[selectedImage]}
+            src={images[safeImageIndex] || ''}
             alt={product.name}
             productId={product.id}
             productName={product.name}
             className="w-full h-full object-cover"
           />
-          {product.badges.length > 0 && (
+          {badges.length > 0 && (
             <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-              {product.badges.map(badge => (
+              {badges.map((badge) => (
                 <Badge key={badge} badge={badge} />
               ))}
             </div>
           )}
         </div>
 
-        {product.images.length > 1 && (
+        {images.length > 1 && (
           <div className="flex gap-2 overflow-x-auto pb-2">
-            {product.images.map((img, idx) => (
+            {images.map((img, idx) => (
               <button
                 key={idx}
+                type="button"
                 onClick={() => setSelectedImage(idx)}
                 className={`relative w-20 h-20 flex-shrink-0 rounded-sm overflow-hidden border-2 transition-colors ${
-                  selectedImage === idx ? 'border-accent' : 'border-transparent'
+                  safeImageIndex === idx ? 'border-accent' : 'border-transparent'
                 }`}
               >
-                <img src={img} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = ''; }} />
+                <img
+                  src={img}
+                  alt=""
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.visibility = 'hidden';
+                  }}
+                />
               </button>
             ))}
           </div>
@@ -71,19 +84,25 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
       <div className="space-y-6">
         <div>
           <p className="text-sm text-accent uppercase tracking-wide mb-2 font-semibold">
-            {product.category.replace('-', ' ')}
+            {(product.category || 'gifts').replace(/-/g, ' ')}
           </p>
           <h2 className="text-2xl md:text-3xl font-semibold text-ink font-serif">{product.name}</h2>
-          <p className="text-ink-secondary mt-1">{product.nameBn}</p>
+          {product.nameBn && <p className="text-ink-secondary mt-1">{product.nameBn}</p>}
         </div>
 
         <div className="flex items-baseline gap-3">
-          <span className={`text-3xl font-bold ${isUndeclaredPrice(displayPrice) ? 'text-ink-secondary italic' : 'text-accent'}`}>
+          <span
+            className={`text-3xl font-bold ${
+              isUndeclaredPrice(displayPrice) ? 'text-ink-secondary italic' : 'text-accent'
+            }`}
+          >
             {priceLabel}
           </span>
           {hasDiscount && (
             <>
-              <span className="text-xl text-ink-secondary line-through">৳{product.price.toLocaleString()}</span>
+              <span className="text-xl text-ink-secondary line-through">
+                ৳{product.price.toLocaleString()}
+              </span>
               <span className="px-2 py-1 bg-accent-soft text-white text-sm rounded-sm">
                 {Math.round((1 - product.salePrice! / product.price) * 100)}% off
               </span>
@@ -91,15 +110,18 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
           )}
         </div>
 
-        <p className="text-ink-secondary leading-relaxed">{product.description}</p>
+        {product.description && (
+          <p className="text-ink-secondary leading-relaxed">{product.description}</p>
+        )}
 
         {product.sizeOptions && product.sizeOptions.length > 0 && (
           <div>
             <p className="text-sm font-medium text-ink mb-2">Size</p>
             <div className="flex flex-wrap gap-2">
-              {product.sizeOptions.map(size => (
+              {product.sizeOptions.map((size) => (
                 <button
                   key={size}
+                  type="button"
                   onClick={() => setSelectedSize(size)}
                   className={`px-4 py-2 border rounded-sm transition-colors ${
                     selectedSize === size
@@ -118,9 +140,10 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
           <div>
             <p className="text-sm font-medium text-ink mb-2">Color</p>
             <div className="flex flex-wrap gap-2">
-              {product.colorOptions.map(color => (
+              {product.colorOptions.map((color) => (
                 <button
                   key={color}
+                  type="button"
                   onClick={() => setSelectedColor(color)}
                   className={`px-4 py-2 border rounded-sm transition-colors ${
                     selectedColor === color
@@ -138,31 +161,29 @@ export default function ProductDetail({ product, onClose }: ProductDetailProps) 
         <div className="flex items-center gap-4">
           <div className="flex items-center border border-line rounded-sm">
             <button
-              onClick={() => setQuantity(q => Math.max(1, q - 1))}
+              type="button"
+              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
               className="p-3 hover:bg-surface transition-colors"
             >
               <Minus className="w-4 h-4" />
             </button>
             <span className="px-4 py-3 font-medium min-w-[60px] text-center">{quantity}</span>
             <button
-              onClick={() => setQuantity(q => Math.min(product.stock, q + 1))}
+              type="button"
+              onClick={() => setQuantity((q) => Math.min(Math.max(product.stock, 1), q + 1))}
               className="p-3 hover:bg-surface transition-colors"
             >
               <Plus className="w-4 h-4" />
             </button>
           </div>
 
-          <Button
-            onClick={handleAddToCart}
-            disabled={product.stock === 0}
-            size="lg"
-            className="flex-1"
-          >
+          <Button onClick={handleAddToCart} disabled={product.stock === 0} size="lg" className="flex-1">
             <ShoppingCart className="w-5 h-5 mr-2" />
             {product.stock === 0 ? 'Out of Stock' : inCart ? 'Add More' : 'Add to Cart'}
           </Button>
 
           <button
+            type="button"
             onClick={() => toggleItem(product)}
             className={`p-3 rounded-sm border transition-colors ${
               isWishlisted

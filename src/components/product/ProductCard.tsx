@@ -21,13 +21,14 @@ const ProductCard = memo(function ProductCard({ product, onClick, onRemove }: Pr
   const { isInWishlist, toggleItem } = useWishlist();
   const [wishlistHint, setWishlistHint] = useState<string | null>(null);
 
+  const badges = product.badges ?? [];
   const isWishlisted = isInWishlist(product.id);
   const inCart = isInCart(product.id);
   const displayPrice = product.salePrice ?? product.price;
   const hasDiscount = product.salePrice && product.salePrice < product.price && !isUndeclaredPrice(product.price);
   const priceLabel = formatProductPrice(product.price, product.salePrice);
 
-  const imageSrc = product.images[0] || '';
+  const imageSrc = product.images?.[0] || '';
 
   const handleView = () => {
     if (onClick) {
@@ -78,12 +79,12 @@ const ProductCard = memo(function ProductCard({ product, onClick, onRemove }: Pr
         )}
 
         <div className="absolute top-3 left-3 z-10 flex flex-wrap gap-1.5 pointer-events-none">
-          {product.badges.includes('new') && (
+          {badges.includes('new') && (
             <span className="px-2 py-1 bg-accent text-white text-[10px] font-bold tracking-widest uppercase shadow-sm">
               NEW
             </span>
           )}
-          {product.badges.filter((b) => b !== 'new').map(badge => (
+          {badges.filter((b) => b !== 'new').map((badge) => (
             <Badge key={badge} badge={badge} size="sm" />
           ))}
         </div>
@@ -116,7 +117,7 @@ const ProductCard = memo(function ProductCard({ product, onClick, onRemove }: Pr
           </div>
         )}
 
-        <div className="absolute inset-0 z-10 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hidden md:flex items-center justify-center gap-2">
+        <div className="absolute inset-0 z-10 bg-black/20 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200 hidden md:flex items-center justify-center gap-2">
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); handleView(); }}
@@ -163,7 +164,7 @@ const ProductCard = memo(function ProductCard({ product, onClick, onRemove }: Pr
         className="w-full p-4 text-left"
       >
         <p className="text-xs text-accent uppercase tracking-wide mb-1 font-semibold">
-          {product.category.replace('-', ' ')}
+          {(product.category || 'gifts').replace(/-/g, ' ')}
         </p>
         <h3 className="font-semibold text-ink mb-1 line-clamp-1 group-hover:text-accent transition-colors">
           {product.name}

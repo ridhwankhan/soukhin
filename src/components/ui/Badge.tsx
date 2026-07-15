@@ -17,8 +17,11 @@ const badgeConfig: Record<ProductBadge, { bg: string; text: string; label: strin
 };
 
 export default function Badge({ badge, size = 'md' }: BadgeProps) {
-  const config = badgeConfig[badge];
-  if (!config) return null;
+  const config = badgeConfig[badge] ?? {
+    bg: 'bg-ink',
+    text: 'text-white',
+    label: String(badge).replace(/-/g, ' ').toUpperCase(),
+  };
 
   return (
     <span
