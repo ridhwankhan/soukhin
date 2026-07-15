@@ -39,6 +39,9 @@ export default function AnnouncementsPage() {
   const [drawer, setDrawer] = useState<DrawerState>({ open: false, mode: 'add', data: EMPTY });
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+
   const openAdd = () => setDrawer({ open: true, mode: 'add', data: { ...EMPTY } });
   const openEdit = (a: Announcement) => setDrawer({
     open: true, mode: 'edit',
@@ -46,20 +49,28 @@ export default function AnnouncementsPage() {
   });
   const closeDrawer = () => setDrawer(d => ({ ...d, open: false }));
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!drawer.data.text.trim()) return;
-    if (drawer.mode === 'add') {
-      addAnnouncement(drawer.data);
-    } else {
-      updateAnnouncement(drawer.data.id!, {
-        text: drawer.data.text,
-        textBn: drawer.data.textBn || undefined,
-        link: drawer.data.link || undefined,
-        isActive: drawer.data.isActive,
-        bgColor: drawer.data.bgColor,
-      });
+    setSaving(true);
+    setSaveError('');
+    try {
+      if (drawer.mode === 'add') {
+        await addAnnouncement(drawer.data);
+      } else {
+        await updateAnnouncement(drawer.data.id!, {
+          text: drawer.data.text,
+          textBn: drawer.data.textBn || undefined,
+          link: drawer.data.link || undefined,
+          isActive: drawer.data.isActive,
+          bgColor: drawer.data.bgColor,
+        });
+      }
+      closeDrawer();
+    } catch {
+      setSaveError('Could not save to database. Check your staff login and try again.');
+    } finally {
+      setSaving(false);
     }
-    closeDrawer();
   };
 
   const setField = <K extends keyof DrawerState['data']>(k: K, v: DrawerState['data'][K]) =>
@@ -130,7 +141,7 @@ export default function AnnouncementsPage() {
                   </td>
                   <td className="px-4 py-4">
                     <button
-                      onClick={() => toggleAnnouncement(a.id)}
+                      onClick={() => void toggleAnnouncement(a.id)}
                       className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${a.isActive ? 'text-accent' : 'text-ink-muted'}`}
                     >
                       {a.isActive ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
@@ -269,20 +280,25 @@ export default function AnnouncementsPage() {
                 )}
               </div>
 
-              <div className="px-6 py-4 border-t border-line flex gap-3">
-                <button
-                  onClick={closeDrawer}
-                  className="flex-1 py-2.5 border border-line text-sm font-medium text-ink-secondary hover:bg-canvas transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={!drawer.data.text.trim()}
-                  className="flex-1 py-2.5 bg-accent text-white text-sm font-medium hover:bg-accent-hover disabled:opacity-50 transition-colors"
-                >
-                  {drawer.mode === 'add' ? 'Add Announcement' : 'Save Changes'}
-                </button>
+              <div className="px-6 py-4 border-t border-line flex flex-col gap-2">
+                {saveError && (
+                  <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-sm px-3 py-2">{saveError}</p>
+                )}
+                <div className="flex gap-3">
+                  <button
+                    onClick={closeDrawer}
+                    className="flex-1 py-2.5 border border-line text-sm font-medium text-ink-secondary hover:bg-canvas transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => void handleSave()}
+                    disabled={!drawer.data.text.trim() || saving}
+                    className="flex-1 py-2.5 bg-accent text-white text-sm font-medium hover:bg-accent-hover disabled:opacity-50 transition-colors"
+                  >
+                    {saving ? 'Saving…' : drawer.mode === 'add' ? 'Add Announcement' : 'Save Changes'}
+                  </button>
+                </div>
               </div>
             </motion.div>
           </>
@@ -306,7 +322,7 @@ export default function AnnouncementsPage() {
                   Cancel
                 </button>
                 <button
-                  onClick={() => { deleteAnnouncement(confirmDelete); setConfirmDelete(null); }}
+                  onClick={() => { void deleteAnnouncement(confirmDelete); setConfirmDelete(null); }}
                   className="flex-1 py-2.5 bg-accent-soft text-white text-sm font-medium hover:bg-accent-hover transition-colors"
                 >
                   Delete

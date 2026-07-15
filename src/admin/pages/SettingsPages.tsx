@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Save, AlertCircle } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { PAYMENT_CONFIG, DELIVERY_CONFIG, SITE_SETTINGS } from '../../config';
-import { fetchSiteSettingsAdmin, saveSiteSetting } from '../../lib/settingsService';
+import { fetchSiteSettingsAdmin, fetchPublicSiteSettings, saveSiteSetting } from '../../lib/settingsService';
 
 export function PaymentSettingsPage() {
   const [config, setConfig] = useState(PAYMENT_CONFIG);
@@ -359,7 +359,21 @@ export function StoreSettingsPage() {
         text: settings.announcementBar,
         textBn: settings.announcementBarBn,
       });
-      setMessage('Store settings saved.');
+      // Keep rotating announcements list in sync for the live header
+      const existing = await fetchPublicSiteSettings();
+      const list = Array.isArray(existing.announcements) ? [...(existing.announcements as object[])] : [];
+      const primary = {
+        id: 'ann-primary',
+        text: settings.announcementBar,
+        textBn: settings.announcementBarBn,
+        isActive: true,
+        bgColor: 'green',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      const withoutPrimary = list.filter((a) => (a as { id?: string }).id !== 'ann-primary' && (a as { id?: string }).id !== 'ann-legacy' && (a as { id?: string }).id !== 'ann-default');
+      await saveSiteSetting('announcements', [primary, ...withoutPrimary]);
+      setMessage('Store settings saved to the live website.');
     } catch (err) {
       setMessage(err instanceof Error ? err.message : 'Save failed');
     } finally {

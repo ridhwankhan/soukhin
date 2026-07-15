@@ -343,13 +343,30 @@ async function fetchExistingSkus(supabase) {
   return new Map((data ?? []).map((p) => [p.sku, p.images]));
 }
 
-async function uploadImage(supabase, filePath, sku) {
-  const buf = readFileSync(filePath);
-  const ext = extname(filePath).toLowerCase().replace('.', '') || 'jpg';
-  const storagePath = `import/${sku}/${basename(filePath).replace(/[^\w.\-()+ ]/g, '_')}`;
+async function prepareUploadBuffer(filePath) {
+  const raw = readFileSync(filePath);
+  const MAX = 1_200_000; // stay under typical 2MB bucket limits
+  if (raw.length <= MAX) {
+    return { buffer: raw, contentType: mimeFor(filePath), ext: extname(filePath).toLowerCase().replace('.', '') || 'jpg' };
+  }
 
-  const { error } = await supabase.storage.from(PRODUCT_IMAGES_BUCKET).upload(storagePath, buf, {
-    contentType: mimeFor(filePath),
+  const sharp = (await import('sharp')).default;
+  const buffer = await sharp(raw)
+    .rotate()
+    .resize({ width: 1600, height: 1600, fit: 'inside', withoutEnlargement: true })
+    .webp({ quality: 82 })
+    .toBuffer();
+
+  return { buffer, contentType: 'image/webp', ext: 'webp' };
+}
+
+async function uploadImage(supabase, filePath, sku) {
+  const { buffer, contentType, ext } = await prepareUploadBuffer(filePath);
+  const safeName = basename(filePath, extname(filePath)).replace(/[^\w.\-()+ ]/g, '_');
+  const storagePath = `import/${sku}/${safeName}.${ext}`;
+
+  const { error } = await supabase.storage.from(PRODUCT_IMAGES_BUCKET).upload(storagePath, buffer, {
+    contentType,
     upsert: true,
     cacheControl: '31536000',
   });

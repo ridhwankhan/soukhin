@@ -9,6 +9,8 @@ import { useWishlist } from '../../context/WishlistContext';
 import { useAuth } from '../../context/AuthContext';
 import { canStaffUseStorefront } from '../../lib/staffAuth';
 import { useStaffAccess } from '../../hooks/useStaffAccess';
+import { useAnnouncements } from '../../context/AnnouncementContext';
+import { SITE_SETTINGS } from '../../config';
 
 interface HeaderProps {
   onCartClick: () => void;
@@ -99,10 +101,25 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
   const { items: wishlistItems } = useWishlist();
   const { user, profile, isEmailVerified } = useAuth();
   const { admin, adminLoading, showDashboard } = useStaffAccess();
+  const { activeAnnouncements } = useAnnouncements();
+  const [announcementIndex, setAnnouncementIndex] = useState(0);
   const canShopAsStaff = admin ? canStaffUseStorefront(admin.role) : false;
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const isHome = location.pathname === '/';
+
+  const announcementText =
+    activeAnnouncements.length > 0
+      ? activeAnnouncements[announcementIndex % activeAnnouncements.length]?.text
+      : SITE_SETTINGS.announcementBar;
+
+  useEffect(() => {
+    if (activeAnnouncements.length <= 1) return;
+    const timer = window.setInterval(() => {
+      setAnnouncementIndex((i) => (i + 1) % activeAnnouncements.length);
+    }, 5000);
+    return () => window.clearInterval(timer);
+  }, [activeAnnouncements.length]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -158,7 +175,7 @@ export default function Header({ onCartClick, searchOpen, onSearchToggle }: Head
             <span className="opacity-60 mr-3" aria-hidden>|</span>
           </>
         )}
-        <span>Free delivery on orders over ৳2000 | Use code: SOUKHIN10</span>
+        <span>{announcementText}</span>
       </div>
 
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

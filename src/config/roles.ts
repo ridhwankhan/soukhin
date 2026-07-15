@@ -21,7 +21,7 @@ export const ROLE_PERMISSIONS: RolePermission[] = [
       'view-customers', 'manage-customers', 'send-customer-notifications',
       'view-reviews', 'manage-reviews',
       'view-coupons', 'manage-coupons', 'view-content', 'manage-content',
-      'view-settings', 'view-users', 'manage-staff',
+      'view-settings', 'manage-settings', 'view-users', 'manage-staff',
     ],
   },
   {

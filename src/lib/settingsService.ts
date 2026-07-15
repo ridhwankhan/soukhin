@@ -17,7 +17,15 @@ export async function saveSiteSetting(key: string, value: unknown): Promise<void
     p_key: key,
     p_value: value,
   });
-  if (error) throw error;
+  if (error) {
+    const msg = error.message || '';
+    if (msg.includes('permission_denied') || error.code === '42501') {
+      throw new Error(
+        'Your staff role cannot edit store settings. Ask an owner to grant manage-settings, or run supabase/FIX_SETTINGS_CONTENT_SAVE.sql.'
+      );
+    }
+    throw error;
+  }
 }
 
 export async function saveSiteSettingsBatch(settings: Record<string, unknown>): Promise<void> {
