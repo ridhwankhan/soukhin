@@ -23,17 +23,44 @@ export default function HomePage() {
   const [shopCategories, setShopCategories] = useState<Category[]>([]);
   const [banners, setBanners] = useState(DEFAULT_BANNERS);
   const [releasePhotos, setReleasePhotos] = useState<NewReleaseSlide[]>([]);
+  const [storeOffline, setStoreOffline] = useState(false);
 
   useEffect(() => {
-    fetchNewArrivals(12).then(setNewArrivals).catch(() => setNewArrivals([]));
-    fetchHotProducts(12).then(setHotProducts).catch(() => setHotProducts([]));
-    getTopLevelCategories().then(setShopCategories).catch(() => setShopCategories([]));
-    fetchPublicSiteSettings().then((s) => {
-      const fromDb = s.banners as typeof DEFAULT_BANNERS | undefined;
-      if (fromDb?.length) setBanners(fromDb);
-      const releases = s.new_releases as NewReleaseSlide[] | undefined;
-      if (releases?.length) setReleasePhotos(releases.filter((r) => r.image && r.title));
-    }).catch(() => {});
+    let cancelled = false;
+
+    const load = async () => {
+      const results = await Promise.allSettled([
+        fetchNewArrivals(12),
+        fetchHotProducts(12),
+        getTopLevelCategories(),
+        fetchPublicSiteSettings(),
+      ]);
+
+      if (cancelled) return;
+
+      const arrivals = results[0].status === 'fulfilled' ? results[0].value : [];
+      const hot = results[1].status === 'fulfilled' ? results[1].value : [];
+      const cats = results[2].status === 'fulfilled' ? results[2].value : [];
+      setNewArrivals(arrivals);
+      setHotProducts(hot);
+      setShopCategories(cats);
+
+      if (results[3].status === 'fulfilled') {
+        const s = results[3].value;
+        const fromDb = s.banners as typeof DEFAULT_BANNERS | undefined;
+        if (fromDb?.length) setBanners(fromDb);
+        const releases = s.new_releases as NewReleaseSlide[] | undefined;
+        if (releases?.length) setReleasePhotos(releases.filter((r) => r.image && r.title));
+      }
+
+      const failed = results.filter((r) => r.status === 'rejected').length;
+      setStoreOffline(failed >= 3 || (arrivals.length === 0 && hot.length === 0 && cats.length === 0 && failed > 0));
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const newReleaseSlides = useMemo(() => {
@@ -61,6 +88,11 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
+      {storeOffline && (
+        <div className="bg-amber-50 border-b border-amber-200 text-amber-900 text-sm text-center px-4 py-3">
+          The shop database is waking up (Free plan pause). Wait about a minute, then refresh this page.
+        </div>
+      )}
       <HeroSection />
 
       <NewReleasesSlideshow slides={newReleaseSlides} />

@@ -243,14 +243,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: `Too many sign-in attempts. Try again in ${formatRetryAfter(attemptLimit.retryAfterMs)}.` };
     }
 
-    const isStaff = await checkStaffEmail(normalizedEmail);
+    let isStaff = false;
+    try {
+      isStaff = await checkStaffEmail(normalizedEmail);
+    } catch {
+      return {
+        error: 'Cannot reach the shop database right now. Wait a minute and try again — the Free plan may be waking up.',
+      };
+    }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: normalizedEmail,
-      password,
-    });
-
-    if (error) return { error: error.message };
+    let data: { user?: { email_confirmed_at?: string | null } | null } | null = null;
+    try {
+      const result = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      });
+      if (result.error) return { error: result.error.message };
+      data = result.data;
+    } catch {
+      return {
+        error: 'Cannot reach the shop database right now. Wait a minute and try again — the Free plan may be waking up.',
+      };
+    }
 
     if (data.user && !data.user.email_confirmed_at) {
       await supabase.auth.signOut();

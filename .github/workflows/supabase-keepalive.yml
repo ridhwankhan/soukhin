@@ -1,0 +1,26 @@
+# Hits the live shop twice a day so the Free-plan Supabase project
+# does not pause from inactivity (paused DB = no products, no login).
+name: Supabase keep-alive
+
+on:
+  schedule:
+    # 08:00 and 20:00 Bangladesh time (UTC+6)
+    - cron: '0 2,14 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping live store keepalive
+        run: |
+          set -e
+          URL="${{ vars.KEEPALIVE_URL }}"
+          if [ -z "$URL" ]; then
+            URL="https://soukhin.vercel.app/api/keepalive"
+          fi
+          echo "Pinging $URL"
+          curl -fsS --retry 3 --retry-delay 8 --max-time 45 "$URL"
+          echo
+          echo "Keep-alive request succeeded"

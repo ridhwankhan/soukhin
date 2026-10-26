@@ -16,7 +16,8 @@
     "deploy-password-otp": "node scripts/deploy-password-otp.mjs",
     "deploy-invite-staff": "node scripts/deploy-invite-staff.mjs",
     "deploy-sync-google-sheets": "node scripts/deploy-sync-google-sheets.mjs",
-    "import-3d-products": "node scripts/import-3d-products.mjs"
+    "import-3d-products": "node scripts/import-3d-products.mjs",
+    "keepalive": "node scripts/keepalive.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",
